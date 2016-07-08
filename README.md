@@ -4,7 +4,7 @@
 ### Installation Instructions
 #### Steps to install via composer:
 1. Update the “repositories” section of your sites “composer.json” file to include the repositories for the hawksearch modules:
-    ```javascript
+```javascript
     "repositories": {
         "0": {
             "type": "composer",
@@ -20,16 +20,16 @@
         }
 
     }
-    ```
+```
 2. Update the “require” section of your sites “composer.json” file to require the hawksearch modules:
-    ```javascript
+```javascript
     "require": {
         "magento/product-enterprise-edition": "2.0.7",
         [other requires…],
         "hawksearch/datafeed": "dev-master",
         "hawksearch/proxy": "dev-master"
     }
-    ```
+```
 3. While logged in as the Magento filesystem owner, run the following commands in a command shell from your Magento 2 root installation directory (see http://devdocs.magento.com/guides/v2.1/install-gde/install-quick-ref.html for reference):
 ```
 composer update
@@ -46,7 +46,7 @@ bin/magento cache:clean
 3. Create a directory named “HawkSearch” in the Magento “app/code” directory and unzip the downloaded files in that directory.
 4. Rename the unzipped directories to “Datafeed” and “Proxy” respectively (directories will be named hawksearch-datafeed-2.git and hawksearch-proxy.git respectively when first unzipped).
 5. Ensure the files have appropriate file permissions for your installation (see http://devdocs.magento.com/guides/v2.1/install-gde/install-quick-ref.html for reference).
-6. While logged in as the Magento filesystem owner, run the following commands in a command shell from your Magento 2 root installation directory:
+6. While logged in as the Magento filesystem owner, run the following commands in a command shell from your Magento 2 root installation directory
 ```
 bin/magento module:enable –clear-static-content HawkSearch_Datafeed HawkSearch_Proxy
 bin/magento setup:upgrade
