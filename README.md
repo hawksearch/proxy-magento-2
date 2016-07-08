@@ -1,0 +1,1 @@
+# HawkSearch Proxy module for Magento 2
