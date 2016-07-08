@@ -1,0 +1,24 @@
+<?php
+/**
+ * Copyright (c) 2013 Hawksearch (www.hawksearch.com) - All Rights Reserved
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+ * IN THE SOFTWARE.
+ */
+
+
+ /** @var $block \HawkSearch\Proxy\Block\Html */
+?>
+<div id="hawkbannerlefttop" class="bannerLeftTop">
+    <?php echo $block->hawkBannerObject()->getFeaturedLeftTop() ?>
+	<?php echo $block->hawkBannerObject()->getBannerLeftTop() ?></div>
+<div id="hawkfacets">
+	<?php echo $block->helper->getFacets(); ?></div>
+<div id="hawkbannerleftbottom" class="bannerLeftBottom">
+    <?php echo $block->hawkBannerObject()->getFeaturedLeftBottom() ?>
+	<?php echo $block->hawkBannerObject()->getBannerLeftBottom() ?></div>

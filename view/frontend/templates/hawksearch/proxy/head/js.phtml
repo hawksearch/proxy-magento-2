@@ -1,0 +1,32 @@
+<?php
+/**
+ * Copyright (c) 2013 Hawksearch (www.hawksearch.com) - All Rights Reserved
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+ * IN THE SOFTWARE.
+ */
+/** @var $helper \HawkSearch\Proxy\Helper\Data */
+$om=\Magento\Framework\App\ObjectManager::getInstance();
+
+$helper=$om->get('HawkSearch\Proxy\Helper\Data');
+?>
+<!-- Hawk Search Header Includes -->
+<script type="text/javascript">
+	//<![CDATA[
+	(function (HawkSearch, undefined) {
+		HawkSearch.BaseUrl = '<?php echo $helper->getBaseUrl(); ?>';
+		HawkSearch.TrackingUrl = '<?php echo $helper->getTrackingUrl(); ?>';
+		if ('https:' == document.location.protocol) {
+			HawkSearch.BaseUrl = HawkSearch.BaseUrl.replace('http://', 'https://');
+			HawkSearch.TrackingUrl = HawkSearch.TrackingUrl.replace('http://', 'https://');
+		}
+	}(window.HawkSearch = window.HawkSearch || {}));
+	document.write(unescape("%3Clink rel='stylesheet' type='text/css' href='" + HawkSearch.TrackingUrl + "/includes/hawksearch.css'%3E%3C/link%3E"));
+	document.write(unescape("%3Cscript src='" + HawkSearch.TrackingUrl + "/includes/hawksearch.min.js' type='text/javascript'%3E%3C/script%3E"));
+	//]]>
+</script>

@@ -1,0 +1,22 @@
+{
+    "name": "HawkSearch/magento2-proxy",
+    "description": "extension for enhanced search in magento 2",
+    "type": "magento2-module",
+    "version": "2.0.0",
+    "license": [
+        "OSL-3.0",
+        "AFL-3.0"
+    ],
+    "require": {
+        "php": "~5.5.0|~5.6.0",
+        "magento/magento-composer-installer": "*"
+    },
+    "autoload": {
+	"psr-4": {
+	    "HawkSearch\\Proxy\\": ""
+	},
+	"files": [
+	    "registration.php"
+	]
+    }
+}

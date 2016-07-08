@@ -1,0 +1,100 @@
+<?php
+/**
+ * Copyright (c) 2013 Hawksearch (www.hawksearch.com) - All Rights Reserved
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+ * IN THE SOFTWARE.
+ */
+/**
+ * Cache template
+ *
+ * @var $block \HawkSearch\Proxy\Block\System\Config\Sync
+ * @var $block \HawkSearch\Proxy\Helper\Data
+ */
+?>
+<div class="pp-buttons-container">
+  <button id="<?php echo $block->getHtmlId() ?>" onclick="return false;"> <span><span><span><?php echo $block->escapeHtml($block->getButtonLabel()); ?></span></span></span> </button>
+</div>
+<?php $object_manager = \Magento\Framework\App\ObjectManager::getInstance();
+$helper = $object_manager->create('HawkSearch\Proxy\Helper\Data');  ?>
+<script>
+ var params = {internUrl:"<?php echo $block->getInternUrl() ?>",  apiKeyId: "#<?php echo $block->getApiKeyId() ?>", htmlId: "#<?php echo $block->getHtmlId() ?>", loadConfigUrl: "<?php echo $block->getLoadConfigUrl() ?>"};  
+ 
+   require(
+        ['jquery'],
+        function(jQuery) {
+			jQuery.noConflict();
+	jQuery("#<?php echo $block->getHtmlId() ?>").click(function(){
+         
+		var hawkSearchProxy = {
+		isInit : false,
+		buttonId : null,
+		init : function() {
+			this.url = '<?php echo $this->getInternUrl() ?>';
+			this.buttonId = '<?php echo $block->getHtmlId() ?>';
+			this.forceId = 'syncforce';
+			this.displayId = "hawksearch_feed_display_msg";
+			this.isInit = true;
+		},
+		syncCategories : function() {
+			if (!this.isInit) {
+				this.init();
+			}
+			var isForce = false;
+			if($(this.forceId)){
+				isForce = $(this.forceId).checked;
+			}
+			new Ajax.Request(this.url, {
+				parameters: {force: isForce},
+				onSuccess: function(transport) {
+					var response = transport.responseText.evalJSON();
+					this.displayResults(response);
+				}.bind(this)
+			});
+		},
+		displayResults : function(response) {
+			var responseEl = $(this.displayId);
+			if (responseEl == null) {
+				var responseEl = new Element('p', {id : this.displayId}).addClassName('note');
+				Element.insert($(this.buttonId) , {after: responseEl});
+			}
+			if (response.error) {
+				return responseEl.innerHTML = response.error;
+			}
+			$(this.buttonId).disabled = true;
+			$(this.buttonId).addClassName("disabled");
+			if($(this.forceId) != null) {
+				$(this.forceId).disabled = true;
+			}
+			return responseEl.innerHTML = "<?php echo $helper->getAjaxNotice(false); ?>";
+		},
+		forceSync: function() {
+			if (!this.isInit) {
+				this.init();
+			}
+			if($(this.forceId).checked && $(this.buttonId).disabled){
+				$(this.buttonId).disabled = false;
+				$(this.buttonId).removeClassName("disabled");
+			} else {
+				$(this.buttonId).disabled = true;
+				$(this.buttonId).addClassName("disabled");
+			}
+		}
+	}
+	
+	
+
+
+hawkSearchProxy.syncCategories();
+		 
+		 
+        })
+	
+        }
+    ); 
+</script> 
