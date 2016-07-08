@@ -31,7 +31,7 @@
     }
     ```
 3. While logged in as the Magento filesystem owner, run the following commands in a command shell from your Magento 2 root installation directory (see http://devdocs.magento.com/guides/v2.1/install-gde/install-quick-ref.html for reference):
-```bash
+```
 composer update
 bin/magento module:enable –clear-static-content HawkSearch_Datafeed HawkSearch_Proxy
 bin/magento setup:upgrade
@@ -47,7 +47,7 @@ bin/magento cache:clean
 4. Rename the unzipped directories to “Datafeed” and “Proxy” respectively (directories will be named hawksearch-datafeed-2.git and hawksearch-proxy.git respectively when first unzipped).
 5. Ensure the files have appropriate file permissions for your installation (see http://devdocs.magento.com/guides/v2.1/install-gde/install-quick-ref.html for reference).
 6. While logged in as the Magento filesystem owner, run the following commands in a command shell from your Magento 2 root installation directory:
-```bash
+```
 bin/magento module:enable –clear-static-content HawkSearch_Datafeed HawkSearch_Proxy
 bin/magento setup:upgrade
 bin/magento cache:clean
