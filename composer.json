@@ -1,6 +1,6 @@
 {
-    "name": "HawkSearch/magento2-proxy",
-    "description": "extension for enhanced search in magento 2",
+    "name": "hawksearch/proxy",
+    "description": "Hawksearch Proxy module for Magento 2",
     "type": "magento2-module",
     "version": "2.0.0",
     "license": [
