@@ -11,103 +11,96 @@
  * IN THE SOFTWARE.
  */
 namespace HawkSearch\Proxy\Block\Product;
-class ListProduct extends \Magento\Catalog\Block\Product\ListProduct {
-		
-private $topseen = false;
+class ListProduct
+    extends \Magento\Catalog\Block\Product\ListProduct
+{
 
-	 
-	public $helper;
-	private $pagers = true;
+    private $topseen = false;
+
+
+    public $helper;
+    private $pagers = true;
     protected $_productCollection;
-	
-	
-	public function setPagers($bool) {
-		$this->pagers = $bool;
-	}
 
 
-
-      function _construct() {
-	  /** @var HawkSearch\Proxy\Helper\Data $this->helper */		
-	
-	   $om=\Magento\Framework\App\ObjectManager::getInstance();
-		$this->helper =$om->get('HawkSearch\Proxy\Helper\Data');
-		$this->helper->setUri($this->getRequest()->getParams());
-		$this->helper->setClientIp($this->getRequest()->getClientIp());
-		$this->helper->setClientUa($om->create('Magento\Framework\HTTP\Header')->getHttpUserAgent());
-		$this->helper->setIsHawkManaged(true);
-		return parent::_construct();
-	}
+    public function setPagers($bool) {
+        $this->pagers = $bool;
+    }
 
 
-	public function getHawkTrackingId() {
-	
-		
-		if(!empty($this->helper)) {
-			return $this->helper->getResultData()->TrackingId;
-		}
-		return '';
-	}
-	public function getToolbarHtml() {
-		
-	
-	
-			if($this->helper->getLocation() != ""){
-				$helper->log(sprintf('Redirecting to location: %s', $this->helper->getLocation()));
-				return $this->_redirectUrl($this->helper->getLocation());
-			}
+    function _construct() {
+        /** @var HawkSearch\Proxy\Helper\Data $this ->helper */
 
-			
-		if(!$this->helper->getIsHawkManaged()) {
-		$this->helper->log('page not managed, returning core pager');
-		return parent::getToolbarHtml();
-		}
-		if ($this->pagers) {
+        $om = \Magento\Framework\App\ObjectManager::getInstance();
+        $this->helper = $om->get('HawkSearch\Proxy\Helper\Data');
+        $this->helper->setUri($this->getRequest()->getParams());
+        $this->helper->setClientIp($this->getRequest()->getClientIp());
+        $this->helper->setClientUa($om->create('Magento\Framework\HTTP\Header')->getHttpUserAgent());
+        $this->helper->setIsHawkManaged(true);
+        return parent::_construct();
+    }
 
-			if ($this->topseen) {
-				return '<div id="hawkbottompager">' . $this->helper->getResultData()->Data->BottomPager . '</div>';
-			}
-			$this->topseen = true;
-			return '<div id="hawktoppager">' . $this->helper->getResultData()->Data->TopPager . '</div>';
-		} else {
-			return '';
-		}
-	}
-			
-	
-	
-	public function hawkBannerObject()
-	{	
-	/** @var HawkSearch\Proxy\Model\Banner $hawkBanner */		
-		$om=\Magento\Framework\App\ObjectManager::getInstance();
-		$hawkBanner=$om->get('HawkSearch\Proxy\Model\Banner');
-		return $hawkBanner;
-		}
-	
-	
 
-	
-	
-	 public function getLoadedProductCollection()
-    {
-		
-		
+    public function getHawkTrackingId() {
 
-    if($this->helper->getConfigurationData('hawksearch_proxy/general/enabled')
-			&& $this->helper->getConfigurationData('hawksearch_proxy/proxy/manage_search')) {		
 
-			if($this->helper->getLocation() != ""){
-				$this->helper->log(sprintf('Redirecting to location: %s', $this->helper->getLocation()));
-				return $this->helper->_redirectUrl($helper->getLocation());
-			}
-			
-        return  $this->helper->getProductCollection();
-		}else
-		
-		{
-			$this->helper->log('hawk not managing search');
-			parent::getProductCollection();
-			}
+        if (!empty($this->helper)) {
+            return $this->helper->getResultData()->TrackingId;
+        }
+        return '';
+    }
+
+    public function getToolbarHtml() {
+
+
+        if ($this->helper->getLocation() != "") {
+            $helper->log(sprintf('Redirecting to location: %s', $this->helper->getLocation()));
+            return $this->_redirectUrl($this->helper->getLocation());
+        }
+
+
+        if (!$this->helper->getIsHawkManaged()) {
+            $this->helper->log('page not managed, returning core pager');
+            return parent::getToolbarHtml();
+        }
+        if ($this->pagers) {
+
+            if ($this->topseen) {
+                return '<div id="hawkbottompager">' . $this->helper->getResultData()->Data->BottomPager . '</div>';
+            }
+            $this->topseen = true;
+            return '<div id="hawktoppager">' . $this->helper->getResultData()->Data->TopPager . '</div>';
+        } else {
+            return '';
+        }
+    }
+
+
+    public function hawkBannerObject() {
+        /** @var HawkSearch\Proxy\Model\Banner $hawkBanner */
+        $om = \Magento\Framework\App\ObjectManager::getInstance();
+        $hawkBanner = $om->get('HawkSearch\Proxy\Model\Banner');
+        return $hawkBanner;
+    }
+
+
+    public function getLoadedProductCollection() {
+
+
+        if ($this->helper->getConfigurationData('hawksearch_proxy/general/enabled')
+            && $this->helper->getConfigurationData('hawksearch_proxy/proxy/manage_search')
+        ) {
+
+            if ($this->helper->getLocation() != "") {
+                $this->helper->log(sprintf('Redirecting to location: %s', $this->helper->getLocation()));
+                return $this->helper->_redirectUrl($helper->getLocation());
+            }
+
+            return $this->helper->getProductCollection();
+        } else {
+            $this->helper->log('hawk not managing search');
+            parent::getProductCollection();
+        }
     }
 
 

@@ -12,25 +12,24 @@
  */
 namespace HawkSearch\Proxy\Controller\Result;
 
-class Index extends \Magento\CatalogSearch\Controller\Result\Index
+class Index
+    extends \Magento\CatalogSearch\Controller\Result\Index
 {
-    	 
-    public function execute()
-    {
-		
-		 /** @var HawkSearch\Proxy\Helper\Data $helper */		
-		$this->_view->loadLayout();
-		$om=\Magento\Framework\App\ObjectManager::getInstance();
-		$helper=$om->create('HawkSearch\Proxy\Helper\Data');
+
+    public function execute() {
+
+        /** @var HawkSearch\Proxy\Helper\Data $helper */
+        $om = \Magento\Framework\App\ObjectManager::getInstance();
+        $helper = $om->create('HawkSearch\Proxy\Helper\Data');
 
 
-  	if($helper->getConfigurationData('hawksearch_proxy/general/enabled')
-			&& $helper->getConfigurationData('hawksearch_proxy/proxy/manage_search')) {
-	
-            $this->_view->renderLayout();	
-
-				} else {
-		parent::execute();
-	}
+        if ($helper->getConfigurationData('hawksearch_proxy/general/enabled')
+            && $helper->getConfigurationData('hawksearch_proxy/proxy/manage_search')
+        ) {
+            $this->_view->loadLayout();
+            $this->_view->renderLayout();
+        } else {
+            parent::execute();
+        }
     }
 }

@@ -43,22 +43,32 @@
           <label>Engine Name</label>
           <comment>Contact your Hawksearch sales rep for this value.</comment>
         </field>
-        <field id="hawksearch_api_key" translate="label comment" type="text" showInDefault="0" showInWebsite="0" showInStore="1" sortOrder="15">
+        <field id="hawksearch_api_key"
+               translate="label comment"
+               type="text" showInDefault="0" showInWebsite="0" showInStore="1" sortOrder="15">
           <label>Hawksearch API Key</label>
           <comment>Contact your Hawksearch sales rep for this value.</comment>
         </field>
-        <field id="order_tracking_key" translate="label comment" type="text" showInDefault="0" showInWebsite="0" showInStore="1" sortOrder="20">
+        <field id="order_tracking_key"
+               translate="label comment"
+               type="text" showInDefault="0" showInWebsite="0" showInStore="1" sortOrder="20">
           <label>Order Tracking key</label>
           <comment>Contact your Hawksearch sales rep for this value.</comment>
         </field>
-        <field id="mode" translate="label comment" type="select" showInDefault="0" showInWebsite="0" showInStore="1" sortOrder="25">
-          <label>Allow Disabled Items</label>
+        <field id="mode"
+               translate="label comment"
+               type="select" showInDefault="0" showInWebsite="0" showInStore="1" sortOrder="25">
+          <label>Run Mode</label>
           <source_model>HawkSearch\Proxy\Model\System\Config\Source\Mode</source_model>
         </field>
-        <field id="tracking_url_staging" translate="label comment" type="text" showInDefault="1" showInWebsite="0" showInStore="0" sortOrder="30">
+        <field id="tracking_url_staging"
+               translate="label comment"
+               type="text" showInDefault="1" showInWebsite="0" showInStore="0" sortOrder="30">
           <label>Hawksearch tracking URL (Development)</label>
         </field>
-        <field id="tracking_url_live" translate="label comment" type="text" showInDefault="1" showInWebsite="0" showInStore="0" sortOrder="35">
+        <field id="tracking_url_live"
+               translate="label comment"
+               type="text" showInDefault="1" showInWebsite="0" showInStore="0" sortOrder="35">
           <label>Hawksearch tracking URL (Production)</label>
         </field>
         <field id="manage_categories" translate="label comment" type="select" showInDefault="0" showInWebsite="0" showInStore="1" sortOrder="40">
@@ -68,39 +78,47 @@
         <field id="manage_all" translate="label comment" type="select" showInDefault="0" showInWebsite="0" showInStore="1" sortOrder="45">
           <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
           <label>Manage Categories</label>
-          <comment>All categories in current store, or only those marked as hawk managed</comment>
+          <comment>All categories in current store, or only those marked as hawk-managed in category setup</comment>
           <depends>
             <field id="manage_categories">1</field>
           </depends>
         </field>
-        <field id="manage_search" translate="label comment" type="select" showInDefault="0" showInWebsite="0" showInStore="1" sortOrder="50">
+        <field id="manage_search"
+               translate="label comment"
+               type="select" showInDefault="0" showInWebsite="0" showInStore="1" sortOrder="50">
           <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
           <label>Manage Search</label>
         </field>
         <field id="search_box_ids" translate="label comment" type="text" showInDefault="0" showInWebsite="0" showInStore="1" sortOrder="55">
           <label>Search Box HTML ID's</label>
           <comment>Comma separated list of HTML ID's of search boxes to attach to HawkSearch</comment>
+            <depends>
+                <field id="manage_search">1</field>
+            </depends>
+
         </field>
-        <field id="enable_custom_search_route" translate="label comment" type="select" showInDefault="0" showInWebsite="0" showInStore="1" sortOrder="60">
+        <field id="enable_custom_search_route"
+               translate="label comment"
+               type="select" showInDefault="0" showInWebsite="0" showInStore="1" sortOrder="60">
           <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
           <label>Add custom URL route for search</label>
-          <depends>
-            <field id="manage_search">1</field>
-          </depends>
+            <depends>
+                <field id="manage_search">1</field>
+            </depends>
+
         </field>
-        <field id="custom_search_routet" translate="label comment" type="text" showInDefault="0" showInWebsite="0" showInStore="1" sortOrder="65">
+        <field id="custom_search_route"
+               translate="label comment"
+               type="text" showInDefault="0" showInWebsite="0" showInStore="1" sortOrder="65">
           <label>Custom search route</label>
           <comment>Route must not be used by another module or contain a directory separator '/'</comment>
-          <depends>
-            <field id="manage_search">1</field>
-          </depends>
           <depends>
             <field id="enable_custom_search_route">1</field>
           </depends>
         </field>
         <field id="custom_search_use_suffix" translate="label comment" type="select" showInDefault="0" showInWebsite="0" showInStore="1" sortOrder="70">
           <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-          <label>Add custom URL route for search</label>
+          <label>Use Category URL Suffix</label>
           <depends>
             <field id="manage_search">1</field>
           </depends>

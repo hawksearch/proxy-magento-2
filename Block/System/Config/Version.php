@@ -14,8 +14,19 @@ namespace HawkSearch\Proxy\Block\System\Config;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 class Version extends \Magento\Config\Block\System\Config\Form\Field
 {
+    private $moduleList;
+    /**
+     * Version constructor.
+     */
+    public function __construct(\Magento\Framework\Module\ModuleListInterface $moduleList,
+                                \Magento\Backend\Block\Template\Context $contex,
+                                array $data = []) {
+        $this->moduleList = $moduleList;
+        parent::__construct($contex, $data);
 
- /**
+    }
+
+    /**
      *
      *
      * @param \Magento\Framework\Data\Form\Element\AbstractElement $element
@@ -23,8 +34,7 @@ class Version extends \Magento\Config\Block\System\Config\Form\Field
      */
     protected function _getElementHtml(\Magento\Framework\Data\Form\Element\AbstractElement $element)
     {
-  
-        return '2.0.0.0';
+        return $this->moduleList->getOne('HawkSearch_Proxy')['setup_version'];
     }
 }
  
