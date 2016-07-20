@@ -1,7 +1,7 @@
 var config = {
     "map": {
         "*": {
-            quickSearch: "js/hawksearch-autosuggest"
+            "quickSearch": "HawkSearch_Proxy/js/autosuggest"
         }
     }
 };

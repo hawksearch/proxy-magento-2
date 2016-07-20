@@ -15,7 +15,8 @@ namespace HawkSearch\Proxy\Block\Search;
 /**
  * Product search result block
  */
-class Result extends \Magento\CatalogSearch\Block\Result
+class Result
+    extends \Magento\CatalogSearch\Block\Result
 {
     /**
      * Catalog Product collection
@@ -50,29 +51,27 @@ class Result extends \Magento\CatalogSearch\Block\Result
      * @param QueryFactory $queryFactory
      * @param array $data
      */
-   
+
 
     /**
      * Retrieve loaded category collection
      *
      * @return Collection
      */
-    protected function _getProductCollection()
-    {
-		
-		
+    protected function _getProductCollection() {
 
-	$om=\Magento\Framework\App\ObjectManager::getInstance();
 
-$helper=$om->create('HawkSearch\Proxy\Helper\Data');
+        $om = \Magento\Framework\App\ObjectManager::getInstance();
+
+        $helper = $om->create('HawkSearch\Proxy\Helper\Data');
 
         if (null === $this->productCollection) {
-			
+
             $this->productCollection = $helper->getProductCollection();
         }
 
         return $this->productCollection;
     }
 
-    
+
 }

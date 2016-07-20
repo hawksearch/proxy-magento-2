@@ -14,13 +14,6 @@
 -->
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
   <body>
-    <referenceContainer name="header-wrapper">
-      <block class="Magento\Framework\View\Element\Template"
-             name="top.hawksearch" as="topHawkSearch"
-             template="HawkSearch_Proxy::hawksearch/proxy/form.mini.phtml"
-             before="top.search" />
-      <referenceBlock name="top.search" remove="true"/>
-    </referenceContainer>
    <referenceBlock name="head.additional">
       <block class="Magento\Framework\View\Element\Js\Components" name="hawksearch.head"  as="hawksearch.head" template="HawkSearch_Proxy::hawksearch/proxy/head/js.phtml"/>
     </referenceBlock>
