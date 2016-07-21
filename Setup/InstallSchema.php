@@ -1,4 +1,4 @@
-<?php 
+<?php
 /**
  * Copyright (c) 2013 Hawksearch (www.hawksearch.com) - All Rights Reserved
  *
@@ -11,14 +11,17 @@
  * IN THE SOFTWARE.
  */
 namespace HawkSearch\Proxy\Setup;
+
 use Magento\Framework\Module\Setup\Migration;
 use Magento\Framework\Setup\InstallDataInterface;
 use Magento\Framework\Setup\ModuleContextInterface;
 use Magento\Framework\Setup\ModuleDataSetupInterface;
 use Magento\Catalog\Setup\CategorySetupFactory;
+
 //use Magento\Framework\DB\Ddl\Table;
- 
-class InstallData implements InstallDataInterface
+
+class InstallData
+    implements InstallDataInterface
 {
     /**
      * Category setup factory
@@ -26,49 +29,48 @@ class InstallData implements InstallDataInterface
      * @var CategorySetupFactory
      */
     private $categorySetupFactory;
- 
+
     /**
      * Init
      *
      * @param CategorySetupFactory $categorySetupFactory
      */
-    public function __construct(CategorySetupFactory $categorySetupFactory)
-    {
+    public function __construct(CategorySetupFactory $categorySetupFactory) {
         $this->categorySetupFactory = $categorySetupFactory;
     }
+
     /**
      * {@inheritdoc}
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function install(ModuleDataSetupInterface $setup, ModuleContextInterface $context)
-    {
+    public function install(ModuleDataSetupInterface $setup, ModuleContextInterface $context) {
         $installer = $setup;
-         $installer->startSetup();
- 
+        $installer->startSetup();
+
         $categorySetup = $this->categorySetupFactory->create(['setup' => $setup]);
         $entityTypeId = $categorySetup->getEntityTypeId(\Magento\Catalog\Model\Category::ENTITY);
         $attributeSetId = $categorySetup->getDefaultAttributeSetId($entityTypeId);
-         $categorySetup->removeAttribute(\Magento\Catalog\Model\Category::ENTITY, 'hawk_landing_page');
+//        $categorySetup->removeAttribute(\Magento\Catalog\Model\Category::ENTITY, 'hawk_landing_page');
         $categorySetup->addAttribute(
-        \Magento\Catalog\Model\Category::ENTITY, 'hawk_landing_page', [
-             'type' => 'int',
-             'label' => 'Hawksearch Landing Page',
-             'input' => 'select',
-             'source' => 'Magento\Eav\Model\Entity\Attribute\Source\Boolean',
-             'required' => false,
-             'sort_order' => 100,
-             'global' => \Magento\Eav\Model\Entity\Attribute\ScopedAttributeInterface::SCOPE_STORE,
-             'group' => 'General Information',
-        ]
-    );
-    $idg =  $categorySetup->getAttributeGroupId($entityTypeId, $attributeSetId, 'General Information');
-    $categorySetup->addAttributeToGroup(
-        $entityTypeId,
-        $attributeSetId,
-        $idg,
-        'hawk_landing_page',
-        46
-    );
-$installer->endSetup();
+            \Magento\Catalog\Model\Category::ENTITY, 'hawk_landing_page', [
+                'type' => 'int',
+                'label' => 'Hawksearch Landing Page',
+                'input' => 'select',
+                'source' => 'Magento\Eav\Model\Entity\Attribute\Source\Boolean',
+                'required' => false,
+                'sort_order' => 100,
+                'global' => \Magento\Eav\Model\Entity\Attribute\ScopedAttributeInterface::SCOPE_STORE,
+                'group' => 'General Information',
+            ]
+        );
+        $idg = $categorySetup->getAttributeGroupId($entityTypeId, $attributeSetId, 'General Information');
+        $categorySetup->addAttributeToGroup(
+            $entityTypeId,
+            $attributeSetId,
+            $idg,
+            'hawk_landing_page',
+            46
+        );
+        $installer->endSetup();
     }
 } 
