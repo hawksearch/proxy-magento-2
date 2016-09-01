@@ -1,0 +1,13 @@
+<script type="text/javascript">
+    (window.HawkSearch = window.HawkSearch || {});
+    require(["jquery","hawksearch"], function($) {
+        HawkSearch.initAutoSuggest = function () {
+            HawkSearch.suggestInit('#search', {
+                lookupUrlPrefix: HawkSearch.TrackingUrl +
+                '/?fn=ajax&f=GetSuggestions',
+                hiddenDivName: '',
+                isAutoWidth: true
+            });
+        };
+    });
+</script>

@@ -103,6 +103,7 @@ $logger->info("HAWKSEARCH: testtesttest");
               throw new \Exception('No URI set.');
         }
         $client = new \Zend_Http_Client();
+        $client->setConfig(['timeout' => 30]);
 	
         $client->setConfig(array('useragent' => $this->clientUA));
         $client->setUri($this->uri);
@@ -273,6 +274,8 @@ $logger->info("HAWKSEARCH: testtesttest");
     public function getHawkResponse($method, $url, $data = null)
     {
         $client = new \Zend_Http_Client();
+        $client->setConfig(['timeout' => 30]);
+
 
         $client->setUri($this->getApiUrl() . $url);
         $client->setMethod($method);

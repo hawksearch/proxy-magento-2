@@ -38,6 +38,18 @@
         </field>
       </group>
       <group id="proxy" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+          <!--
+           NOTE: Engine Name, Order Tracking Key, and Api Key can be extracted from the hawksearch_dev
+           database on CL-STAND-42Q02 for development engines with a query similar to:
+           SELECT ClientName, SiteDirectory [EngineName], Guid [OrderTrackingKey], ApiKey
+           FROM [hawksearch_dev].[dbo].[Database]
+           where [SiteDirectory] like '%magento%'
+
+ClientName	EngineName	OrderTrackingKey	ApiKey
+Magento - AE - Community	magentoaecomm	24925d9247b74086a10a0a16eb768654	5A407A8C-BE09-400B-82FF-D12ED4904418
+Magento - AE - Community1	magentoaecomm1	24925d9247b74086a10a0a16eb768655	5A407A8C-BE09-400B-82FF-D12ED4904419
+Russo Power Search Magento	russopowermagento	a78bc075ffa94b39aebc8ed5ddad68dc	A957E303-E055-4EE6-94E6-7877174C954D
+           -->
         <label>Proxy Module Settings</label>
         <field id="engine_name" translate="label comment" type="text" showInDefault="0" showInWebsite="0" showInStore="1" sortOrder="10">
           <label>Engine Name</label>
