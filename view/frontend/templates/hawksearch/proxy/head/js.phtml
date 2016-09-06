@@ -17,16 +17,5 @@ $helper=$om->get('HawkSearch\Proxy\Helper\Data');
 ?>
 <!-- Hawk Search Header Includes -->
 <script type="text/javascript">
-	//<![CDATA[
-	(function (HawkSearch, undefined) {
-		HawkSearch.BaseUrl = '<?php echo $helper->getBaseUrl(); ?>';
-		HawkSearch.TrackingUrl = '<?php echo $helper->getTrackingUrl(); ?>';
-		if ('https:' == document.location.protocol) {
-			HawkSearch.BaseUrl = HawkSearch.BaseUrl.replace('http://', 'https://');
-			HawkSearch.TrackingUrl = HawkSearch.TrackingUrl.replace('http://', 'https://');
-		}
-	}(window.HawkSearch = window.HawkSearch || {}));
-//	document.write(unescape("%3Clink rel='stylesheet' type='text/css' href='" + HawkSearch.TrackingUrl + "/includes/hawksearch.css'%3E%3C/link%3E"));
-//	document.write(unescape("%3Cscript src='" + HawkSearch.TrackingUrl + "/includes/hawksearch.min.js' type='text/javascript'%3E%3C/script%3E"));
-	//]]>
+	document.write(unescape("%3Clink rel='stylesheet' type='text/css' href='<?php echo $helper->getTrackingUrl(); ?>/includes/hawksearch.css'%3E%3C/link%3E"));
 </script>

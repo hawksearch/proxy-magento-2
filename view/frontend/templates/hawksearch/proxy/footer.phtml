@@ -24,6 +24,7 @@ $helper=$om->get('HawkSearch\Proxy\Helper\Data');
             HawkSearch.TrackingUrl = HawkSearch.TrackingUrl.replace('http://', 'https://');
         }
     }(window.HawkSearch = window.HawkSearch || {}));
+
     require(["hawksearch"], function() {
         HawkSearch.initAutoSuggest = function () {
             HawkSearch.suggestInit('#search', {

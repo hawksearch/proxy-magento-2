@@ -14,13 +14,11 @@
 -->
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
-    <!--<head>-->
-        <!--<link src="HawkSearch_Proxy::test.js"/>-->
-    <!--</head>-->
     <body>
-        <!--<referenceBlock name="head.additional">-->
-        <!--<block class="Magento\Framework\View\Element\Js\Components" name="hawksearch.head"  as="hawksearch.head" template="HawkSearch_Proxy::hawksearch/proxy/head/js.phtml"/>-->
-        <!--</referenceBlock>-->
+        <referenceBlock name="head.additional">
+            <block class="Magento\Framework\View\Element\Js\Components" name="hawksearch.head" as="hawksearch.head"
+                   template="HawkSearch_Proxy::hawksearch/proxy/head/js.phtml"/>
+        </referenceBlock>
         <referenceContainer name="before.body.end">
             <block class="Magento\Framework\View\Element\Template" name="hawksearch_proxyfooter"
                    as="hawksearch_proxyfooter" template="HawkSearch_Proxy::hawksearch/proxy/footer.phtml"/>
