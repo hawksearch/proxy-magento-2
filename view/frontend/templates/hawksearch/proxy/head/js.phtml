@@ -10,12 +10,17 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
-/** @var $helper \HawkSearch\Proxy\Helper\Data */
-$om=\Magento\Framework\App\ObjectManager::getInstance();
-
-$helper=$om->get('HawkSearch\Proxy\Helper\Data');
+$trackingUrl  = $block->getTrackingUrl();
 ?>
 <!-- Hawk Search Header Includes -->
 <script type="text/javascript">
-	document.write(unescape("%3Clink rel='stylesheet' type='text/css' href='<?php echo $helper->getTrackingUrl(); ?>/includes/hawksearch.css'%3E%3C/link%3E"));
+	document.write(unescape("%3Clink rel='stylesheet' type='text/css' href='<?php echo $trackingUrl; ?>/includes/hawksearch.css'%3E%3C/link%3E"));
+    (function() {
+        var config = {
+            paths: {
+                "hawksearch": "<?php echo $trackingUrl; ?>/includes/hawksearch.min"
+            }
+        };
+        require.config(config);
+    })();
 </script>
