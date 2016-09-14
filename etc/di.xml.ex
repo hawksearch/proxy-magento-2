@@ -14,8 +14,8 @@
 -->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
-	<preference for="Magento\CatalogSearch\Controller\Result\Index"
-                type="HawkSearch\Proxy\Controller\Result\Index" />
-	<preference for="Magento\CatalogSearch\Block\Result"
-                type="HawkSearch\Proxy\Block\Search\Result" />
+	<!--<preference for="Magento\CatalogSearch\Controller\Result\Index"-->
+                <!--type="HawkSearch\Proxy\Controller\Result\Index" />-->
+	<!--<preference for="Magento\CatalogSearch\Block\Result"-->
+                <!--type="HawkSearch\Proxy\Block\Search\Result" />-->
 </config>

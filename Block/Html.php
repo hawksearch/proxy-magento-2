@@ -72,14 +72,12 @@ function getFacets() {
 	}
 	
 	function getItemList() {
-		
-		
-		$html =$this->getLayout()
-            ->createBlock('HawkSearch\Proxy\Block\Product\ListProduct')
-            ->setTemplate('Magento_Catalog::product/list.phtml')
-            ->toHtml();
-			
-			return $html;
+        $layout = $this->getLayout();
+        $block = $layout->createBlock('HawkSearch\Proxy\Block\Product\ListProduct');
+        $block->getLoadedProductCollection();
+        $block->setTemplate('Magento_Catalog::product/list.phtml');
+
+        return $block->toHtml();
 		
 	}
     

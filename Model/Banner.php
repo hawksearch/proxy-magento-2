@@ -15,7 +15,7 @@ class Banner extends \Magento\Framework\DataObject {
 
 	protected function _construct() {
 		
-		 /** @var HawkSearch\Proxy\Helper\Data $helper */	
+		 /** @var \HawkSearch\Proxy\Helper\Data $helper */
 		$om=\Magento\Framework\App\ObjectManager::getInstance();		
 		$helper=$om->create('HawkSearch\Proxy\Helper\Data');
 		foreach($helper->getResultData()->Data->Merchandising->Items as $banner) {

@@ -12,13 +12,13 @@
  */
 namespace HawkSearch\Proxy\Helper;
 
+use Magento\Framework\App\Helper\Context;
 use Magento\Store\Model\StoreManagerInterface;
 
-class Data
+class Data extends \Magento\Framework\App\Helper\AbstractHelper
 {
 
 
-    protected $scopeConfig;
     protected $_storeManager;
     const LP_CACHE_KEY = 'hawk_landing_pages';
     const LOCK_FILE_NAME = 'hawkcategorysync.lock';
@@ -34,14 +34,25 @@ class Data
     private $isManaged;
     private $pathGenerator;
 
-    public function __construct(\Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
-                                StoreManagerInterface $storemanager,
+    public function __construct(Context $context,
+                                StoreManagerInterface $storeManager,
                                 \Magento\CatalogUrlRewrite\Model\CategoryUrlPathGenerator $pathGenerator)
     {
-        $this->scopeConfig = $scopeConfig;
-        $this->_storeManager = $storemanager;
+        // parent construct first so scopeConfig gets set for use in "setUri", etc.
+        parent::__construct($context);
+        $this->_storeManager = $storeManager;
         $this->pathGenerator = $pathGenerator;
+        $params = $context->getRequest()->getParams();
+        if(is_array($params) && isset($params['q'])){
+            $this->setUri($context->getRequest()->getParams());
+        } else {
+            $this->setUri(array('lpurl' => $context->getRequest()->getAlias('rewrite_request_path'), 'output' => 'custom', 'hawkitemlist' => 'json'));
+        }
+        $this->setClientIp($context->getRequest()->getClientIp());
+        $this->setClientUa($context->getHttpHeader()->getHttpUserAgent());
     }
+
+
 
 
     public function getConfigurationData($data)
@@ -95,8 +106,8 @@ class Data
         $args['hawkitemlist'] = 'json';
         if (isset($args['q'])) {
             unset($args['lpurl']);
+            $args['keyword'] = $args['q'];
         }
-        $args['keyword'] = $args['q'];
         $args['hawksessionid'] = $this->createObj()->get('Magento\Catalog\Model\Session')->getSessionId();
 
         $this->uri = $this->getTrackingUrl() . '/?' . http_build_query($args);
@@ -234,6 +245,7 @@ class Data
         if (empty($this->hawkData)) {
             $this->fetchResponse();
         }
+        $this->setIsHawkManaged(true);
         $skus = array();
         $map = array();
         $i = 0;

@@ -17,11 +17,11 @@
     <body>
         <referenceContainer name="content">
             <block class="Magento\Framework\View\Element\Template"
-                   name="hawksearch_hawkitems"
+                   name="hawksearch_landingpage"
                    template="HawkSearch_Proxy::hawksearch/proxy/content/hawkitems.phtml">
             </block>
         </referenceContainer>
-        <move element="search.result" destination="hawksearch_hawkitems"/>
+        <move element="category.products" destination="hawksearch_landingpage"/>
         <referenceContainer name="sidebar.main">
             <block class="HawkSearch\Proxy\Block\Product\Facets" name="hawksearch_facets" as="hawksearch_facets"
                    template="HawkSearch_Proxy::hawksearch/proxy/left/facets.phtml"/>
