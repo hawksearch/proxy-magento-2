@@ -11,13 +11,15 @@
  * IN THE SOFTWARE.
  */
 namespace HawkSearch\Proxy\Helper;
+
 use Magento\Store\Model\StoreManagerInterface;
 
-class Data{
-	
-	
-	protected $scopeConfig;
-    protected $_storeManager; 
+class Data
+{
+
+
+    protected $scopeConfig;
+    protected $_storeManager;
     const LP_CACHE_KEY = 'hawk_landing_pages';
     const LOCK_FILE_NAME = 'hawkcategorysync.lock';
     private $mode = null;
@@ -28,36 +30,40 @@ class Data{
     private $uri;
     private $clientIP;
     private $clientUA;
-    private $_feedFilePath;    
+    private $_feedFilePath;
     private $isManaged;
-	
-   public function __construct(\Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,StoreManagerInterface $storemanager)
-   {
-      $this->scopeConfig = $scopeConfig;
-	  $this->_storeManager = $storemanager;
-   }
+    private $pathGenerator;
 
- 
-  
+    public function __construct(\Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
+                                StoreManagerInterface $storemanager,
+                                \Magento\CatalogUrlRewrite\Model\CategoryUrlPathGenerator $pathGenerator)
+    {
+        $this->scopeConfig = $scopeConfig;
+        $this->_storeManager = $storemanager;
+        $this->pathGenerator = $pathGenerator;
+    }
 
 
- public function getConfigurationData($data) {
-     $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
-     return $this->scopeConfig->getValue($data, $storeScope);
+    public function getConfigurationData($data)
+    {
+        $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
+        return $this->scopeConfig->getValue($data, $storeScope);
 
-     }
+    }
 
     public function isValidSearchRoute($route)
     {
-		// currently only checking for presence of slash
+        // currently only checking for presence of slash
         $valid = strpos($route, '/') === false;
-		$valid = $valid && $route != 'hawksearch';
-		return $valid;
+        $valid = $valid && $route != 'hawksearch';
+        return $valid;
     }
-	public function setStore($s){
-		$this->store = $s;
-		return $this;
-	}
+
+    public function setStore($s)
+    {
+        $this->store = $s;
+        return $this;
+    }
 
 
     public function setClientIp($ip)
@@ -69,20 +75,20 @@ class Data{
     {
         $this->clientUA = $ua;
     }
-	
-	  public function createObj()
+
+    public function createObj()
     {
-       return \Magento\Framework\App\ObjectManager::getInstance();
+        return \Magento\Framework\App\ObjectManager::getInstance();
     }
-	
+
 
     public function setUri($args)
     {
-							
-$writer = new \Zend\Log\Writer\Stream(BP . '/var/log/testtest.log');
-$logger = new \Zend\Log\Logger();
-$logger->addWriter($writer);
-$logger->info("HAWKSEARCH: testtesttest");
+
+        $writer = new \Zend\Log\Writer\Stream(BP . '/var/log/testtest.log');
+        $logger = new \Zend\Log\Logger();
+        $logger->addWriter($writer);
+        $logger->info("HAWKSEARCH: testtesttest");
         unset($args['ajax']);
         unset($args['json']);
         $args['output'] = 'custom';
@@ -90,7 +96,7 @@ $logger->info("HAWKSEARCH: testtesttest");
         if (isset($args['q'])) {
             unset($args['lpurl']);
         }
-		 $args['keyword']=$args['q'];
+        $args['keyword'] = $args['q'];
         $args['hawksessionid'] = $this->createObj()->get('Magento\Catalog\Model\Session')->getSessionId();
 
         $this->uri = $this->getTrackingUrl() . '/?' . http_build_query($args);
@@ -100,11 +106,11 @@ $logger->info("HAWKSEARCH: testtesttest");
     {
 
         if (empty($this->uri)) {
-              throw new \Exception('No URI set.');
+            throw new \Exception('No URI set.');
         }
         $client = new \Zend_Http_Client();
         $client->setConfig(['timeout' => 30]);
-	
+
         $client->setConfig(array('useragent' => $this->clientUA));
         $client->setUri($this->uri);
         $client->setHeaders('HTTP-TRUE-CLIENT-IP', $this->clientIP);
@@ -113,7 +119,7 @@ $logger->info("HAWKSEARCH: testtesttest");
         $this->rawResponse = $response->getBody();
 
         $this->hawkData = json_decode($this->rawResponse);
-		
+
     }
 
     public function getResultData()
@@ -126,18 +132,18 @@ $logger->info("HAWKSEARCH: testtesttest");
 
     public function getBaseUrl()
     {
-		
-		 
+
+
         return $this->getConfigurationData('web/secure/base_url') . 'hawkproxy';
     }
 
     public function getApiUrl()
     {
         if ($this->getMode() == '1') {
-			
-            $apiUrl =$this->getConfigurationData('hawksearch_proxy/proxy/tracking_url_live');
+
+            $apiUrl = $this->getConfigurationData('hawksearch_proxy/proxy/tracking_url_live');
         } else {
-		
+
             $apiUrl = $this->getConfigurationData('hawksearch_proxy/proxy/tracking_url_staging');
         }
         $apiUrl = preg_replace('|^http://|', 'https://', $apiUrl);
@@ -170,10 +176,10 @@ $logger->info("HAWKSEARCH: testtesttest");
 
     public function getTrackingUrl()
     {
-        if ($this->getMode() == '1') {			
-            $trackingUrl = 	$this->getConfigurationData('hawksearch_proxy/proxy/tracking_url_live');
+        if ($this->getMode() == '1') {
+            $trackingUrl = $this->getConfigurationData('hawksearch_proxy/proxy/tracking_url_live');
         } else {
-            $trackingUrl =$this->getConfigurationData('hawksearch_proxy/proxy/tracking_url_staging');
+            $trackingUrl = $this->getConfigurationData('hawksearch_proxy/proxy/tracking_url_staging');
         }
         if ('/' == substr($trackingUrl, -1)) {
             return $trackingUrl . 'sites/' . $this->getEngineName();
@@ -184,8 +190,8 @@ $logger->info("HAWKSEARCH: testtesttest");
     public function getTrackingPixelUrl($args)
     {
         if ($this->getMode() == '1') {
-			
-            $trackingUrl =$this->getConfigurationData('hawksearch_proxy/proxy/tracking_url_live');
+
+            $trackingUrl = $this->getConfigurationData('hawksearch_proxy/proxy/tracking_url_live');
         } else {
             $trackingUrl = $this->getConfigurationData('hawksearch_proxy/proxy/tracking_url_staging');
         }
@@ -197,21 +203,21 @@ $logger->info("HAWKSEARCH: testtesttest");
 
     public function getOrderTackingKey()
     {
-		
-        return$this->getConfigurationData('hawksearch_proxy/proxy/order_tracking_key');
+
+        return $this->getConfigurationData('hawksearch_proxy/proxy/order_tracking_key');
     }
 
     public function getEngineName()
     {
-		
+
         return $this->getConfigurationData('hawksearch_proxy/proxy/engine_name');
     }
 
     public function getMode()
     {
         if (empty($this->mode)) {
-			
-			
+
+
             $this->mode = $this->getConfigurationData('hawksearch_proxy/proxy/mode');
         }
         return $this->mode;
@@ -219,7 +225,7 @@ $logger->info("HAWKSEARCH: testtesttest");
 
     public function getApiKey()
     {
-		
+
         return $this->getConfigurationData('hawksearch_proxy/proxy/hawksearch_api_key');
     }
 
@@ -236,13 +242,13 @@ $logger->info("HAWKSEARCH: testtesttest");
             return null;
         }
         foreach ($results->Items as $item) {
-			if(isset($item->Custom->sku)){
-            $skus[] = $item->Custom->sku;
-            $map[$item->Custom->sku] = $i;
-            $i++;
-			}
+            if (isset($item->Custom->sku)) {
+                $skus[] = $item->Custom->sku;
+                $map[$item->Custom->sku] = $i;
+                $i++;
+            }
         }
-	
+
         /** @var Mage_Catalog_Model_Resource_Product_Collection $collection */
         $collection = $this->createObj()->create('Magento\Catalog\Model\ResourceModel\Product\Collection')
             ->addAttributeToSelect($this->createObj()->create('Magento\Catalog\Model\Config')->getProductAttributes())
@@ -254,7 +260,7 @@ $logger->info("HAWKSEARCH: testtesttest");
 
         $sorted = array();
         if ($collection->count() > 0) {
-					
+
             $it = $collection->getIterator();
             while ($it->valid()) {
                 $prod = $it->current();
@@ -289,22 +295,24 @@ $logger->info("HAWKSEARCH: testtesttest");
         return $response->getBody();
     }
 
-	public function getLPCacheKey() {
-		
-		
-		return self::LP_CACHE_KEY . $this->createObj()->get('Magento\Store\Model\StoreManagerInterface')->getStore()->getId();
-	}
+    public function getLPCacheKey()
+    {
+
+
+        return self::LP_CACHE_KEY . $this->createObj()->get('Magento\Store\Model\StoreManagerInterface')->getStore()->getId();
+    }
+
     public function getLandingPages($force = false)
     {
-		
-	
+
+
         /** @var Varien_Cache_Core $cache */
-        $cache = $this->createObj()->get('Magento\Framework\Cache\Core');    
-            $this->landingPages = json_decode($this->getHawkResponse(\Zend_Http_Client::GET, 'LandingPage/Urls'));
-            sort($this->landingPages, SORT_STRING);
-           // $cache->save(serialize($this->landingPages), $this->getLPCacheKey(), array(), 30);
-      
-		
+        $cache = $this->createObj()->get('Magento\Framework\Cache\Core');
+        $this->landingPages = json_decode($this->getHawkResponse(\Zend_Http_Client::GET, 'LandingPage/Urls'));
+        sort($this->landingPages, SORT_STRING);
+        // $cache->save(serialize($this->landingPages), $this->getLPCacheKey(), array(), 30);
+
+
         return $this->landingPages;
     }
 
@@ -323,8 +331,8 @@ $logger->info("HAWKSEARCH: testtesttest");
             $path = '/' . $path;
         }
         $hs = $this->getLandingPages();
-		
-			
+
+
         $low = 0;
         $high = count($hs) - 1;
         while ($low <= $high) {
@@ -345,7 +353,7 @@ $logger->info("HAWKSEARCH: testtesttest");
 
     public function getCategoryStoreId()
     {
-        $code =$this->getConfigurationData('hawksearch_proxy/proxy/store_code');
+        $code = $this->getConfigurationData('hawksearch_proxy/proxy/store_code');
 
         /** @var Mage_Core_Model_Resource_Store_Collection $store */
         $store = $this->createObj()->get('Magento\Store\Model\ResourceModel\Store\Collection');
@@ -355,16 +363,15 @@ $logger->info("HAWKSEARCH: testtesttest");
 
     public function addLandingPage($cid)
     {
-		
-		
-		
+
+
         $sid = $this->getCategoryStoreId();
-        $cat =$this->createObj()->get('Magento\Catalog\Model\CategoryFactory')->setStoreId($sid)->load($cid);
+        $cat = $this->createObj()->get('Magento\Catalog\Model\CategoryFactory')->setStoreId($sid)->load($cid);
         $lpObject = $this->getLandingPageObject(
             $cat->getName(),
             $this->getHawkCategoryUrl($cat),
             $this->getHawkNarrowXml($cat->getId()),
-			$cid
+            $cid
         );
 
         $this->log(sprintf("going to add landing page for landing page %s with id %d", $lpObject['CustomUrl'], $cat->getId()));
@@ -397,14 +404,14 @@ $logger->info("HAWKSEARCH: testtesttest");
             'SortDirection' => 'Asc',
             'SelectedFacets' => array(),
             'NarrowXml' => $xml,
-			'Custom' => "__mage_catid_{$cid}__"
+            'Custom' => "__mage_catid_{$cid}__"
         );
     }
 
     public function removeLandingPage($cid)
     {
         $sid = $this->getCategoryStoreId();
-        $cat=$this->createObj()->get('Magento\Catalog\Model\CategoryFactory')->setStoreId($sid)->load($cid);
+        $cat = $this->createObj()->get('Magento\Catalog\Model\CategoryFactory')->setStoreId($sid)->load($cid);
 
         $urlpath = $this->getHawkCategoryUrl($cat);
         $this->log("going to remove landing page for catid: {$cat->getId()} and url {$urlpath}");
@@ -430,9 +437,9 @@ $logger->info("HAWKSEARCH: testtesttest");
 
     public function getHawkCategoryUrl(\Magento\Catalog\Model\Category $cat)
     {
-		
-		
-        $fullUrl =$this->createObj()->get('Magento\Catalog\Helper\Category')->getCategoryUrl($cat);
+
+
+        $fullUrl = $this->createObj()->get('Magento\Catalog\Helper\Category')->getCategoryUrl($cat);
         $base = $this->createObj()->get('Magento\Store\Model\StoreManagerInterface')->getStore()->getBaseUrl();
         $url = substr($fullUrl, strlen($base) - 1);
         $this->log(sprintf('full %s', $fullUrl));
@@ -444,7 +451,7 @@ $logger->info("HAWKSEARCH: testtesttest");
 
     private function syncHawkLandingByStore(\Magento\Store\Model\Store $store)
     {
-      
+
 
         $this->log(sprintf('Starting environment for store %s', $store->getName()));
         /** @var Mage_Core_Model_App_Emulation $appEmulation */
@@ -480,12 +487,12 @@ $logger->info("HAWKSEARCH: testtesttest");
             }
             if ($sc < 0) {
                 //Hawk has page Magento doesn't want managed, delete, increment left
-				if(substr($hawkList[$left]['custom'], 0, strlen('__mage_catid_')) == '__mage_catid_') {
-					$resp = $this->getHawkResponse(\Zend_Http_Client::DELETE, 'LandingPage/' . $hawkList[$left]['pageid']);
-					$this->log(sprintf('attempt to remove page %s resulted in: %s', $hawkList[$left]['hawkurl'], $resp));
-				} else {
-					$this->log(sprintf('Customer custom landing page "%s", skipping', $hawkList[$left]['hawkurl']));
-				}
+                if (substr($hawkList[$left]['custom'], 0, strlen('__mage_catid_')) == '__mage_catid_') {
+                    $resp = $this->getHawkResponse(\Zend_Http_Client::DELETE, 'LandingPage/' . $hawkList[$left]['pageid']);
+                    $this->log(sprintf('attempt to remove page %s resulted in: %s', $hawkList[$left]['hawkurl'], $resp));
+                } else {
+                    $this->log(sprintf('Customer custom landing page "%s", skipping', $hawkList[$left]['hawkurl']));
+                }
                 $left++;
             } elseif ($sc > 0) {
                 //Mage wants it managed, but hawk doesn't know, POST and increment right
@@ -493,7 +500,7 @@ $logger->info("HAWKSEARCH: testtesttest");
                     $mageList[$right]['name'],
                     $mageList[$right]['hawkurl'],
                     $this->getHawkNarrowXml($mageList[$right]['catid']),
-					$mageList[$right]['catid']
+                    $mageList[$right]['catid']
                 );
 
                 $resp = $this->getHawkResponse(\Zend_Http_Client::POST, 'LandingPage/', json_encode($lpObject));
@@ -505,7 +512,7 @@ $logger->info("HAWKSEARCH: testtesttest");
                     $mageList[$right]['name'],
                     $mageList[$right]['hawkurl'],
                     $this->getHawkNarrowXml($mageList[$right]['catid']),
-					$mageList[$right]['catid']
+                    $mageList[$right]['catid']
                 );
                 $lpObject['PageId'] = $hawkList[$left]['pageid'];
                 $resp = $this->getHawkResponse(\Zend_Http_Client::PUT, 'LandingPage/' . $hawkList[$left]['pageid'], json_encode($lpObject));
@@ -524,13 +531,13 @@ $logger->info("HAWKSEARCH: testtesttest");
     {
         try {
             /** @var Mage_Core_Model_Resource_Store_Collection $stores */
-            $stores =  $this->createObj()->get('Magento\Store\Model\ResourceModel\Store\Collection');
+            $stores = $this->createObj()->get('Magento\Store\Model\ResourceModel\Store\Collection');
             /** @var Mage_Core_Model_Store $store */
             foreach ($stores as $store) {
                 if ($this->getConfigurationData('hawksearch_proxy/general/enabled')) {
                     $this->syncHawkLandingByStore($store);
                 }
-            } 
+            }
 
         } catch (Exception $e) {
             $this->log(sprintf('there has been an error: %s', $e->getMessage()));
@@ -548,7 +555,7 @@ $logger->info("HAWKSEARCH: testtesttest");
                 'pageid' => $page->PageId,
                 'hawkurl' => $page->CustomUrl,
                 'name' => $page->Name,
-				'custom' => $page->Custom
+                'custom' => $page->Custom
             );
         }
 
@@ -560,7 +567,7 @@ $logger->info("HAWKSEARCH: testtesttest");
         $this->log('getting magento landing pages...');
 
         /** @var Mage_Catalog_Helper_Category $helper */
-        $helper =  $this->createObj()->get('Magento\Catalog\Helper\Category');
+        $helper = $this->createObj()->get('Magento\Catalog\Helper\Category');
 
         /** @var Mage_Catalog_Model_Resource_Category_Collection $categories */
         $categories = $helper->getStoreCategories(false, true, false);
@@ -570,7 +577,6 @@ $logger->info("HAWKSEARCH: testtesttest");
             $categories->addAttributeToFilter('hawk_landing_page', array('eq' => '1'));
         }
         $categories->addAttributeToSort('entity_id')
-
             ->addAttributeToSort('parent_id')
             ->addAttributeToSort('position');
 
@@ -583,16 +589,9 @@ $logger->info("HAWKSEARCH: testtesttest");
             $categories->clear();
             $categories->setCurPage($currentPage);
             $categories->load();
-            /** @var Mage_Catalog_Model_Category $cat */
             foreach ($categories as $cat) {
-                $suff = $helper->getCategoryUrlSuffix();
-                if(substr($cat->getRequestPath(), -1 * strlen($suff)) == $suff) {
-                    $path =  $cat->getRequestPath();
-                } else {
-                    $path = implode(".", array_filter(array($cat->getRequestPath(), $helper->getCategoryUrlSuffix())));
-                }
                 $cats[] = array(
-                    'hawkurl' => sprintf("/%s", $path),
+                    'hawkurl' => sprintf("/%s", $this->pathGenerator->getUrlPathWithSuffix($cat, $this->getCategoryStoreId())),
                     'name' => $cat->getName(),
                     'catid' => $cat->getId(),
                     'pid' => $cat->getParentId()
@@ -607,33 +606,33 @@ $logger->info("HAWKSEARCH: testtesttest");
     public function log($message)
     {
         if ($this->isLoggingEnabled()) {
-			
-					
-$writer = new \Zend\Log\Writer\Stream(BP . '/var/log/hawkproxy.log');
-$logger = new \Zend\Log\Logger();
-$logger->addWriter($writer);
-$logger->info("HAWKSEARCH: $message");
-        
+
+
+            $writer = new \Zend\Log\Writer\Stream(BP . '/var/log/hawkproxy.log');
+            $logger = new \Zend\Log\Logger();
+            $logger->addWriter($writer);
+            $logger->info("HAWKSEARCH: $message");
+
         }
     }
 
     public function getManageAll()
     {
-		
+
         return $this->getConfigurationData('hawksearch_proxy/proxy/manage_all');
     }
 
     public function isLoggingEnabled()
     {
-		return $this->getConfigurationData('hawksearch_proxy/proxy/logging_enabled');
+        return $this->getConfigurationData('hawksearch_proxy/proxy/logging_enabled');
     }
 
     public function getAjaxNotice($force = true)
     {
-		
+
         /** @var Mage_Catalog_Model_Resource_Category_Collection $collection */
         $categoryFactory = $this->createObj()->create('Magento\Catalog\Model\ResourceModel\Category\CollectionFactory');
-		$collection = $categoryFactory->create();
+        $collection = $categoryFactory->create();
         $collection->addAttributeToFilter('parent_id', array('neq' => '0'));
         $collection->addAttributeToFilter('hawk_landing_page', array('eq' => '1'));
         $collection->addAttributeToFilter('is_active', array('neq' => '0'));
@@ -667,20 +666,21 @@ $logger->info("HAWKSEARCH: $message");
 
         $parts = explode(DIRECTORY_SEPARATOR, __FILE__);
         array_pop($parts);
-        $parts[] = 'runsync.php';
+        $parts[] = 'Runsync.php';
         $runfile = implode(DIRECTORY_SEPARATOR, $parts);
-        $root = getcwd();
+        $root = BP;
 
         $this->log("going to open new shell script: $tmpfile");
         $f = fopen($tmpfile, 'w');
-        fwrite($f, '#!/bin/sh' . "\n");
+//        fwrite($f, '#!/bin/sh' . "\n");
         $phpbin = PHP_BINDIR . DIRECTORY_SEPARATOR . "php";
 
-        $this->log("writing script: $phpbin $runfile -r $root -t $tmpfile");
-        fwrite($f, "$phpbin $runfile -r $root -t $tmpfile\n");
+        $this->log("writing script: $phpbin -d memory_limit=6144M $runfile -r $root -t $tmpfile");
+        fwrite($f, "$phpbin -d memory_limit=6144M $runfile -r $root -t $tmpfile\n");
 
         $this->log('going to execute script');
-        shell_exec("/bin/sh $tmpfile > /dev/null 2>&1 &");
+        $syncLog = implode(DIRECTORY_SEPARATOR, [BP, 'var', 'log', 'hawkSyncLog.log']);
+        shell_exec("/bin/sh $tmpfile > $syncLog 2>&1 &");
         $this->log('sync script launched');
     }
 
@@ -703,9 +703,9 @@ $logger->info("HAWKSEARCH: $message");
      */
     public function makeVarPath($directories)
     {
-		$object_manager = Magento\Core\Model\ObjectManager::getInstance();
-$dir = $object_manager->get('Magento\App\Dir');            
-$base = $dir->getDir(Magento\App\Dir::VAR_DIR);
+        $object_manager = Magento\Core\Model\ObjectManager::getInstance();
+        $dir = $object_manager->get('Magento\App\Dir');
+        $base = $dir->getDir(Magento\App\Dir::VAR_DIR);
 
         $path = $base;
         foreach ($directories as $dir) {

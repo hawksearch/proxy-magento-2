@@ -12,7 +12,8 @@
  */
 namespace HawkSearch\Proxy\Controller;
 
-class Router implements \Magento\Framework\App\RouterInterface
+class Router
+    implements \Magento\Framework\App\RouterInterface
 {
     /**
      * @var \Magento\Framework\App\ActionFactory
@@ -24,7 +25,7 @@ class Router implements \Magento\Framework\App\RouterInterface
      * @var \Magento\Framework\Event\ManagerInterface
      */
     protected $_eventManager;
-  
+
     /**
      * Config primary
      *
@@ -43,6 +44,7 @@ class Router implements \Magento\Framework\App\RouterInterface
      * @var \Magento\Framework\App\ResponseInterface
      */
     protected $_response;
+
     /**
      * @param \Magento\Framework\App\ActionFactory $actionFactory
      * @param \Magento\Framework\Event\ManagerInterface $eventManager
@@ -53,15 +55,17 @@ class Router implements \Magento\Framework\App\RouterInterface
         \Magento\Framework\App\ActionFactory $actionFactory,
         \Magento\Framework\Event\ManagerInterface $eventManager,
         \Magento\Framework\UrlInterface $url,
-      \Magento\Framework\View\Result\PageFactory $resultPageFactory,
+        \Magento\Framework\View\Result\PageFactory $resultPageFactory,
         \Magento\Framework\App\ResponseInterface $response
-    ) {
+    )
+    {
         $this->actionFactory = $actionFactory;
         $this->_eventManager = $eventManager;
         $this->_url = $url;
         $this->_pageFactory = $resultPageFactory;
         $this->_response = $response;
     }
+
     /**
      * Validate and Match Cms Page and modify request
      *
@@ -70,28 +74,27 @@ class Router implements \Magento\Framework\App\RouterInterface
      */
     public function match(\Magento\Framework\App\RequestInterface $request)
     {
-		$om=\Magento\Framework\App\ObjectManager::getInstance();
+        $om = \Magento\Framework\App\ObjectManager::getInstance();
 
-$helper=$om->create('HawkSearch\Proxy\Helper\Data');
-$stem = $helper->getConfigurationData('hawksearch_proxy/proxy/custom_search_routet');
+        $helper = $om->create('HawkSearch\Proxy\Helper\Data');
+        $stem = $helper->getConfigurationData('hawksearch_proxy/proxy/custom_search_routet');
 
-         $identifier = trim($request->getPathInfo(), '/');
-		 $path = explode('/', $identifier);
-		
-	
-        if(strpos($identifier, $stem) !== false) {
+        $identifier = trim($request->getPathInfo(), '/');
+        $path = explode('/', $identifier);
+
+
+        if (strpos($identifier, $stem) !== false) {
             /*
              * We must set module, controller path and action name + we will set page id 5 witch is about us page on
              * default magento 2 installation with sample data.
-             */		
+             */
             $request->setModuleName('catalogsearch')->setControllerName('result')->setActionName('index')->setParam('q', $_GET['q']);
-     
-       } 
-	   else {
+
+        } else {
             //There is no match
             return;
         }
- 
+
         /*
          * We have match and now we will forward action
          */
@@ -100,5 +103,5 @@ $stem = $helper->getConfigurationData('hawksearch_proxy/proxy/custom_search_rout
             ['request' => $request]
         );
     }
-   
+
 }

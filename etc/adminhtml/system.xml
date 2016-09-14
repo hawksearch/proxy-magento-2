@@ -12,167 +12,184 @@
  * IN THE SOFTWARE.
  */
 -->
-<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
-  <system>
-    <tab id="hawksearch" translate="label" sortOrder="400">
-      <label>HawkSearch</label>
-    </tab>
-    <section id="hawksearch_proxy" translate="label" type="text" sortOrder="300" showInDefault="1" showInWebsite="1" showInStore="1">
-      <class>separator-top</class>
-      <label>HawkProxy Settings</label>
-      <tab>hawksearch</tab>
-      <resource>HawkSearch_Proxy::config_hawksearchproxy</resource>
-      <group id="general" translate="label" type="text" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
-        <label>General</label>
-        <field id="enabled" translate="label comment" type="select" showInDefault="0" showInWebsite="0" showInStore="1" sortOrder="5">
-          <label>Enabled</label>
-          <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-        </field>
-        <field id="logging_enabled" translate="label comment" type="select" showInDefault="0" showInWebsite="0" showInStore="1" sortOrder="10">
-          <label>Enable Logging</label>
-          <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-        </field>
-        <field id="version" translate="label comment" showInDefault="1" showInWebsite="0" showInStore="0" sortOrder="15">
-          <label>Version</label>
-          <frontend_model>HawkSearch\Proxy\Block\System\Config\Version</frontend_model>
-        </field>
-      </group>
-      <group id="proxy" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
-          <!--
-           NOTE: Engine Name, Order Tracking Key, and Api Key can be extracted from the hawksearch_dev
-           database on CL-STAND-42Q02 for development engines with a query similar to:
-           SELECT ClientName, SiteDirectory [EngineName], Guid [OrderTrackingKey], ApiKey
-           FROM [hawksearch_dev].[dbo].[Database]
-           where [SiteDirectory] like '%magento%'
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <tab id="hawksearch" translate="label" sortOrder="400">
+            <label>HawkSearch</label>
+        </tab>
+        <section id="hawksearch_proxy" translate="label" type="text" sortOrder="300" showInDefault="1" showInWebsite="1"
+                 showInStore="1">
+            <class>separator-top</class>
+            <label>HawkProxy Settings</label>
+            <tab>hawksearch</tab>
+            <resource>HawkSearch_Proxy::config_hawksearchproxy</resource>
+            <group id="general" translate="label" type="text" sortOrder="5" showInDefault="1" showInWebsite="1"
+                   showInStore="1">
+                <label>General</label>
+                <field id="enabled" translate="label comment" type="select" showInDefault="0" showInWebsite="0"
+                       showInStore="1" sortOrder="5">
+                    <label>Enabled</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="logging_enabled" translate="label comment" type="select" showInDefault="0" showInWebsite="0"
+                       showInStore="1" sortOrder="10">
+                    <label>Enable Logging</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="version" translate="label comment" showInDefault="1" showInWebsite="0" showInStore="0"
+                       sortOrder="15">
+                    <label>Version</label>
+                    <frontend_model>HawkSearch\Proxy\Block\System\Config\Version</frontend_model>
+                </field>
+            </group>
+            <group id="proxy" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1"
+                   showInStore="1">
+                <!--
+                 NOTE: Engine Name, Order Tracking Key, and Api Key can be extracted from the hawksearch_dev
+                 database on CL-STAND-42Q02 for development engines with a query similar to:
+                 SELECT ClientName, SiteDirectory [EngineName], Guid [OrderTrackingKey], ApiKey
+                 FROM [hawksearch_dev].[dbo].[Database]
+                 where [SiteDirectory] like '%magento%'
 
-ClientName	EngineName	OrderTrackingKey	ApiKey
-Magento - AE - Community	magentoaecomm	24925d9247b74086a10a0a16eb768654	5A407A8C-BE09-400B-82FF-D12ED4904418
-Magento - AE - Community1	magentoaecomm1	24925d9247b74086a10a0a16eb768655	5A407A8C-BE09-400B-82FF-D12ED4904419
-Russo Power Search Magento	russopowermagento	a78bc075ffa94b39aebc8ed5ddad68dc	A957E303-E055-4EE6-94E6-7877174C954D
-           -->
-        <label>Proxy Module Settings</label>
-        <field id="engine_name" translate="label comment" type="text" showInDefault="0" showInWebsite="0" showInStore="1" sortOrder="10">
-          <label>Engine Name</label>
-          <comment>Contact your Hawksearch sales rep for this value.</comment>
-        </field>
-        <field id="hawksearch_api_key"
-               translate="label comment"
-               type="text" showInDefault="0" showInWebsite="0" showInStore="1" sortOrder="15">
-          <label>Hawksearch API Key</label>
-          <comment>Contact your Hawksearch sales rep for this value.</comment>
-        </field>
-        <field id="order_tracking_key"
-               translate="label comment"
-               type="text" showInDefault="0" showInWebsite="0" showInStore="1" sortOrder="20">
-          <label>Order Tracking key</label>
-          <comment>Contact your Hawksearch sales rep for this value.</comment>
-        </field>
-        <field id="mode"
-               translate="label comment"
-               type="select" showInDefault="0" showInWebsite="0" showInStore="1" sortOrder="25">
-          <label>Run Mode</label>
-          <source_model>HawkSearch\Proxy\Model\System\Config\Source\Mode</source_model>
-        </field>
-        <field id="tracking_url_staging"
-               translate="label comment"
-               type="text" showInDefault="1" showInWebsite="0" showInStore="0" sortOrder="30">
-          <label>Hawksearch tracking URL (Development)</label>
-        </field>
-        <field id="tracking_url_live"
-               translate="label comment"
-               type="text" showInDefault="1" showInWebsite="0" showInStore="0" sortOrder="35">
-          <label>Hawksearch tracking URL (Production)</label>
-        </field>
-        <field id="manage_categories" translate="label comment" type="select" showInDefault="0" showInWebsite="0" showInStore="1" sortOrder="40">
-          <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-          <label>Manage Categories</label>
-        </field>
-        <field id="manage_all" translate="label comment" type="select" showInDefault="0" showInWebsite="0" showInStore="1" sortOrder="45">
-          <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-          <label>Manage Categories</label>
-          <comment>All categories in current store, or only those marked as hawk-managed in category setup</comment>
-          <depends>
-            <field id="manage_categories">1</field>
-          </depends>
-        </field>
-        <field id="manage_search"
-               translate="label comment"
-               type="select" showInDefault="0" showInWebsite="0" showInStore="1" sortOrder="50">
-          <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-          <label>Manage Search</label>
-        </field>
-        <field id="search_box_ids" translate="label comment" type="text" showInDefault="0" showInWebsite="0" showInStore="1" sortOrder="55">
-          <label>Search Box HTML ID's</label>
-          <comment>Comma separated list of HTML ID's of search boxes to attach to HawkSearch</comment>
-            <depends>
-                <field id="manage_search">1</field>
-            </depends>
+                  ClientName	EngineName	OrderTrackingKey	ApiKey
+                  Magento - AE - Community	magentoaecomm	24925d9247b74086a10a0a16eb768654	5A407A8C-BE09-400B-82FF-D12ED4904418
+                  Magento - AE - Community1	magentoaecomm1	24925d9247b74086a10a0a16eb768655	5A407A8C-BE09-400B-82FF-D12ED4904419
+                  Russo Power Search Magento	russopowermagento	a78bc075ffa94b39aebc8ed5ddad68dc	A957E303-E055-4EE6-94E6-7877174C954D
+                 -->
+                <label>Proxy Module Settings</label>
+                <field id="engine_name" translate="label comment" type="text" showInDefault="0" showInWebsite="0"
+                       showInStore="1" sortOrder="10">
+                    <label>Engine Name</label>
+                    <comment>Contact your Hawksearch sales rep for this value.</comment>
+                </field>
+                <field id="hawksearch_api_key"
+                       translate="label comment"
+                       type="text" showInDefault="0" showInWebsite="0" showInStore="1" sortOrder="15">
+                    <label>Hawksearch API Key</label>
+                    <comment>Contact your Hawksearch sales rep for this value.</comment>
+                </field>
+                <field id="order_tracking_key"
+                       translate="label comment"
+                       type="text" showInDefault="0" showInWebsite="0" showInStore="1" sortOrder="20">
+                    <label>Order Tracking key</label>
+                    <comment>Contact your Hawksearch sales rep for this value.</comment>
+                </field>
+                <field id="mode"
+                       translate="label comment"
+                       type="select" showInDefault="0" showInWebsite="0" showInStore="1" sortOrder="25">
+                    <label>Run Mode</label>
+                    <source_model>HawkSearch\Proxy\Model\System\Config\Source\Mode</source_model>
+                </field>
+                <field id="tracking_url_staging"
+                       translate="label comment"
+                       type="text" showInDefault="1" showInWebsite="0" showInStore="0" sortOrder="30">
+                    <label>Hawksearch tracking URL (Development)</label>
+                </field>
+                <field id="tracking_url_live"
+                       translate="label comment"
+                       type="text" showInDefault="1" showInWebsite="0" showInStore="0" sortOrder="35">
+                    <label>Hawksearch tracking URL (Production)</label>
+                </field>
+                <field id="manage_categories" translate="label comment" type="select" showInDefault="0"
+                       showInWebsite="0" showInStore="1" sortOrder="40">
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <label>Manage Categories</label>
+                </field>
+                <field id="manage_all" translate="label comment" type="select" showInDefault="0" showInWebsite="0"
+                       showInStore="1" sortOrder="45">
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <label>Manage All Categories</label>
+                    <comment>All categories in current store, or only those marked as hawk-managed in category setup</comment>
+                    <depends>
+                        <field id="manage_categories">1</field>
+                    </depends>
+                </field>
+                <field id="manage_search"
+                       translate="label comment"
+                       type="select" showInDefault="0" showInWebsite="0" showInStore="1" sortOrder="50">
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <label>Manage Search</label>
+                </field>
+                <field id="search_box_ids" translate="label comment" type="text" showInDefault="0" showInWebsite="0"
+                       showInStore="1" sortOrder="55">
+                    <label>Search Box HTML ID's</label>
+                    <comment>Comma separated list of HTML ID's of search boxes to attach to HawkSearch</comment>
+                    <depends>
+                        <field id="manage_search">1</field>
+                    </depends>
 
-        </field>
-        <field id="enable_custom_search_route"
-               translate="label comment"
-               type="select" showInDefault="0" showInWebsite="0" showInStore="1" sortOrder="60">
-          <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-          <label>Add custom URL route for search</label>
-            <depends>
-                <field id="manage_search">1</field>
-            </depends>
+                </field>
+                <field id="enable_custom_search_route"
+                       translate="label comment"
+                       type="select" showInDefault="0" showInWebsite="0" showInStore="1" sortOrder="60">
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <label>Add custom URL route for search</label>
+                    <depends>
+                        <field id="manage_search">1</field>
+                    </depends>
 
-        </field>
-        <field id="custom_search_route"
-               translate="label comment"
-               type="text" showInDefault="0" showInWebsite="0" showInStore="1" sortOrder="65">
-          <label>Custom search route</label>
-          <comment>Route must not be used by another module or contain a directory separator '/'</comment>
-          <depends>
-            <field id="enable_custom_search_route">1</field>
-          </depends>
-        </field>
-        <field id="custom_search_use_suffix" translate="label comment" type="select" showInDefault="0" showInWebsite="0" showInStore="1" sortOrder="70">
-          <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-          <label>Use Category URL Suffix</label>
-          <depends>
-            <field id="manage_search">1</field>
-          </depends>
-          <depends>
-            <field id="enable_custom_search_route">1</field>
-          </depends>
-        </field>
-      </group>
-      <group id="sync" translate="label" type="text" sortOrder="15" showInDefault="1" showInWebsite="1" showInStore="1">
-        <label>Synchronization Settings</label>
-        <field id="generateimagecache" translate="button_label"  sortOrder="5" showInDefault="1" showInWebsite="0" showInStore="0">
-          <label/>
-          <button_label>
-            <![CDATA[Synchronize]]>
-          </button_label>
-          <button_url>
-            <![CDATA[hawksearchproxy/hawkproxysynchronize/index]]>
-          </button_url>
-          <frontend_model>HawkSearch\Proxy\Block\System\Config\Sync</frontend_model>
-          <comment>
-            <![CDATA[Manually Synchronize Categories.]]>
-          </comment>
-        </field>
-        <field id="enabled" translate="label comment" type="select" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="25">
-          <label>Enable cron sync</label>
-          <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-        </field>
-        <field id="cron_string" translate="label comment" type="text" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="30">
-          <label>Cron expression</label>
-          <comment>Integer and modular values only, named values and lists not allowed</comment>
-          <backend_model>HawkSearch\Datafeed\Model\Config\Backend\Cron</backend_model>
-          <depends>
-            <field id="enabled">1</field>
-          </depends>
-        </field>
-        <field id="email" translate="label comment" type="text" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="35">
-          <label>Feed Cron Email</label>
-          <depends>
-            <field id="enabled">1</field>
-          </depends>
-        </field>
-      </group>
-    </section>
-  </system>
+                </field>
+                <field id="custom_search_route"
+                       translate="label comment"
+                       type="text" showInDefault="0" showInWebsite="0" showInStore="1" sortOrder="65">
+                    <label>Custom search route</label>
+                    <comment>Route must not be used by another module or contain a directory separator '/'</comment>
+                    <depends>
+                        <field id="enable_custom_search_route">1</field>
+                    </depends>
+                </field>
+                <field id="custom_search_use_suffix" translate="label comment" type="select" showInDefault="0"
+                       showInWebsite="0" showInStore="1" sortOrder="70">
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <label>Use Category URL Suffix</label>
+                    <depends>
+                        <field id="manage_search">1</field>
+                    </depends>
+                    <depends>
+                        <field id="enable_custom_search_route">1</field>
+                    </depends>
+                </field>
+            </group>
+            <group id="sync" translate="label" type="text" sortOrder="15" showInDefault="1" showInWebsite="1"
+                   showInStore="1">
+                <label>Synchronization Settings</label>
+                <field id="generateimagecache" translate="button_label" sortOrder="5" showInDefault="1"
+                       showInWebsite="0" showInStore="0">
+                    <label/>
+                    <button_label>
+                        <![CDATA[Synchronize]]>
+                    </button_label>
+                    <button_url>
+                        <![CDATA[hawksearchproxy/hawkproxysynchronize/index]]>
+                    </button_url>
+                    <frontend_model>HawkSearch\Proxy\Block\System\Config\Sync</frontend_model>
+                    <comment>
+                        <![CDATA[Manually Synchronize Categories.]]>
+                    </comment>
+                </field>
+                <field id="enabled" translate="label comment" type="select" showInDefault="1" showInWebsite="1"
+                       showInStore="1" sortOrder="25">
+                    <label>Enable cron sync</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="cron_string" translate="label comment" type="text" showInDefault="1" showInWebsite="1"
+                       showInStore="1" sortOrder="30">
+                    <label>Cron expression</label>
+                    <comment>Integer and modular values only, named values and lists not allowed</comment>
+                    <backend_model>HawkSearch\Datafeed\Model\Config\Backend\Cron</backend_model>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                </field>
+                <field id="email" translate="label comment" type="text" showInDefault="1" showInWebsite="1"
+                       showInStore="1" sortOrder="35">
+                    <label>Feed Cron Email</label>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                </field>
+            </group>
+        </section>
+    </system>
 </config>

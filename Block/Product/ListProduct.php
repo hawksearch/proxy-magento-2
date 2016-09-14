@@ -11,6 +11,8 @@
  * IN THE SOFTWARE.
  */
 namespace HawkSearch\Proxy\Block\Product;
+use Magento\Catalog\Api\CategoryRepositoryInterface;
+
 class ListProduct
     extends \Magento\Catalog\Block\Product\ListProduct
 {
@@ -27,7 +29,19 @@ class ListProduct
         $this->pagers = $bool;
     }
 
+    public function fooconstruct(\Magento\Catalog\Block\Product\Context $context,
+                                \Magento\Framework\Data\Helper\PostHelper $postDataHelper,
+                                \Magento\Catalog\Model\Layer\Resolver $layerResolver,
+                                CategoryRepositoryInterface $categoryRepository,
+                                \Magento\Framework\Url\Helper\Data $urlHelper,
+                                \HawkSearch\Proxy\Helper\Data $hawkHelper,
+                                array $data)
+    {
+        $this->hawkHelper = $hawkHelper;
+        parent::__construct($context, $postDataHelper, $layerResolver, $categoryRepository, $urlHelper, $data);
+    }
 
+    // garbage constructor from porting developer
     function _construct() {
         /** @var HawkSearch\Proxy\Helper\Data $this ->helper */
 
@@ -103,5 +117,7 @@ class ListProduct
         }
     }
 
-
+//    protected function _getProductCollection(){
+//
+//    }
 } 

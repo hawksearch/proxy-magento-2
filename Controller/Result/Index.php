@@ -18,7 +18,7 @@ class Index
 
     public function execute() {
 
-        /** @var HawkSearch\Proxy\Helper\Data $helper */
+        /** @var \HawkSearch\Proxy\Helper\Data $helper */
         $om = \Magento\Framework\App\ObjectManager::getInstance();
         $helper = $om->create('HawkSearch\Proxy\Helper\Data');
 

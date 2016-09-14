@@ -11,64 +11,54 @@
  * IN THE SOFTWARE.
  */
 namespace HawkSearch\Proxy\Controller\Adminhtml\Hawkproxysynchronize;
- 
+
 use Magento\Backend\App\Action\Context;
+use Magento\Framework\App\ResponseInterface;
 use Magento\Framework\View\Result\PageFactory;
- 
-class Index extends \Magento\Backend\App\Action
+
+class Index
+    extends \Magento\Backend\App\Action
 {
     /**
-     * @var PageFactory
+     * @var \Magento\Framework\Controller\Result\JsonFactory
      */
-    protected $resultPageFactory;
- 
+    protected $resultJsonFactory;
+    /** @var \HawkSearch\Proxy\Helper\Data $helper */
+    protected $dataHelper;
+
     /**
      * @param Context $context
-     * @param PageFactory $resultPageFactory
+     * @param \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory
      */
     public function __construct(
         Context $context,
-        PageFactory $resultPageFactory
-    ) {
+        \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory,
+        \HawkSearch\Proxy\Helper\Data $dataHelper
+    )
+    {
         parent::__construct($context);
-        $this->resultPageFactory = $resultPageFactory;
+        $this->resultJsonFactory = $resultJsonFactory;
+        $this->dataHelper = $dataHelper;
     }
- 
+
     /**
-     * Index action
-     *
-     * @return void
+     * @return \Magento\Framework\Controller\Result\Json
      */
     public function execute()
     {
-        /** @var \Magento\Backend\Model\View\Result\Page $resultPage */
-      $response = array("error" => false);
+        $disabledFuncs = explode(',', ini_get('disable_functions'));
+        $isShellDisabled = is_array($disabledFuncs) ? in_array('shell_exec', $disabledFuncs) : true;
+        $isShellDisabled = (stripos(PHP_OS, 'win') === false) ? $isShellDisabled : true;
 
-		try {
-			$disabledFuncs = explode(',', ini_get('disable_functions'));
-			$isShellDisabled = is_array($disabledFuncs) ? in_array('shell_exec', $disabledFuncs) : true;
-			$isShellDisabled = (stripos(PHP_OS, 'win') === false) ? $isShellDisabled : true;
-
-			if($isShellDisabled) {
-				$response['error'] = 'This installation cannot run one off category synchronizations because the PHP function "shell_exec" has been disabled. Please use cron.';
-			} else {
-				
-				 /** @var HawkSearch\Proxy\Helper\Data $helper */	
-				$object_manager = \Magento\Framework\App\ObjectManager::getInstance();
-				$helper = $object_manager->get('HawkSearch\Proxy\Helper\Data'); 
-		
-				if(strtolower($this->getRequest()->getParam('force')) == 'true') {
-					$helper->removeSyncLocks();
-				}
-				$helper->launchSyncProcess();
-			}
-		}
-		catch (Exception $e) {
-			$response['error'] = $e;
-			
-		}
-		$this->getResponse()
-			->setHeader("Content-Type", "application/json")
-			->setBody(json_encode($response));
+        if ($isShellDisabled) {
+            return $this->resultJsonFactory->create()->setData([
+                'error' => 'This installation cannot run one-off category synchronizations because the PHP function "shell_exec" has been disabled. Please use cron.']);
+        } else {
+            if (strtolower($this->getRequest()->getParam('force')) == 'true') {
+                $this->dataHelper->removeSyncLocks();
+            }
+            $this->dataHelper->launchSyncProcess();
+        }
+        return $this->resultJsonFactory->create()->setData(['error' => 'false']);
     }
 }
