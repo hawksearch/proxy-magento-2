@@ -56,6 +56,7 @@
                   Magento - AE - Community	magentoaecomm	24925d9247b74086a10a0a16eb768654	5A407A8C-BE09-400B-82FF-D12ED4904418
                   Magento - AE - Community1	magentoaecomm1	24925d9247b74086a10a0a16eb768655	5A407A8C-BE09-400B-82FF-D12ED4904419
                   Russo Power Search Magento	russopowermagento	a78bc075ffa94b39aebc8ed5ddad68dc	A957E303-E055-4EE6-94E6-7877174C954D
+                  Russo Power Magento Dev	russopowermagento-dev	8face083c0614c0faaa027ca639c347a	A5DF37C9-879B-476F-9053-1F9CA14FE37E
                  -->
                 <label>Proxy Module Settings</label>
                 <field id="engine_name" translate="label comment" type="text" showInDefault="0" showInWebsite="0"

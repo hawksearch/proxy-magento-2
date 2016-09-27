@@ -636,7 +636,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     public function isLoggingEnabled()
     {
-        return $this->getConfigurationData('hawksearch_proxy/proxy/logging_enabled');
+        return $this->getConfigurationData('hawksearch_proxy/general/logging_enabled');
     }
 
     public function getAjaxNotice($force = true)

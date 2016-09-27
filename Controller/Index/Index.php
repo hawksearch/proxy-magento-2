@@ -12,34 +12,32 @@
  */
 namespace HawkSearch\Proxy\Controller\Index;
 
-class Index extends \Magento\Framework\App\Action\Action
+class Index
+    extends \Magento\Framework\App\Action\Action
 {
-   
+
     protected $resultPageFactory;
+    private $session;
 
 
+    public function __construct(\Magento\Framework\App\Action\Context $context,
+                                \Magento\Catalog\Model\Session $session,
+                                \Magento\Framework\View\Result\PageFactory $resultPageFactory)
+    {
+        $this->resultPageFactory = $resultPageFactory;
+        $this->session = $session;
+        parent::__construct($context);
+    }
 
-	   public function __construct(
-            \Magento\Framework\App\Action\Context $context,
-            \Magento\Framework\View\Result\PageFactory $resultPageFactory
-        )
-        {
-            $this->resultPageFactory = $resultPageFactory;	
-            parent::__construct($context);
-        }
-	 
-	 
+
     public function execute()
     {
-		
-			$html = $this->_view->getLayout()
-            ->createBlock('HawkSearch\Proxy\Block\Html')
-            ->setTemplate('HawkSearch_Proxy::hawksearch/proxy/html.phtml')
-            ->toHtml();
-			$params = $this->getRequest()->getParams();
-			$obj = array('Success' => 'true', 'html' => $html, 'location' => '');
+        $this->_view->loadLayout($this->session->getHawkCurrentUpdateHandle());
+        $html = $this->_view->getLayout()->createBlock('HawkSearch\Proxy\Block\Html')->setTemplate('HawkSearch_Proxy::hawksearch/proxy/html.phtml')->toHtml();
+        $params = $this->getRequest()->getParams();
+        $obj = array('Success' => 'true', 'html' => $html, 'location' => '');
 
- 			echo $params['callback'].'('.json_encode($obj).')';
-		
+        echo $params['callback'] . '(' . json_encode($obj) . ')';
+
     }
 }

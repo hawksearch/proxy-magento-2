@@ -10,15 +10,11 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
-/** @var $helper \HawkSearch\Proxy\Helper\Data */
-$om=\Magento\Framework\App\ObjectManager::getInstance();
-
-$helper=$om->get('HawkSearch\Proxy\Helper\Data');
 ?>
 <script type="text/javascript">
     (function (HawkSearch, undefined) {
-        HawkSearch.BaseUrl = '<?php echo $helper->getBaseUrl(); ?>';
-        HawkSearch.TrackingUrl = '<?php echo $helper->getTrackingUrl(); ?>';
+        HawkSearch.BaseUrl = '<?php echo $block->getBaseUrl(); ?>';
+        HawkSearch.TrackingUrl = '<?php echo $block->getTrackingUrl(); ?>';
         if ('https:' == document.location.protocol) {
             HawkSearch.BaseUrl = HawkSearch.BaseUrl.replace('http://', 'https://');
             HawkSearch.TrackingUrl = HawkSearch.TrackingUrl.replace('http://', 'https://');

@@ -21,7 +21,7 @@
                    template="HawkSearch_Proxy::hawksearch/proxy/head/js.phtml"/>
         </referenceBlock>
         <referenceContainer name="before.body.end">
-            <block class="Magento\Framework\View\Element\Template" name="hawksearch_proxyfooter"
+            <block class="HawkSearch\Proxy\Block\Footer" name="hawksearch_proxyfooter"
                    as="hawksearch_proxyfooter" template="HawkSearch_Proxy::hawksearch/proxy/footer.phtml"/>
         </referenceContainer>
     </body>
