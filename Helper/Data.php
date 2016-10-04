@@ -106,7 +106,10 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $args['hawkitemlist'] = 'json';
         if (isset($args['q'])) {
             unset($args['lpurl']);
-            $args['keyword'] = $args['q'];
+            //$args['keyword'] = $args['q'];
+            if(isset($args['keyword'])){
+                unset($args['keyword']);
+            }
         }
         $args['hawksessionid'] = $this->createObj()->get('Magento\Catalog\Model\Session')->getSessionId();
 
