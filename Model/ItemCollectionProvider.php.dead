@@ -1,0 +1,25 @@
+<?php
+/**
+ * Created by PhpStorm.
+ * User: mageuser
+ * Date: 10/4/16
+ * Time: 3:56 PM
+ */
+
+namespace HawkSearch\Proxy\Model;
+use Magento\Catalog\Model\Layer\ItemCollectionProviderInterface;
+use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
+
+
+class ItemCollectionProvider implements ItemCollectionProviderInterface
+{
+
+    /**
+     * @param \Magento\Catalog\Model\Category $category
+     * @return \Magento\Catalog\Model\ResourceModel\Product\Collection
+     */
+    public function getCollection(\Magento\Catalog\Model\Category $category)
+    {
+        // TODO: Implement getCollection() method.
+    }
+}
