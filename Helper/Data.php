@@ -33,15 +33,18 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     private $_feedFilePath;
     private $isManaged;
     private $pathGenerator;
+    private $directoryList;
 
     public function __construct(Context $context,
                                 StoreManagerInterface $storeManager,
-                                \Magento\CatalogUrlRewrite\Model\CategoryUrlPathGenerator $pathGenerator)
+                                \Magento\CatalogUrlRewrite\Model\CategoryUrlPathGenerator $pathGenerator,
+                                \Magento\Framework\App\Filesystem\DirectoryList $directoryList)
     {
         // parent construct first so scopeConfig gets set for use in "setUri", etc.
         parent::__construct($context);
         $this->_storeManager = $storeManager;
         $this->pathGenerator = $pathGenerator;
+        $this->directoryList = $directoryList;
         $params = $context->getRequest()->getParams();
         if(is_array($params) && isset($params['q'])){
             $this->setUri($context->getRequest()->getParams());
@@ -554,7 +557,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                 }
             }
 
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->log(sprintf('there has been an error: %s', $e->getMessage()));
         }
     }
@@ -665,7 +668,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         $this->log('checking for sync lock');
         $path = $this->getSyncFilePath();
-        $filename = implode(DS, array($path, self::LOCK_FILE_NAME));
+        $filename = implode(DIRECTORY_SEPARATOR, array($path, self::LOCK_FILE_NAME));
         if (is_file($filename)) {
             $this->log('category sync lock file found, returning true');
             return true;
@@ -718,13 +721,14 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function makeVarPath($directories)
     {
-        $object_manager = Magento\Core\Model\ObjectManager::getInstance();
-        $dir = $object_manager->get('Magento\App\Dir');
-        $base = $dir->getDir(Magento\App\Dir::VAR_DIR);
+//        $object_manager = Magento\Core\Model\ObjectManager::getInstance();
+//        $dir = $object_manager->get('Magento\App\Dir');
+//        $base = $dir->getDir(Magento\App\Dir::VAR_DIR);
+        $base = $this->directoryList->getPath('var');
 
         $path = $base;
         foreach ($directories as $dir) {
-            $path .= DS . $dir;
+            $path .= DIRECTORY_SEPARATOR . $dir;
             if (!is_dir($path)) {
                 mkdir($path, 0777);
             }
@@ -736,7 +740,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         $this->log('going to create proxy lock file');
         $path = $this->getSyncFilePath();
-        $filename = implode(DS, array($path, self::LOCK_FILE_NAME));
+        $filename = implode(DIRECTORY_SEPARATOR, array($path, self::LOCK_FILE_NAME));
         $content = date("Y-m-d H:i:s");
 
         if (file_put_contents($filename, $content) === false) {
@@ -750,7 +754,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function removeSyncLocks()
     {
         $path = $this->getSyncFilePath();
-        $filename = implode(DS, array($path, self::LOCK_FILE_NAME));
+        $filename = implode(DIRECTORY_SEPARATOR, array($path, self::LOCK_FILE_NAME));
+
 
         if (file_exists($filename)) {
             return unlink($filename);

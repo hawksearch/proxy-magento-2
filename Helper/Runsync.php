@@ -25,7 +25,7 @@ $helper = $obj->get('HawkSearch\Proxy\Helper\Data');
  
 
 if ($helper->isSyncLocked()) {
-	  throw new \Magento\Framework\Exception("One or more feeds are being generated. Generation temporarily locked.");
+	  throw new \Exception("One or more feeds are being generated. Generation temporarily locked.");
 }
 if ($helper->createSyncLocks()) {
 	$helper->synchronizeHawkLandingPages();
