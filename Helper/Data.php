@@ -34,17 +34,21 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     private $isManaged;
     private $pathGenerator;
     private $directoryList;
+    /** @var \Magento\Framework\Logger\Monolog $logger */
+    private $logger;
 
     public function __construct(Context $context,
                                 StoreManagerInterface $storeManager,
                                 \Magento\CatalogUrlRewrite\Model\CategoryUrlPathGenerator $pathGenerator,
-                                \Magento\Framework\App\Filesystem\DirectoryList $directoryList)
+                                \Magento\Framework\App\Filesystem\DirectoryList $directoryList,
+                                \Psr\Log\LoggerInterface $logger)
     {
         // parent construct first so scopeConfig gets set for use in "setUri", etc.
         parent::__construct($context);
         $this->_storeManager = $storeManager;
         $this->pathGenerator = $pathGenerator;
         $this->directoryList = $directoryList;
+        $this->logger = $logger;
         $params = $context->getRequest()->getParams();
         if(is_array($params) && isset($params['q'])){
             $this->setUri($context->getRequest()->getParams());
@@ -99,10 +103,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function setUri($args)
     {
 
-        $writer = new \Zend\Log\Writer\Stream(BP . '/var/log/testtest.log');
-        $logger = new \Zend\Log\Logger();
-        $logger->addWriter($writer);
-        $logger->info("HAWKSEARCH: testtesttest");
         unset($args['ajax']);
         unset($args['json']);
         $args['output'] = 'custom';
@@ -624,13 +624,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function log($message)
     {
         if ($this->isLoggingEnabled()) {
-
-
-            $writer = new \Zend\Log\Writer\Stream(BP . '/var/log/hawkproxy.log');
-            $logger = new \Zend\Log\Logger();
-            $logger->addWriter($writer);
-            $logger->info("HAWKSEARCH: $message");
-
+            $this->logger->addDebug($message);
         }
     }
 

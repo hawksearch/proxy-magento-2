@@ -19,7 +19,7 @@ $bootstrap = \Magento\Framework\App\Bootstrap::create(BP, $_SERVER);
 $obj = $bootstrap->getObjectManager();
  
 $state = $obj->get('Magento\Framework\App\State');
-$state->setAreaCode('frontnend');
+$state->setAreaCode('frontend');
 
 $helper = $obj->get('HawkSearch\Proxy\Helper\Data');  
  
