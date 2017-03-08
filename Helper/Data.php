@@ -580,7 +580,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $stores = $this->_storeManager->getStores();
         foreach ($stores as $store) {
             /** @var \Magento\Store\Model\Store $store */
-            if ($this->getConfigurationData('hawksearch_proxy/general/enabled') && $store->isActive()) {
+            if ($store->getConfig('hawksearch_proxy/general/enabled') && $store->isActive()) {
                 try {
                     $this->syncHawkLandingByStore($store);
                 } catch (\Exception $e) {

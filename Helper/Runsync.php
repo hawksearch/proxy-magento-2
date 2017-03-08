@@ -22,7 +22,9 @@ $state->setAreaCode('frontend');
 
 $helper = $obj->get('HawkSearch\Proxy\Helper\Data');  
 
-$helper->setOverwriteFlag($opts['f']);
+if(isset($opts['f'])){
+    $helper->setOverwriteFlag($opts['f']);
+}
 
 if ($helper->isSyncLocked()) {
     $helper->log("-- Block: One or more HawkSearch Proxy feeds are being generated. Generation temporarily locked.");

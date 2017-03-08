@@ -33,4 +33,8 @@ class Footer extends \Magento\Framework\View\Element\Template
     public function getTrackingUrl() {
         return $this->helper->getTrackingUrl();
     }
+    public function getSearchBoxes() {
+        $ids = $this->helper->getConfigurationData('hawksearch_proxy/proxy/search_box_ids');
+        return explode(',', $ids);
+    }
 }

@@ -15,6 +15,10 @@
     (function (HawkSearch, undefined) {
         HawkSearch.BaseUrl = '<?php echo $block->getBaseUrl(); ?>';
         HawkSearch.TrackingUrl = '<?php echo $block->getTrackingUrl(); ?>';
+        if ('http:' == document.location.protocol) {
+            HawkSearch.BaseUrl = HawkSearch.BaseUrl.replace('https://', 'http://');
+            HawkSearch.TrackingUrl = HawkSearch.TrackingUrl.replace('https://', 'http://');
+        }
         if ('https:' == document.location.protocol) {
             HawkSearch.BaseUrl = HawkSearch.BaseUrl.replace('http://', 'https://');
             HawkSearch.TrackingUrl = HawkSearch.TrackingUrl.replace('http://', 'https://');
@@ -23,12 +27,14 @@
 
     require(["hawksearch"], function() {
         HawkSearch.initAutoSuggest = function () {
-            HawkSearch.suggestInit('#search', {
+<?php foreach($block->getSearchBoxes() as $sbid) : ?>
+            HawkSearch.suggestInit('#<?php echo $sbid; ?>', {
                 lookupUrlPrefix: HawkSearch.TrackingUrl +
                 '/?fn=ajax&f=GetSuggestions',
                 hiddenDivName: '',
                 isAutoWidth: true
             });
+<?php endforeach; ?>
         };
     });
 </script>
