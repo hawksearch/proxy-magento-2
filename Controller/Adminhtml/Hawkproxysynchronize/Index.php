@@ -57,8 +57,15 @@ class Index
             if (strtolower($this->getRequest()->getParam('force')) == 'true') {
                 $this->dataHelper->removeSyncLocks();
             }
-            $this->dataHelper->launchSyncProcess();
+            if(strtolower($this->getRequest()->getParam('overwrite')) == 'true') {
+                $this->dataHelper->setOverwriteFlag(true);
+            }
+            $rs = $this->dataHelper->launchSyncProcess();
+            if ($rs === true) {
+                return $this->resultJsonFactory->create()->setData(['message' => 'Sync started, running as background process.']);
+            } else {
+                return $this->resultJsonFactory->create()->setData(['error' => $rs]);
+            }
         }
-        return $this->resultJsonFactory->create()->setData(['error' => 'false']);
     }
 }

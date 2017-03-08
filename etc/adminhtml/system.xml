@@ -142,7 +142,7 @@
             <group id="sync" translate="label" type="text" sortOrder="15" showInDefault="1" showInWebsite="1"
                    showInStore="1">
                 <label>Synchronization Settings</label>
-                <field id="generateimagecache" translate="button_label" sortOrder="5" showInDefault="1"
+                <field id="synchronize" translate="button_label" sortOrder="5" showInDefault="1"
                        showInWebsite="0" showInStore="0">
                     <label/>
                     <button_label>

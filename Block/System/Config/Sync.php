@@ -11,23 +11,24 @@
  * IN THE SOFTWARE.
  */
 namespace HawkSearch\Proxy\Block\System\Config;
-use Magento\Framework\App\Config\ScopeConfigInterface;
+
 class Sync extends \Magento\Config\Block\System\Config\Form\Field
 {
+    private $helper;
     /**
-     * Path to block template
+     * @param \Magento\Backend\Block\Template\Context $context
+     * @param array $data
      */
+    public function __construct(\Magento\Backend\Block\Template\Context $context,
+                                \HawkSearch\Proxy\Helper\Data $helper,
+                                array $data = [])
+    {
+        $this->helper = $helper;
+        parent::__construct($context, $data);
+    }
 
-    /**
-     * Set template to itself
-     *
-     * @return $this
-     */
-	 
 
-	 
-	 
- protected function _prepareLayout()
+    protected function _prepareLayout()
     {
         parent::_prepareLayout();
         if (!$this->getTemplate()) {
@@ -55,16 +56,19 @@ class Sync extends \Magento\Config\Block\System\Config\Form\Field
      */
     protected function _getElementHtml(\Magento\Framework\Data\Form\Element\AbstractElement $element)
     {
-        $originalData = $element->getOriginalData();
+        $config = $element->getFieldConfig();
         $this->addData(
             [
-             
-				'button_label' =>$originalData['button_label'],
-                'intern_url' => $this->getUrl($originalData['button_url']),               
+				'button_label' =>$config['button_label'],
+                'intern_url' => $this->getUrl($config['button_url']),
                 'html_id' => $element->getHtmlId(),
             ]
         );
         return $this->_toHtml();
     }
+    public function isSyncLocked() {
+        return $this->helper->isSyncLocked();
+    }
+
 }
  

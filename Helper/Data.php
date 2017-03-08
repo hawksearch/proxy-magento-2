@@ -17,7 +17,15 @@ use Magento\Store\Model\StoreManagerInterface;
 
 class Data extends \Magento\Framework\App\Helper\AbstractHelper
 {
+    const HAWK_LANDING_PAGE_URL = 'LandingPage/';
 
+    protected $_logFilename = "/var/log/hawk_sync_categories.log";
+    protected $_exceptionLog = "hawk_sync_exception.log";
+
+    protected $_logger;
+    protected $_exceptionLogger;
+
+    protected $_syncingExceptions = [];
 
     protected $_storeManager;
     const LP_CACHE_KEY = 'hawk_landing_pages';
@@ -35,20 +43,18 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     private $pathGenerator;
     private $directoryList;
     /** @var \Magento\Framework\Logger\Monolog $logger */
-    private $logger;
+    private $overwriteFlag;
 
     public function __construct(Context $context,
                                 StoreManagerInterface $storeManager,
                                 \Magento\CatalogUrlRewrite\Model\CategoryUrlPathGenerator $pathGenerator,
-                                \Magento\Framework\App\Filesystem\DirectoryList $directoryList,
-                                \Psr\Log\LoggerInterface $logger)
+                                \Magento\Framework\App\Filesystem\DirectoryList $directoryList)
     {
         // parent construct first so scopeConfig gets set for use in "setUri", etc.
         parent::__construct($context);
         $this->_storeManager = $storeManager;
         $this->pathGenerator = $pathGenerator;
         $this->directoryList = $directoryList;
-        $this->logger = $logger;
         $params = $context->getRequest()->getParams();
         if(is_array($params) && isset($params['q'])){
             $this->setUri($context->getRequest()->getParams());
@@ -57,8 +63,22 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         }
         $this->setClientIp($context->getRequest()->getClientIp());
         $this->setClientUa($context->getHttpHeader()->getHttpUserAgent());
+        $this->overwriteFlag = false;
+        $writer = new \Zend\Log\Writer\Stream(BP . $this->_logFilename);
+        $this->_logger = new \Zend\Log\Logger();
+        $this->_logger->addWriter($writer);
+
     }
 
+    public function logException(\Exception $e)
+    {
+        if (!$this->_exceptionLogger instanceof \Zend\Log\Logger) {
+            $writer = new \Zend\Log\Writer\Stream(BP . '/var/log/' . $this->_exceptionLog);
+            $this->_exceptionLogger = new \Zend\Log\Logger();
+            $this->_exceptionLogger->addWriter($writer);
+        }
+        $this->_exceptionLogger->info($e->getMessage() . ' - File: ' . $e->getFile() . ' on line ' . $e->getLine());
+    }
 
 
 
@@ -102,7 +122,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     public function setUri($args)
     {
-
+        //$this->uri = $this->getTrackingUrl() . '/?fn=' .$args['fn'].'&Items='.$args['Items'];
         unset($args['ajax']);
         unset($args['json']);
         $args['output'] = 'custom';
@@ -297,20 +317,26 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     public function getHawkResponse($method, $url, $data = null)
     {
-        $client = new \Zend_Http_Client();
-        $client->setConfig(['timeout' => 30]);
+        try {
+
+            $client = new \Zend_Http_Client();
+            $client->setConfig(['timeout' => 60]);
 
 
-        $client->setUri($this->getApiUrl() . $url);
-        $client->setMethod($method);
-        if (isset($data)) {
-            $client->setRawData($data, 'application/json');
+            $client->setUri($this->getApiUrl() . $url);
+            $client->setMethod($method);
+            if (isset($data)) {
+                $client->setRawData($data, 'application/json');
+            }
+            $client->setHeaders('X-HawkSearch-ApiKey', $this->getApiKey());
+            $client->setHeaders('Accept', 'application/json');
+            $this->log(sprintf('fetching request. URL: %s, Method: %s', $client->getUri(), $method));
+            $response = $client->request();
+            return $response->getBody();
+        } catch (\Exception $e) {
+            $this->logException($e);
+            return json_encode(['Message' => "Internal Error - " . $e->getMessage()]);
         }
-        $client->setHeaders('X-HawkSearch-ApiKey', $this->getApiKey());
-        $client->setHeaders('Accept', 'application/json');
-        $this->log(sprintf('fetching request. URL: %s, Method: %s', $client->getUri(), $method));
-        $response = $client->request();
-        return $response->getBody();
     }
 
     public function getLPCacheKey()
@@ -470,11 +496,10 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     private function syncHawkLandingByStore(\Magento\Store\Model\Store $store)
     {
 
-
         $this->log(sprintf('Starting environment for store %s', $store->getName()));
         /** @var Mage_Core_Model_App_Emulation $appEmulation */
         $appEmulation = $this->createObj()->get('Magento\Store\Model\App\Emulation');
-        $initialEnvironmentInfo = $appEmulation->startEnvironmentEmulation($store->getId());
+        $appEmulation->startEnvironmentEmulation($store->getId());
         $this->log('starting synchronizeHawkLandingPages()');
 
         $hawkList = $this->getHawkLandingPages();
@@ -506,7 +531,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             if ($sc < 0) {
                 //Hawk has page Magento doesn't want managed, delete, increment left
                 if (substr($hawkList[$left]['custom'], 0, strlen('__mage_catid_')) == '__mage_catid_') {
-                    $resp = $this->getHawkResponse(\Zend_Http_Client::DELETE, 'LandingPage/' . $hawkList[$left]['pageid']);
+                    $resp = $this->getHawkResponse(\Zend_Http_Client::DELETE, self::HAWK_LANDING_PAGE_URL . $hawkList[$left]['pageid']);
+                    $this->validateHawkLandingPageResponse($resp, \Zend_Http_Client::DELETE, $hawkList[$left]['hawkurl']);
                     $this->log(sprintf('attempt to remove page %s resulted in: %s', $hawkList[$left]['hawkurl'], $resp));
                 } else {
                     $this->log(sprintf('Customer custom landing page "%s", skipping', $hawkList[$left]['hawkurl']));
@@ -521,7 +547,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                     $mageList[$right]['catid']
                 );
 
-                $resp = $this->getHawkResponse(\Zend_Http_Client::POST, 'LandingPage/', json_encode($lpObject));
+                $resp = $this->getHawkResponse(\Zend_Http_Client::POST, self::HAWK_LANDING_PAGE_URL, json_encode($lpObject));
+                $this->validateHawkLandingPageResponse($resp, \Zend_Http_Client::POST, $hawkList[$left]['hawkurl'], json_encode($lpObject));
+
                 $this->log(sprintf('attempt to add page %s resulted in: %s', $mageList[$right]['hawkurl'], $resp));
                 $right++;
             } else {
@@ -533,7 +561,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                     $mageList[$right]['catid']
                 );
                 $lpObject['PageId'] = $hawkList[$left]['pageid'];
-                $resp = $this->getHawkResponse(\Zend_Http_Client::PUT, 'LandingPage/' . $hawkList[$left]['pageid'], json_encode($lpObject));
+                $resp = $this->getHawkResponse(\Zend_Http_Client::PUT, self::HAWK_LANDING_PAGE_URL . $hawkList[$left]['pageid'], json_encode($lpObject));
+                $this->validateHawkLandingPageResponse($resp, \Zend_Http_Client::PUT, $hawkList[$left]['hawkurl'], json_encode($lpObject));
+
                 $this->log(sprintf('attempt to update page %s resulted in %s', $hawkList[$left]['hawkurl'], $resp));
                 $left++;
                 $right++;
@@ -542,23 +572,23 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         }
 
         // end emulation
-        $appEmulation->stopEnvironmentEmulation($initialEnvironmentInfo);
+        $appEmulation->stopEnvironmentEmulation();
     }
 
     public function synchronizeHawkLandingPages()
     {
-        try {
-            /** @var Mage_Core_Model_Resource_Store_Collection $stores */
-            $stores = $this->createObj()->get('Magento\Store\Model\ResourceModel\Store\Collection');
-            /** @var Mage_Core_Model_Store $store */
-            foreach ($stores as $store) {
-                if ($this->getConfigurationData('hawksearch_proxy/general/enabled')) {
+        $stores = $this->_storeManager->getStores();
+        foreach ($stores as $store) {
+            /** @var \Magento\Store\Model\Store $store */
+            if ($this->getConfigurationData('hawksearch_proxy/general/enabled') && $store->isActive()) {
+                try {
                     $this->syncHawkLandingByStore($store);
+                } catch (\Exception $e) {
+                    $this->log('-- Error: ' . $e->getMessage() . ' - File: ' . $e->getFile() . ' on line ' . $e->getLine());
+                    $this->logException($e);
+                    continue;
                 }
             }
-
-        } catch (\Exception $e) {
-            $this->log(sprintf('there has been an error: %s', $e->getMessage()));
         }
     }
 
@@ -567,7 +597,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $hawkPages = array();
         $pages = json_decode($this->getHawkResponse(\Zend_Http_Client::GET, 'LandingPage'));
         foreach ($pages as $page) {
-            if (empty($page->Custom))
+            if (empty($page->Custom) && ! $this->overwriteFlag)
                 continue;
             $hawkPages[] = array(
                 'pageid' => $page->PageId,
@@ -624,7 +654,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function log($message)
     {
         if ($this->isLoggingEnabled()) {
-            $this->logger->addDebug($message);
+            $this->_logger->info($message);
         }
     }
 
@@ -672,28 +702,71 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     public function launchSyncProcess()
     {
-        $this->log('launching new sync process');
-        $tmppath = sys_get_temp_dir();
-        $tmpfile = tempnam($tmppath, 'hawkproxy_');
+        try {
+            $this->log('-');
+            $this->log('--');
+            $this->log('----');
+            $this->log('launching new sync process');
 
-        $parts = explode(DIRECTORY_SEPARATOR, __FILE__);
-        array_pop($parts);
-        $parts[] = 'Runsync.php';
-        $runfile = implode(DIRECTORY_SEPARATOR, $parts);
-        $root = BP;
+            $tmppath = sys_get_temp_dir();
+            $tmpfile = tempnam($tmppath, 'hawkproxy_');
 
-        $this->log("going to open new shell script: $tmpfile");
-        $f = fopen($tmpfile, 'w');
-//        fwrite($f, '#!/bin/sh' . "\n");
-        $phpbin = PHP_BINDIR . DIRECTORY_SEPARATOR . "php";
+            $parts = explode(DIRECTORY_SEPARATOR, __FILE__);
+            array_pop($parts);
+            $parts[] = 'Runsync.php';
+            $runfile = implode(DIRECTORY_SEPARATOR, $parts);
+            $root = BP;
+            $this->log("get run file: {$runfile}");
 
-        $this->log("writing script: $phpbin -d memory_limit=6144M $runfile -r $root -t $tmpfile");
-        fwrite($f, "$phpbin -d memory_limit=6144M $runfile -r $root -t $tmpfile\n");
+            $this->log("going to open new shell script: $tmpfile");
+            $f = fopen($tmpfile, 'w');
 
-        $this->log('going to execute script');
-        $syncLog = implode(DIRECTORY_SEPARATOR, [BP, 'var', 'log', 'hawkSyncLog.log']);
-        shell_exec("/bin/sh $tmpfile > $syncLog 2>&1 &");
-        $this->log('sync script launched');
+            $phpbin = PHP_BINDIR . DIRECTORY_SEPARATOR . "php";
+
+            if($this->overwriteFlag) {
+                $this->log("writing script: $phpbin -d memory_limit=6144M $runfile -r $root -t $tmpfile -f 1");
+                fwrite($f, "$phpbin -d memory_limit=6144M $runfile -r $root -t $tmpfile -f 1\n");
+            } else {
+                $this->log("writing script: $phpbin -d memory_limit=6144M $runfile -r $root -t $tmpfile");
+                fwrite($f, "$phpbin -d memory_limit=6144M $runfile -r $root -t $tmpfile\n");
+            }
+
+            $this->log('going to execute script');
+            $syncLog = implode(DIRECTORY_SEPARATOR, [BP, 'var', 'log', $this->_exceptionLog]);
+            shell_exec("/bin/sh $tmpfile > $syncLog 2>&1 &");
+            $this->log('sync script launched');
+            return true;
+        } catch (\Exception $e) {
+            $this->log('-- Error: ' . $e->getMessage() . ' - File: ' . $e->getFile() . ' on line ' . $e->getLine());
+            $this->logException($e);
+            return $e->getMessage();
+        }
+
+    }
+
+    private function validateHawkLandingPageResponse($response, $action, $url, $request_raw = null)
+    {
+        // valid action
+        if ($action == \Zend_Http_Client::PUT) {
+            $act = 'Update Landing page';
+        } elseif ($action == \Zend_Http_Client::POST) {
+            $act = 'Create new Landing page';
+        } elseif ($action == \Zend_Http_Client::DELETE) {
+            $act = 'Delete Landing page';
+        } else {
+            $act = "Unknown action ({$action})";
+        }
+
+        // valid response
+        $res = json_decode($response, true);
+        if (isset($res['Message'])) {
+            $this->_syncingExceptions[] = [
+                'action' => $act,
+                'url' => $url,
+                'request_raw' => $request_raw,
+                'error' => $res['Message']
+            ];
+        }
     }
 
     public function getSyncFilePath()
@@ -751,7 +824,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $filename = implode(DIRECTORY_SEPARATOR, array($path, self::LOCK_FILE_NAME));
 
 
-        if (file_exists($filename)) {
+        if (is_file($filename)) {
             return unlink($filename);
         }
         return false;
@@ -766,5 +839,81 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         }
         return $sbids;
     }
+
+    public function setOverwriteFlag($bool) {
+        $this->overwriteFlag = $bool;
+    }
+    public function isCronEnabled()
+    {
+        return $this->scopeConfig->getValue('hawksearch_proxy/sync/enabled');
+    }
+    public function hasExceptions()
+    {
+        return count($this->_syncingExceptions) > 0 ? true : false;
+    }
+
+    public function getException()
+    {
+        return $this->_syncingExceptions;
+    }
+
+    protected function _getEmailExtraHtml()
+    {
+        if ($this->hasExceptions()) {
+            $limit = 50;
+            $html = "<p><strong>Exception logs</strong> (limited at {$limit}):</p>";
+
+            for ($i = 0; $i <= $limit; $i++) {
+                if (isset($this->_syncingExceptions[$i])) {
+                    $html .= "<p>";
+                    $html .= "<strong>Category Url:</strong>" . $this->_syncingExceptions[$i]['url'] . "<br/>";
+                    $html .= "<strong>Action:</strong>" . $this->_syncingExceptions[$i]['action'] . "<br/>";
+                    $html .= "<strong>Request Raw Data:</strong>" . $this->_syncingExceptions[$i]['request_raw'] . "<br/>";
+                    $html .= "<strong>Response Message:</strong>" . $this->_syncingExceptions[$i]['error'] . "<br/>";
+                    $html .= "</p>";
+                    $html .= "<hr/>";
+                }
+            }
+
+            $html .= "<br/><br/><p><strong>Note*:</strong> Other synchronizing requests to HawkSearch were sent as successfully.</p>";
+
+            return $html;
+        }
+        return '';
+    }
+
+    public function getEmailReceiver()
+    {
+        return $this->getConfigurationData('hawksearch_proxy/sync/email_notification');
+    }
+
+    public function sendStatusEmail()
+    {
+        if ($receiver = $this->getEmailReceiver()) {
+            if ($this->hasExceptions())
+                $status_text = "with some following exceptions:";
+            else
+                $status_text = "without any exception.";
+
+            $extra_html = $this->_getEmailExtraHtml();
+
+            /** @var \AmericanEagle\HawkSearch\Model\ProxyEmail $mail_helper */
+            $mail_helper = $this->createObj()->create('AmericanEagle\HawkSearch\Model\ProxyEmail');
+
+            try {
+                $mail_helper->sendEmail($receiver, [
+                    'status_text' => $status_text,
+                    'extra_html' => $extra_html
+                ]);
+                return true;
+            } catch (\Exception $e) {
+                $this->log('-- Error: ' . $e->getMessage() . ' - File: ' . $e->getFile() . ' on line ' . $e->getLine());
+                $this->logException($e);
+                return false;
+            }
+        }
+        return true;
+    }
+
 
 }
