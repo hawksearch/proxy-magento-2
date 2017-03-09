@@ -41,20 +41,20 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     private $_feedFilePath;
     private $isManaged;
     private $pathGenerator;
-    private $directoryList;
+    private $filesystem;
     /** @var \Magento\Framework\Logger\Monolog $logger */
     private $overwriteFlag;
 
     public function __construct(Context $context,
                                 StoreManagerInterface $storeManager,
                                 \Magento\CatalogUrlRewrite\Model\CategoryUrlPathGenerator $pathGenerator,
-                                \Magento\Framework\App\Filesystem\DirectoryList $directoryList)
+                                \Magento\Framework\App\Filesystem $filesystem)
     {
         // parent construct first so scopeConfig gets set for use in "setUri", etc.
         parent::__construct($context);
         $this->_storeManager = $storeManager;
         $this->pathGenerator = $pathGenerator;
-        $this->directoryList = $directoryList;
+        $this->filesystem = $filesystem;
         $params = $context->getRequest()->getParams();
         if(is_array($params) && isset($params['q'])){
             $this->setUri($context->getRequest()->getParams());
@@ -708,7 +708,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             $this->log('----');
             $this->log('launching new sync process');
 
-            $tmppath = sys_get_temp_dir();
+            //$tmppath = sys_get_temp_dir();
+            $tmppath = $mediaRoot = $this->filesystem->getDirectoryWrite('tmp')->getAbsolutePath();
             $tmpfile = tempnam($tmppath, 'hawkproxy_');
 
             $parts = explode(DIRECTORY_SEPARATOR, __FILE__);
@@ -771,36 +772,26 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     public function getSyncFilePath()
     {
-        $this->log('getting feed file path');
-        if ($this->_feedFilePath === null) {
-            $this->log('path is null, checking/creating');
-            $this->_feedFilePath = $this->makeVarPath(array('hawksearch', 'proxy'));
-        }
-        $this->log("returning feed file path: {$this->_feedFilePath}");
-        return $this->_feedFilePath;
-    }
+        $this->log('getting sync lock file path');
+        $relPath = $this->scopeConfig->getValue(\HawkSearch\Datafeed\Helper\Data::CONFIG_FEED_PATH);
 
-    /**
-     * Create path within var folder if necessary given an array of directory names
-     *
-     * @param array $directories
-     * @return string
-     */
-    public function makeVarPath($directories)
-    {
-//        $object_manager = Magento\Core\Model\ObjectManager::getInstance();
-//        $dir = $object_manager->get('Magento\App\Dir');
-//        $base = $dir->getDir(Magento\App\Dir::VAR_DIR);
-        $base = $this->directoryList->getPath('var');
-
-        $path = $base;
-        foreach ($directories as $dir) {
-            $path .= DIRECTORY_SEPARATOR . $dir;
-            if (!is_dir($path)) {
-                mkdir($path, 0777);
-            }
+        if(!$relPath) {
+            $relPath = \HawkSearch\Datafeed\Helper\Data::DEFAULT_FEED_PATH;
         }
-        return $path;
+        $mediaRoot = $this->filesystem->getDirectoryWrite('media')->getAbsolutePath();
+
+        if(strpos(strrev($mediaRoot), '/') !== 0) {
+            $fullPath = implode(DIRECTORY_SEPARATOR, array($mediaRoot, $relPath));
+        } else {
+            $fullPath = $mediaRoot . $relPath;
+        }
+
+        if(!file_exists($fullPath)) {
+            mkdir($fullPath, 0777, true);
+        }
+
+        return $fullPath;
+
     }
 
     public function createSyncLocks()
@@ -822,7 +813,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         $path = $this->getSyncFilePath();
         $filename = implode(DIRECTORY_SEPARATOR, array($path, self::LOCK_FILE_NAME));
-
 
         if (is_file($filename)) {
             return unlink($filename);
