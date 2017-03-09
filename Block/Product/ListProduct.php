@@ -93,6 +93,9 @@ class ListProduct
                 return parent::_getProductCollection();
             }
         }
+        if($this->_productCollection == null) {
+            $this->_productCollection = parent::_getProductCollection();
+        }
         return $this->_productCollection;
     }
 
