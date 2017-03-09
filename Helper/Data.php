@@ -48,7 +48,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function __construct(Context $context,
                                 StoreManagerInterface $storeManager,
                                 \Magento\CatalogUrlRewrite\Model\CategoryUrlPathGenerator $pathGenerator,
-                                \Magento\Framework\App\Filesystem $filesystem)
+                                \Magento\Framework\Filesystem $filesystem)
     {
         // parent construct first so scopeConfig gets set for use in "setUri", etc.
         parent::__construct($context);
