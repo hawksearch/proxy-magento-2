@@ -508,6 +508,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
         $mageList = $this->getMagentoLandingPages();
 
+        $this->log(sprintf('got %d magento category pages', count($mageList)));
+
         usort($hawkList, function ($a, $b) {
             return strcmp($a['hawkurl'], $b['hawkurl']);
         });
