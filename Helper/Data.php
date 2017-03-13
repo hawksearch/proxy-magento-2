@@ -530,7 +530,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             }
             if ($sc < 0) {
                 //Hawk has page Magento doesn't want managed, delete, increment left
-                if (substr($hawkList[$left]['custom'], 0, strlen('__mage_catid_')) == '__mage_catid_') {
+                if (substr($hawkList[$left]['custom'], 0, strlen('__mage_catid_')) == '__mage_catid_' || $this->overwriteFlag) {
                     $resp = $this->getHawkResponse(\Zend_Http_Client::DELETE, self::HAWK_LANDING_PAGE_URL . $hawkList[$left]['pageid']);
                     $this->validateHawkLandingPageResponse($resp, \Zend_Http_Client::DELETE, $hawkList[$left]['hawkurl']);
                     $this->log(sprintf('attempt to remove page %s resulted in: %s', $hawkList[$left]['hawkurl'], $resp));
