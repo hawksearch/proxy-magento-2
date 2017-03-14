@@ -437,8 +437,12 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $this->log(sprintf('response: %s', $resp));
     }
 
-    private function getLandingPageObject($name, $url, $xml, $cid)
+    private function getLandingPageObject($name, $url, $xml, $cid, $clear = false)
     {
+        $custom = '';
+        if(!$clear) {
+            $custom = "__mage_catid_{$cid}__";
+        }
         return array(
             'PageId' => 0,
             'Name' => $name,
@@ -448,7 +452,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             'SortDirection' => 'Asc',
             'SelectedFacets' => array(),
             'NarrowXml' => $xml,
-            'Custom' => "__mage_catid_{$cid}__"
+            'Custom' => $custom
         );
     }
 
@@ -493,6 +497,36 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         return $url;
     }
 
+    private function createExistingCustomFieldMap($hawklist) {
+        $a = [];
+        foreach ($hawklist as $item) {
+            if(isset($item['custom'])){
+                $a[$item['custom']] = $item;
+            }
+        }
+        return $a;
+    }
+
+    private function clearExistingCustomField($lpObject, $existingCustom){
+
+        if(isset($existingCustom[$lpObject['Custom']]) && $existingCustom[$lpObject['Custom']]['hawkurl'] != $lpObject['CustomUrl']) {
+            preg_match('/__mage_catid_(\d+)__/', $existingCustom[$lpObject['Custom']]['custom'], $matches);
+            if($matches[1]){
+                $otherObject = $this->getLandingPageObject(
+                   $existingCustom[$lpObject['Custom']]['name'],
+                   $existingCustom[$lpObject['Custom']]['hawkurl'],
+                   $this->getHawkNarrowXml($matches[1]),
+                   $matches[1],
+                   true
+                );
+                $otherObject['PageId'] = $existingCustom[$lpObject['Custom']]['pageid'];
+                $resp = $this->getHawkResponse(\Zend_Http_Client::PUT, self::HAWK_LANDING_PAGE_URL . $otherObject['PageId'], json_encode($otherObject));
+                $this->validateHawkLandingPageResponse($resp, \Zend_Http_Client::PUT, $lpObject['hawkurl'], json_encode($lpObject));
+            }
+        }
+        return $lpObject['Custom'];
+    }
+
     private function syncHawkLandingByStore(\Magento\Store\Model\Store $store)
     {
 
@@ -501,12 +535,18 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $appEmulation = $this->createObj()->get('Magento\Store\Model\App\Emulation');
         $appEmulation->startEnvironmentEmulation($store->getId());
         $this->log('starting synchronizeHawkLandingPages()');
+        /*
+         * ok, so here is the problem, if we put or post, and some landing page already has that "custom" value, we get
+         * a duplicate error: {"Message":"Duplicate Custom field"}. so lets create a new array "existingCustom" so we can
+         * clear the custom value from the existing landing page. we will need to trim that function at the end of each
+         * iteration so we don't end up removing custom fields we just set */
 
         $hawkList = $this->getHawkLandingPages();
-
+        $existingCustom = $this->createExistingCustomFieldMap($hawkList);
         $this->log(sprintf('got %d hawk managed landing pages', count($hawkList)));
 
         $mageList = $this->getMagentoLandingPages();
+        $this->log(sprintf('got %d magento categories', count($mageList)));
 
         $this->log(sprintf('got %d magento category pages', count($mageList)));
 
@@ -530,6 +570,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             } else {
                 $sc = strcmp($hawkList[$left]['hawkurl'], $mageList[$right]['hawkurl']);
             }
+            $customVal = null;
             if ($sc < 0) {
                 //Hawk has page Magento doesn't want managed, delete, increment left
                 if (substr($hawkList[$left]['custom'], 0, strlen('__mage_catid_')) == '__mage_catid_' || $this->overwriteFlag) {
@@ -539,6 +580,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                 } else {
                     $this->log(sprintf('Customer custom landing page "%s", skipping', $hawkList[$left]['hawkurl']));
                 }
+                $customVal = $hawkList[$left]['custom'];
                 $left++;
             } elseif ($sc > 0) {
                 //Mage wants it managed, but hawk doesn't know, POST and increment right
@@ -548,7 +590,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                     $this->getHawkNarrowXml($mageList[$right]['catid']),
                     $mageList[$right]['catid']
                 );
-
+                $customVal = $this->clearExistingCustomField($lpObject, $existingCustom);
                 $resp = $this->getHawkResponse(\Zend_Http_Client::POST, self::HAWK_LANDING_PAGE_URL, json_encode($lpObject));
                 $this->validateHawkLandingPageResponse($resp, \Zend_Http_Client::POST, $hawkList[$left]['hawkurl'], json_encode($lpObject));
 
@@ -562,7 +604,12 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                     $this->getHawkNarrowXml($mageList[$right]['catid']),
                     $mageList[$right]['catid']
                 );
+                if($mageList[$right]['catid'] >= 1756 && $mageList[$right]['catid'] <= 1757) {
+                    $foo = 'bar';
+                }
                 $lpObject['PageId'] = $hawkList[$left]['pageid'];
+                $customVal = $this->clearExistingCustomField($lpObject, $existingCustom);
+
                 $resp = $this->getHawkResponse(\Zend_Http_Client::PUT, self::HAWK_LANDING_PAGE_URL . $hawkList[$left]['pageid'], json_encode($lpObject));
                 $this->validateHawkLandingPageResponse($resp, \Zend_Http_Client::PUT, $hawkList[$left]['hawkurl'], json_encode($lpObject));
 
@@ -570,7 +617,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                 $left++;
                 $right++;
             }
-
+            if(isset($existingCustom[$customVal])){
+                unset($existingCustom[$customVal]);
+            }
         }
 
         // end emulation
