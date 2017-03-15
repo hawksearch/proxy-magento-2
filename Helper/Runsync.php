@@ -30,8 +30,8 @@ if ($helper->isSyncLocked()) {
     $helper->log("-- Block: One or more HawkSearch Proxy feeds are being generated. Generation temporarily locked.");
     try {
         if ($reciever = $helper->getEmailReceiver()) {
-            /** @var \AmericanEagle\HawkSearch\Model\ProxyEmail $mail_helper */
-            $mail_helper = $obj->create('AmericanEagle\HawkSearch\Model\ProxyEmail');
+            /** @var \HawkSearch\Proxy\Model\ProxyEmail $mail_helper */
+            $mail_helper = $obj->create('HawkSearch\Proxy\Model\ProxyEmail');
             $mail_helper->sendEmail($reciever, [
                 'status_text' => 'with following message:',
                 'extra_html' => "<p><strong>One or more HawkSearch Proxy feeds are being generated. Generation temporarily locked.</strong></p>"

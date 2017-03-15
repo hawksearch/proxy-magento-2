@@ -44,11 +44,13 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     private $filesystem;
     /** @var \Magento\Framework\Logger\Monolog $logger */
     private $overwriteFlag;
+    private $email_helper;
 
     public function __construct(Context $context,
                                 StoreManagerInterface $storeManager,
                                 \Magento\CatalogUrlRewrite\Model\CategoryUrlPathGenerator $pathGenerator,
-                                \Magento\Framework\Filesystem $filesystem)
+                                \Magento\Framework\Filesystem $filesystem,
+                                \HawkSearch\Proxy\Model\ProxyEmail $email_helper)
     {
         // parent construct first so scopeConfig gets set for use in "setUri", etc.
         parent::__construct($context);
@@ -67,6 +69,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $writer = new \Zend\Log\Writer\Stream(BP . $this->_logFilename);
         $this->_logger = new \Zend\Log\Logger();
         $this->_logger->addWriter($writer);
+        $this->email_helper = $email_helper;
 
     }
 
@@ -936,8 +939,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
             $extra_html = $this->_getEmailExtraHtml();
 
-            /** @var \AmericanEagle\HawkSearch\Model\ProxyEmail $mail_helper */
-            $mail_helper = $this->createObj()->create('AmericanEagle\HawkSearch\Model\ProxyEmail');
+            /** @var \HawkSearch\Proxy\Model\ProxyEmail $mail_helper */
+            $mail_helper = $this->email_helper;
 
             try {
                 $mail_helper->sendEmail($receiver, [
