@@ -524,7 +524,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                 );
                 $otherObject['PageId'] = $existingCustom[$lpObject['Custom']]['pageid'];
                 $resp = $this->getHawkResponse(\Zend_Http_Client::PUT, self::HAWK_LANDING_PAGE_URL . $otherObject['PageId'], json_encode($otherObject));
-                $this->validateHawkLandingPageResponse($resp, \Zend_Http_Client::PUT, $lpObject['hawkurl'], json_encode($lpObject));
+                $this->validateHawkLandingPageResponse($resp, \Zend_Http_Client::PUT, $lpObject['CustomUrl'], json_encode($lpObject));
             }
         }
         return $lpObject['Custom'];
