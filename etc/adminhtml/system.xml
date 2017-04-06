@@ -138,6 +138,11 @@
                         <field id="enable_custom_search_route">1</field>
                     </depends>
                 </field>
+                <field id="hawksearch_include_css" translate="label comment" type="select"
+                       showInDefault="0" showInStore="1" showInWebsite="0">
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <label>Use HawkSearch CSS</label>
+                </field>
             </group>
             <group id="sync" translate="label" type="text" sortOrder="15" showInDefault="1" showInWebsite="1"
                    showInStore="1">

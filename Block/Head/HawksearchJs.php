@@ -28,4 +28,7 @@ extends \Magento\Framework\View\Element\Template
     public function getTrackingUrl() {
         return $this->dataHelper->getTrackingUrl();
     }
+    public function getIncludeHawkCss(){
+        return $this->dataHelper->getConfigurationData('hawksearch_proxy/proxy/hawksearch_include_css');
+    }
 }
