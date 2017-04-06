@@ -23,6 +23,7 @@ class ListProduct
     private $hawkHelper;
     private $pagers = true;
     protected $_productCollection;
+    private $controller;
 
 
     public function setPagers($bool)
@@ -39,6 +40,11 @@ class ListProduct
                                 array $data = [])
     {
         $this->hawkHelper = $hawkHelper;
+
+        /** @var \Magento\Framework\App\Request\Http $req */
+        $req = $context->getRequest();
+        $this->controller = $req->getControllerName();
+
         parent::__construct($context, $postDataHelper, $layerResolver, $categoryRepository, $urlHelper, $data);
     }
 
@@ -79,9 +85,14 @@ class ListProduct
 
     protected function _getProductCollection()
     {
+        if($this->controller == 'category') {
+            $contextActive = $this->hawkHelper->getConfigurationData('hawksearch_proxy/proxy/manage_categories');
+        } else {
+            $contextActive = $this->hawkHelper->getConfigurationData('hawksearch_proxy/proxy/manage_search');
+        }
         if ($this->_productCollection === null) {
 
-            if ($this->hawkHelper->getConfigurationData('hawksearch_proxy/general/enabled') && $this->hawkHelper->getConfigurationData('hawksearch_proxy/proxy/manage_search')) {
+            if ($this->hawkHelper->getConfigurationData('hawksearch_proxy/general/enabled') && $contextActive) {
 
                 if ($this->hawkHelper->getLocation() != "") {
                     $this->hawkHelper->log(sprintf('Redirecting to location: %s', $this->helper->getLocation()));
