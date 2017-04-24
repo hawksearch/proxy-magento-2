@@ -17,14 +17,17 @@ class Index
 {
 
     protected $resultPageFactory;
+    protected $resultFactory;
     private $session;
 
 
     public function __construct(\Magento\Framework\App\Action\Context $context,
                                 \Magento\Catalog\Model\Session $session,
-                                \Magento\Framework\View\Result\PageFactory $resultPageFactory)
+                                \Magento\Framework\View\Result\PageFactory $resultPageFactory,
+                                \Magento\Framework\Controller\ResultFactory $resultFactory)
     {
         $this->resultPageFactory = $resultPageFactory;
+        $this->resultFactory = $resultFactory;
         $this->session = $session;
         parent::__construct($context);
     }
@@ -37,7 +40,10 @@ class Index
         $params = $this->getRequest()->getParams();
         $obj = array('Success' => 'true', 'html' => $html, 'location' => '');
 
-        echo $params['callback'] . '(' . json_encode($obj) . ')';
+        $result = $this->resultFactory->create(\Magento\Framework\Controller\ResultFactory::TYPE_RAW);
+        $result->setHeader('Content-Type', 'text/html');
+        $result->setContents($params['callback'] . '(' . json_encode($obj) . ')');
 
+        return $result;
     }
 }
