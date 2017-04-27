@@ -17,17 +17,14 @@ class Index
 {
 
     protected $resultPageFactory;
-    protected $resultFactory;
     private $session;
 
 
     public function __construct(\Magento\Framework\App\Action\Context $context,
                                 \Magento\Catalog\Model\Session $session,
-                                \Magento\Framework\View\Result\PageFactory $resultPageFactory,
-                                \Magento\Framework\Controller\ResultFactory $resultFactory)
+                                \Magento\Framework\View\Result\PageFactory $resultPageFactory)
     {
         $this->resultPageFactory = $resultPageFactory;
-        $this->resultFactory = $resultFactory;
         $this->session = $session;
         parent::__construct($context);
     }
