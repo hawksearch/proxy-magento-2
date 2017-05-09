@@ -60,10 +60,10 @@ class InstallData
                 'required' => false,
                 'sort_order' => 100,
                 'global' => \Magento\Eav\Model\Entity\Attribute\ScopedAttributeInterface::SCOPE_STORE,
-                'group' => 'General Information',
+                'group' => 'Display Settings',
             ]
         );
-        $idg = $categorySetup->getAttributeGroupId($entityTypeId, $attributeSetId, 'General Information');
+        $idg = $categorySetup->getAttributeGroupId($entityTypeId, $attributeSetId, 'Display Settings');
         $categorySetup->addAttributeToGroup(
             $entityTypeId,
             $attributeSetId,
