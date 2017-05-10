@@ -41,7 +41,7 @@ class UpgradeData implements \Magento\Framework\Setup\UpgradeDataInterface
         $entityTypeId = $categorySetup->getEntityTypeId(\Magento\Catalog\Model\Category::ENTITY);
         $attributeSetId = $categorySetup->getDefaultAttributeSetId($entityTypeId);
         if (version_compare($context->getVersion(), '2.1.1', '<')) {
-            $attribute = $this->eavConfig->getAttribute(\Magento\Catalog\Model\Category::ENTITY, 'hawk_landing_page');
+            $attribute = $categorySetup->getAttribute(\Magento\Catalog\Model\Category::ENTITY, 'hawk_landing_page');
             if($attribute){
 				$idg = $categorySetup->getAttributeGroupId($entityTypeId, $attributeSetId, 'Display Settings');
 				$categorySetup->addAttributeToGroup(
