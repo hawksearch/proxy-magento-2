@@ -51,8 +51,7 @@ class UpgradeData implements \Magento\Framework\Setup\UpgradeDataInterface
 				'hawk_landing_page',
 				46
 			);
-                $attribute->setData('group','Display Settings')
-                    ->save();
+                $attribute->save();
             }
         }
         
