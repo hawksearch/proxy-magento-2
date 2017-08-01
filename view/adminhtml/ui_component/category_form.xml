@@ -23,7 +23,7 @@
                     <item name="validation" xsi:type="array">
                         <item name="required-entry" xsi:type="boolean">false</item>
                     </item>
-                    <item name="default" xsi:type="string">0</item>
+                    <item name="default" xsi:type="string">1</item>
                     <item name="label" xsi:type="string" translate="true">Hawksearch Landing Page</item>
                 </item>
             </argument>
