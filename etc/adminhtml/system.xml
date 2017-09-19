@@ -139,10 +139,29 @@
                     </depends>
                 </field>
                 <field id="hawksearch_include_css" translate="label comment" type="select"
-                       showInDefault="0" showInStore="1" showInWebsite="0">
+                       showInDefault="0" showInStore="1" showInWebsite="0" sortOrder="80">
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <label>Use HawkSearch CSS</label>
                 </field>
+                <field id="autocomplete_div_id"
+                       type="text"
+                       showInWebsite="0"
+                       showInDefault="0"
+                       showInStore="1"
+                       sortOrder="90">
+                    <label>Autocomplete Div ID</label>
+                    <comment>The HTML id of the div that will hold autosuggest results</comment>
+                </field>
+                <field id="autocomplete_query_params"
+                       type="text"
+                       showInWebsite="0"
+                       showInDefault="0"
+                       showInStore="1"
+                       sortOrder="100">
+                    <label>Query Params for the autosuggest call to HawkSearch</label>
+                    <comment>Default is: "/?fn=ajax&amp;f=GetSuggestions"</comment>
+                </field>
+
             </group>
             <group id="sync" translate="label" type="text" sortOrder="15" showInDefault="1" showInWebsite="1"
                    showInStore="1">

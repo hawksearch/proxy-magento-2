@@ -10,9 +10,12 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
+/** @var Magento\Catalog\Model\ResourceModel\Product\Attribute\Collection $pac */
+
+/** @var HawkSearch\Proxy\Block\Footer $block */
 ?>
 <script type="text/javascript">
-    (function (HawkSearch, undefined) {
+    (function (HawkSearch) {
         HawkSearch.BaseUrl = '<?php echo $block->getBaseUrl(); ?>';
         HawkSearch.TrackingUrl = '<?php echo $block->getTrackingUrl(); ?>';
         if ('http:' == document.location.protocol) {
@@ -29,9 +32,8 @@
         HawkSearch.initAutoSuggest = function () {
 <?php foreach($block->getSearchBoxes() as $sbid) : ?>
             HawkSearch.suggestInit('#<?php echo $sbid; ?>', {
-                lookupUrlPrefix: HawkSearch.TrackingUrl +
-                '/?fn=ajax&f=GetSuggestions',
-                hiddenDivName: '',
+                lookupUrlPrefix: HawkSearch.TrackingUrl + '<?php echo $block->getAutosuggestParams() ?>',
+                hiddenDivName: '<?php echo $block->getHiddenDivName() ?>',
                 isAutoWidth: true
             });
 <?php endforeach; ?>
