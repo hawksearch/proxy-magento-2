@@ -42,21 +42,25 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     private $isManaged;
     private $pathGenerator;
     private $filesystem;
+    private $collection;
     /** @var \Magento\Framework\Logger\Monolog $logger */
     private $overwriteFlag;
     private $email_helper;
 
-    public function __construct(Context $context,
-                                StoreManagerInterface $storeManager,
-                                \Magento\CatalogUrlRewrite\Model\CategoryUrlPathGenerator $pathGenerator,
-                                \Magento\Framework\Filesystem $filesystem,
-                                \HawkSearch\Proxy\Model\ProxyEmail $email_helper)
+    public function __construct(
+        Context $context,
+        StoreManagerInterface $storeManager,
+        \Magento\CatalogUrlRewrite\Model\CategoryUrlPathGenerator $pathGenerator,
+        \Magento\Framework\Filesystem $filesystem,
+        \HawkSearch\Proxy\Model\ProxyEmail $email_helper,
+        \Magento\Catalog\Model\ResourceModel\Product\Collection $collection)
     {
         // parent construct first so scopeConfig gets set for use in "setUri", etc.
         parent::__construct($context);
         $this->_storeManager = $storeManager;
         $this->pathGenerator = $pathGenerator;
         $this->filesystem = $filesystem;
+        $this->collection = $collection;
         $params = $context->getRequest()->getParams();
         if(is_array($params) && isset($params['q'])){
             $this->setUri($context->getRequest()->getParams());
@@ -83,8 +87,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $this->_exceptionLogger->info($e->getMessage() . ' - File: ' . $e->getFile() . ' on line ' . $e->getLine());
     }
 
-
-
     public function getConfigurationData($data)
     {
         $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
@@ -106,7 +108,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         return $this;
     }
 
-
     public function setClientIp($ip)
     {
         $this->clientIP = $ip;
@@ -116,12 +117,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         $this->clientUA = $ua;
     }
-
-    public function createObj()
-    {
-        return \Magento\Framework\App\ObjectManager::getInstance();
-    }
-
 
     public function setUri($args)
     {
@@ -269,6 +264,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         return $this->getConfigurationData('hawksearch_proxy/proxy/hawksearch_api_key');
     }
 
+    /**
+     * @return null
+     */
     public function getProductCollection()
     {
         if (empty($this->hawkData)) {
@@ -290,7 +288,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             }
         }
 
-        /** @var Mage_Catalog_Model_Resource_Product_Collection $collection */
+        /** @var \Magento\Catalog\Model\ResourceModel\Product\Collection $collection */
         $collection = $this->createObj()->create('Magento\Catalog\Model\ResourceModel\Product\Collection')
             ->addAttributeToSelect($this->createObj()->create('Magento\Catalog\Model\Config')->getProductAttributes())
             ->addAttributeToFilter('sku', array('in' => $skus))

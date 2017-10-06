@@ -11,6 +11,10 @@
  * IN THE SOFTWARE.
  */
 namespace HawkSearch\Proxy\Block\Search;
+use Magento\Catalog\Model\Layer\Resolver as LayerResolver;
+use Magento\CatalogSearch\Helper\Data;
+use Magento\Framework\View\Element\Template\Context;
+use Magento\Search\Model\QueryFactory;
 
 /**
  * Product search result block
@@ -45,29 +49,38 @@ class Result
     private $queryFactory;
 
     /**
+     * @var \HawkSearch\Proxy\Helper\Data
+     */
+    private $helper;
+
+    /**
+     * Result constructor.
      * @param Context $context
      * @param LayerResolver $layerResolver
      * @param Data $catalogSearchData
      * @param QueryFactory $queryFactory
+     * @param \HawkSearch\Proxy\Helper\Data $helper
      * @param array $data
      */
+    public function __construct(
+        Context $context,
+        LayerResolver $layerResolver,
+        Data $catalogSearchData,
+        QueryFactory $queryFactory,
+        \HawkSearch\Proxy\Helper\Data $helper,
+        array $data = [])
+    {
+        $this->helper = $helper;
+        parent::__construct($context, $layerResolver, $catalogSearchData, $queryFactory, $data);
+    }
 
 
     /**
-     * Retrieve loaded category collection
-     *
-     * @return Collection
+     * @return Collection|\HawkSearch\Proxy\Helper\Mage_Catalog_Model_Resource_Product_Collection|null
      */
     protected function _getProductCollection() {
-
-
-        $om = \Magento\Framework\App\ObjectManager::getInstance();
-
-        $helper = $om->create('HawkSearch\Proxy\Helper\Data');
-
         if (null === $this->productCollection) {
-
-            $this->productCollection = $helper->getProductCollection();
+            $this->productCollection = $this->helper->getProductCollection();
         }
 
         return $this->productCollection;
