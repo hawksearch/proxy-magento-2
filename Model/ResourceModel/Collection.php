@@ -14,7 +14,10 @@ extends \Magento\CatalogSearch\Model\ResourceModel\Fulltext\Collection
 {
     protected function _renderFiltersBefore()
     {
-        return;
+        if($this->_scopeConfig->getValue('hawksearch_proxy/proxy/manage_categories', 'stores')) {
+            return;
+        }
+        return parent::_renderFiltersBefore();
     }
 
 }

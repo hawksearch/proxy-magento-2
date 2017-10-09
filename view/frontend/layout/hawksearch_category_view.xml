@@ -16,7 +16,7 @@
       xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <body>
         <referenceContainer name="content">
-            <block class="Magento\Framework\View\Element\Template"
+            <block class="HawkSearch\Proxy\Block\HawkItems"
                    name="hawksearch_landingpage"
                    template="HawkSearch_Proxy::hawksearch/proxy/content/hawkitems.phtml">
             </block>

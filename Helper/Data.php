@@ -18,6 +18,7 @@ use Magento\Store\Model\StoreManagerInterface;
 class Data extends \Magento\Framework\App\Helper\AbstractHelper
 {
     const HAWK_LANDING_PAGE_URL = 'LandingPage/';
+    const CONFIG_PROXY_RESULT_TYPE = 'hawksearch_proxy/proxy/result_type';
 
     protected $_logFilename = "/var/log/hawk_sync_categories.log";
     protected $_exceptionLog = "hawk_sync_exception.log";
@@ -45,18 +46,29 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     /** @var \Magento\Framework\Logger\Monolog $logger */
     private $overwriteFlag;
     private $email_helper;
+    private $collectionFactory;
+    private $session;
+    private $catalogConfig;
 
-    public function __construct(Context $context,
-                                StoreManagerInterface $storeManager,
-                                \Magento\CatalogUrlRewrite\Model\CategoryUrlPathGenerator $pathGenerator,
-                                \Magento\Framework\Filesystem $filesystem,
-                                \HawkSearch\Proxy\Model\ProxyEmail $email_helper)
-    {
+    public function __construct(
+        Context $context,
+        StoreManagerInterface $storeManager,
+        \Magento\CatalogUrlRewrite\Model\CategoryUrlPathGenerator $pathGenerator,
+        \Magento\Framework\Filesystem $filesystem,
+        \HawkSearch\Proxy\Model\ProxyEmail $email_helper,
+        \Magento\Catalog\Model\ResourceModel\Product\CollectionFactory $collectionFactory,
+        \Magento\Catalog\Model\Config $catalogConfig,
+        \Magento\Catalog\Model\Session $session
+    ) {
         // parent construct first so scopeConfig gets set for use in "setUri", etc.
         parent::__construct($context);
         $this->_storeManager = $storeManager;
         $this->pathGenerator = $pathGenerator;
         $this->filesystem = $filesystem;
+        $this->collectionFactory = $collectionFactory;
+        $this->session = $session;
+        $this->catalogConfig = $catalogConfig;
+
         $params = $context->getRequest()->getParams();
         if(is_array($params) && isset($params['q'])){
             $this->setUri($context->getRequest()->getParams());
@@ -119,7 +131,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     public function createObj()
     {
-        return \Magento\Framework\App\ObjectManager::getInstance();
+        throw new \Exception('calling the object manager directly');
+        //return \Magento\Framework\App\ObjectManager::getInstance();
     }
 
 
@@ -130,6 +143,10 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         unset($args['json']);
         $args['output'] = 'custom';
         $args['hawkitemlist'] = 'json';
+        if($this->getResultType()){
+            $args['it'] = $this->getResultType();
+
+        }
         if (isset($args['q'])) {
             unset($args['lpurl']);
             //$args['keyword'] = $args['q'];
@@ -137,7 +154,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                 unset($args['keyword']);
             }
         }
-        $args['hawksessionid'] = $this->createObj()->get('Magento\Catalog\Model\Session')->getSessionId();
+        $args['hawksessionid'] = $this->session->getSessionId();
 
         $this->uri = $this->getTrackingUrl() . '/?' . http_build_query($args);
     }
@@ -170,10 +187,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         return $this->hawkData;
     }
 
+    public  function getResultType() {
+        return $this->getConfigurationData(self::CONFIG_PROXY_RESULT_TYPE);
+    }
     public function getBaseUrl()
     {
-
-
         return $this->getConfigurationData('web/secure/base_url') . 'hawkproxy';
     }
 
@@ -256,8 +274,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function getMode()
     {
         if (empty($this->mode)) {
-
-
             $this->mode = $this->getConfigurationData('hawksearch_proxy/proxy/mode');
         }
         return $this->mode;
@@ -290,9 +306,10 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             }
         }
 
-        /** @var Mage_Catalog_Model_Resource_Product_Collection $collection */
-        $collection = $this->createObj()->create('Magento\Catalog\Model\ResourceModel\Product\Collection')
-            ->addAttributeToSelect($this->createObj()->create('Magento\Catalog\Model\Config')->getProductAttributes())
+        /** @var \Magento\Catalog\Model\ResourceModel\Product\Collection $collection */
+        $collection = $this->collectionFactory->create();
+        $collection
+            ->addAttributeToSelect($this->catalogConfig->getProductAttributes())
             ->addAttributeToFilter('sku', array('in' => $skus))
             ->addMinimalPrice()
             ->addFinalPrice()
@@ -727,8 +744,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
 
         /** @var Mage_Catalog_Model_Resource_Category_Collection $collection */
-        $categoryFactory = $this->createObj()->create('Magento\Catalog\Model\ResourceModel\Category\CollectionFactory');
-        $collection = $categoryFactory->create();
+//        $categoryFactory = $this->createObj()->create('Magento\Catalog\Model\ResourceModel\Category\CollectionFactory');
+        $collection = $this->categoryFactory->create();
         $collection->addAttributeToFilter('parent_id', array('neq' => '0'));
         $collection->addAttributeToFilter('hawk_landing_page', array('eq' => '1'));
         $collection->addAttributeToFilter('is_active', array('neq' => '0'));

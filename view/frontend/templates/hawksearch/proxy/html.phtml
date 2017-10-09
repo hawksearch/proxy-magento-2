@@ -12,9 +12,6 @@
  */
  
  /** @var $block \HawkSearch\Proxy\Block\Html */
-/** @var $hawkBanner \HawkSearch\Proxy\Model\Banner */
-$om=\Magento\Framework\App\ObjectManager::getInstance();
-$hawkBanner=$om->get('HawkSearch\Proxy\Model\Banner');
 ?>
 
 <div>
@@ -29,11 +26,11 @@ $hawkBanner=$om->get('HawkSearch\Proxy\Model\Banner');
   <div id="hawksmartbug"></div>
   <div id="hawkrelated"><?php echo $block->getRelated() ?></div>
   <div id="hawkfacets"><?php echo $block->getFacets() ?></div>
-  <div id="hawkbannertop" class="bannerTop"> <?php echo $hawkBanner->getFeaturedTop() ?> <?php echo $hawkBanner->getBannerTop() ?></div>
-  <div id="hawkbannerlefttop" class="bannerLeftTop"><?php echo $hawkBanner->getBannerLeftTop() ?></div>
-  <div id="hawkbannerleftbottom" class="bannerLeftBottom"><?php echo $hawkBanner->getBannerLeftBottom() ?></div>
-  <div id="hawkbannerbottom" class="bannerBottom"> <?php echo $hawkBanner->getFeaturedBottom() ?> <?php echo $hawkBanner->getBannerBottom() ?></div>
-  <div id="hawkbannerbottom2" class="bannerBottom"> <?php echo $hawkBanner->getBannerBottom2() ?> <?php echo $hawkBanner->getFeaturedBottom2() ?></div>
+  <div id="hawkbannertop" class="bannerTop"> <?php echo $block->getBanner()->getFeaturedTop() ?> <?php echo $block->getBanner()->getBannerTop() ?></div>
+  <div id="hawkbannerlefttop" class="bannerLeftTop"><?php echo $block->getBanner()->getBannerLeftTop() ?></div>
+  <div id="hawkbannerleftbottom" class="bannerLeftBottom"><?php echo $block->getBanner()->getBannerLeftBottom() ?></div>
+  <div id="hawkbannerbottom" class="bannerBottom"> <?php echo $block->getBanner()->getFeaturedBottom() ?> <?php echo $block->getBanner()->getBannerBottom() ?></div>
+  <div id="hawkbannerbottom2" class="bannerBottom"> <?php echo $block->getBanner()->getBannerBottom2() ?> <?php echo $block->getBanner()->getFeaturedBottom2() ?></div>
   <div id="hawkbreadcrumb"><?php echo $block->getBreadCrumb() ?></div>
   <div id="hawktitle"><?php echo $block->getTitle() ?></div>
 </div>

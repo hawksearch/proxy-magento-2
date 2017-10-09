@@ -22,9 +22,11 @@ class Html
 {
 
     private $helper;
+    private $banner;
 
     public function __construct(Template\Context $context,
                                 \HawkSearch\Proxy\Helper\Data $helper,
+                                \HawkSearch\Proxy\Model\Banner $banner,
                                 array $data = [])
     {
         $helper->setUri($context->getRequest()->getParams());
@@ -32,8 +34,13 @@ class Html
         $helper->setClientUa($context->getRequest()->getHeader('UserAgent'));
         $helper->setIsHawkManaged(true);
         $this->helper = $helper;
+        $this->banner = $banner;
 
         parent::__construct($context, $data);
+    }
+
+    public function getBanner() {
+        return $this->banner;
     }
 
     function getFacets()
