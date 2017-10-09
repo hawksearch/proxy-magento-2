@@ -37,4 +37,10 @@ class Footer extends \Magento\Framework\View\Element\Template
         $ids = $this->helper->getConfigurationData('hawksearch_proxy/proxy/search_box_ids');
         return explode(',', $ids);
     }
+    public function getHiddenDivName() {
+        return $this->helper->getConfigurationData('hawksearch_proxy/proxy/autocomplete_div_id');
+    }
+    public function getAutosuggestParams() {
+        return $this->helper->getConfigurationData('hawksearch_proxy/proxy/autocomplete_query_params');
+    }
 }

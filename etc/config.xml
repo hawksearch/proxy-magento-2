@@ -24,7 +24,9 @@
         <tracking_url_staging>https://dev.hawksearch.net/</tracking_url_staging>
         <tracking_url_live>https://manage.hawksearch.com/</tracking_url_live>
         <search_box_ids>hawksearch</search_box_ids>
-        <hawksearch_include_css>0</hawksearch_include_css>
+        <autocomplete_div_id>search_autocomplete</autocomplete_div_id>
+        <autocomplete_query_params><![CDATA[/?fn=ajax&f=GetSuggestions]]></autocomplete_query_params>
+        <hawksearch_include_css>1</hawksearch_include_css>
       </proxy>
     </hawksearch_proxy>
   </default>

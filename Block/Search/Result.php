@@ -23,32 +23,6 @@ class Result
     extends \Magento\CatalogSearch\Block\Result
 {
     /**
-     * Catalog Product collection
-     *
-     * @var Collection
-     */
-    protected $productCollection;
-
-    /**
-     * Catalog search data
-     *
-     * @var Data
-     */
-    protected $catalogSearchData;
-
-    /**
-     * Catalog layer
-     *
-     * @var \Magento\Catalog\Model\Layer
-     */
-    protected $catalogLayer;
-
-    /**
-     * @var QueryFactory
-     */
-    private $queryFactory;
-
-    /**
      * @var \HawkSearch\Proxy\Helper\Data
      */
     private $helper;
@@ -74,9 +48,8 @@ class Result
         parent::__construct($context, $layerResolver, $catalogSearchData, $queryFactory, $data);
     }
 
-
     /**
-     * @return Collection|\HawkSearch\Proxy\Helper\Mage_Catalog_Model_Resource_Product_Collection|null
+     * @return \Magento\CatalogSearch\Model\ResourceModel\Fulltext\Collection
      */
     protected function _getProductCollection() {
         if (null === $this->productCollection) {
