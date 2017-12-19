@@ -40,7 +40,7 @@ bin/magento cache:clean
 4. Login to your Magento Dashboard and configure the modules with instructions provided by your Hawksearch account manager.
 
 
-#### Steps to install the hawksearch modules via zip file:
+#### Steps to install the HawkSearch modules via zip file:
 1. Open https://gitlab.idevdesign.net/magento2-modules/hawksearch-datafeed-2 and https://gitlab.idevdesign.net/magento2-modules/hawksearch-proxy-2 in a browser.
 2. On each page, click the “Download zip” button to download the zip files.
 3. Create a directory named “HawkSearch” in the Magento “app/code” directory and unzip the downloaded files in that directory.
