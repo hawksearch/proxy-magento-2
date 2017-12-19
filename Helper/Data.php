@@ -36,7 +36,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     private $rawResponse;
     private $store = null;
     private $landingPages;
-    private $uri;
+    protected $uri; /***overrrided CatalogSearch/Helper/Data.php***/
     private $clientIP;
     private $clientUA;
     private $_feedFilePath;
@@ -48,7 +48,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     private $overwriteFlag;
     private $email_helper;
     private $collectionFactory;
-    private $session;
+    protected $session; /***overrrided CatalogSearch/Helper/Data.php***/
     private $catalogConfig;
 
     /* this function needs to be eliminated */
