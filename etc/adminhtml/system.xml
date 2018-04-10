@@ -69,14 +69,19 @@
                     <label>Run Mode</label>
                     <source_model>HawkSearch\Proxy\Model\System\Config\Source\Mode</source_model>
                 </field>
-                <field id="tracking_url_staging"
+                <field id="tracking_url_develop"
                        translate="label comment"
                        type="text" showInDefault="1" showInWebsite="0" showInStore="0" sortOrder="30">
                     <label>Hawksearch tracking URL (Development)</label>
                 </field>
-                <field id="tracking_url_live"
+                <field id="tracking_url_staging"
                        translate="label comment"
                        type="text" showInDefault="1" showInWebsite="0" showInStore="0" sortOrder="35">
+                    <label>Hawksearch tracking URL (Staging)</label>
+                </field>
+                <field id="tracking_url_production"
+                       translate="label comment"
+                       type="text" showInDefault="1" showInWebsite="0" showInStore="0" sortOrder="36">
                     <label>Hawksearch tracking URL (Production)</label>
                 </field>
                 <field id="manage_categories" translate="label comment" type="select" showInDefault="0"

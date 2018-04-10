@@ -19,6 +19,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 {
     const HAWK_LANDING_PAGE_URL = 'LandingPage/';
     const CONFIG_PROXY_RESULT_TYPE = 'hawksearch_proxy/proxy/result_type';
+    const LP_CACHE_KEY = 'hawk_landing_pages';
+    const LOCK_FILE_NAME = 'hawkcategorysync.lock';
 
     protected $_logFilename = "/var/log/hawk_sync_categories.log";
     protected $_exceptionLog = "hawk_sync_exception.log";
@@ -28,10 +30,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     protected $_syncingExceptions = [];
 
-    protected $_storeManager;
-    const LP_CACHE_KEY = 'hawk_landing_pages';
-    const LOCK_FILE_NAME = 'hawkcategorysync.lock';
-    private $mode = null;
+    protected $storeManager;
     private $hawkData;
     private $rawResponse;
     private $store = null;
@@ -69,7 +68,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     ) {
         // parent construct first so scopeConfig gets set for use in "setUri", etc.
         parent::__construct($context);
-        $this->_storeManager = $storeManager;
+        $this->storeManager = $storeManager;
         $this->pathGenerator = $pathGenerator;
         $this->filesystem = $filesystem;
         $this->collectionFactory = $collectionFactory;
@@ -105,7 +104,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function getConfigurationData($data)
     {
         $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
-        return $this->scopeConfig->getValue($data, $storeScope);
+
+        return $this->scopeConfig->getValue($data, $storeScope, $this->storeManager->getStore()->getCode());
 
     }
 
@@ -194,18 +194,12 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     public function getApiUrl()
     {
-        if ($this->getMode() == '1') {
-
-            $apiUrl = $this->getConfigurationData('hawksearch_proxy/proxy/tracking_url_live');
-        } else {
-
-            $apiUrl = $this->getConfigurationData('hawksearch_proxy/proxy/tracking_url_staging');
-        }
+        $apiUrl = $this->getConfigurationData(sprintf('hawksearch_proxy/proxy/tracking_url_%s', $this->getMode()));
         $apiUrl = preg_replace('|^http://|', 'https://', $apiUrl);
         if ('/' == substr($apiUrl, -1)) {
             return $apiUrl . 'api/v3/';
         }
-        return $apiUrl . '/api/v3/	';
+        return $apiUrl . '/api/v3/';
     }
 
     public function clearHawkData()
@@ -231,11 +225,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     public function getTrackingUrl()
     {
-        if ($this->getMode() == '1') {
-            $trackingUrl = $this->getConfigurationData('hawksearch_proxy/proxy/tracking_url_live');
-        } else {
-            $trackingUrl = $this->getConfigurationData('hawksearch_proxy/proxy/tracking_url_staging');
-        }
+        $trackingUrl = $this->getConfigurationData(sprintf('hawksearch_proxy/proxy/tracking_url_%', $this->getMode()));
         if ('/' == substr($trackingUrl, -1)) {
             return $trackingUrl . 'sites/' . $this->getEngineName();
         }
@@ -244,12 +234,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     public function getTrackingPixelUrl($args)
     {
-        if ($this->getMode() == '1') {
-
-            $trackingUrl = $this->getConfigurationData('hawksearch_proxy/proxy/tracking_url_live');
-        } else {
-            $trackingUrl = $this->getConfigurationData('hawksearch_proxy/proxy/tracking_url_staging');
-        }
+        $trackingUrl = $this->getConfigurationData(sprintf('hawksearch_proxy/proxy/tracking_url_%', $this->getMode()));
         if ('/' == substr($trackingUrl, -1)) {
             return $trackingUrl . 'sites/_hawk/hawkconversion.aspx?' . http_build_query($args);
         }
@@ -264,21 +249,16 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     public function getEngineName()
     {
-
         return $this->getConfigurationData('hawksearch_proxy/proxy/engine_name');
     }
 
     public function getMode()
     {
-        if (empty($this->mode)) {
-            $this->mode = $this->getConfigurationData('hawksearch_proxy/proxy/mode');
-        }
-        return $this->mode;
+        return $this->getConfigurationData('hawksearch_proxy/proxy/mode');
     }
 
     public function getApiKey()
     {
-
         return $this->getConfigurationData('hawksearch_proxy/proxy/hawksearch_api_key');
     }
 
@@ -541,7 +521,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     private function syncHawkLandingByStore(\Magento\Store\Model\Store $store)
     {
-
         $this->log(sprintf('Starting environment for store %s', $store->getName()));
         /** @var Mage_Core_Model_App_Emulation $appEmulation */
         $appEmulation = $this->createObj()->get('Magento\Store\Model\App\Emulation');
@@ -640,7 +619,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     public function synchronizeHawkLandingPages()
     {
-        $stores = $this->_storeManager->getStores();
+        $stores = $this->storeManager->getStores();
         foreach ($stores as $store) {
             /** @var \Magento\Store\Model\Store $store */
             if ($store->getConfig('hawksearch_proxy/general/enabled') && $store->isActive()) {
