@@ -3,6 +3,7 @@
 namespace HawkSearch\Proxy\Setup;
 
 use Magento\Framework\App\Config\ConfigResource\ConfigInterface;
+use Magento\Framework\Cache\FrontendInterface;
 use Magento\Framework\Setup\ModuleContextInterface;
 use Magento\Framework\Setup\ModuleDataSetupInterface;
 use Magento\Catalog\Setup\CategorySetupFactory;
@@ -19,17 +20,23 @@ class UpgradeData implements \Magento\Framework\Setup\UpgradeDataInterface
      * @var ConfigInterface
      */
     private $config;
+    /**
+     * @var FrontendInterface
+     */
+    private $cache;
 
     /**
      * Init
      *
      * @param CategorySetupFactory $categorySetupFactory
      * @param ConfigInterface $config
+     * @param FrontendInterface $cache
      */
-    public function __construct(CategorySetupFactory $categorySetupFactory, ConfigInterface $config)
+    public function __construct(CategorySetupFactory $categorySetupFactory, ConfigInterface $config, FrontendInterface $cache)
     {
         $this->categorySetupFactory = $categorySetupFactory;
         $this->config = $config;
+        $this->cache = $cache;
     }
 
     /**
@@ -105,5 +112,6 @@ class UpgradeData implements \Magento\Framework\Setup\UpgradeDataInterface
         // delete old values:
         $config->deleteConfig('hawksearch_proxy/proxy/tracking_url_staging', 'default', 0);
         $config->deleteConfig('hawksearch_proxy/proxy/tracking_url_live', 'default', 0);
+        $this->cache->clean();
     }
 }
