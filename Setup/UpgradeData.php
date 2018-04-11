@@ -2,8 +2,8 @@
 
 namespace HawkSearch\Proxy\Setup;
 
+use Magento\Framework\App\Cache\Type\Config;
 use Magento\Framework\App\Config\ConfigResource\ConfigInterface;
-use Magento\Framework\Cache\FrontendInterface;
 use Magento\Framework\Setup\ModuleContextInterface;
 use Magento\Framework\Setup\ModuleDataSetupInterface;
 use Magento\Catalog\Setup\CategorySetupFactory;
@@ -21,7 +21,7 @@ class UpgradeData implements \Magento\Framework\Setup\UpgradeDataInterface
      */
     private $config;
     /**
-     * @var FrontendInterface
+     * @var Config
      */
     private $cache;
 
@@ -30,9 +30,9 @@ class UpgradeData implements \Magento\Framework\Setup\UpgradeDataInterface
      *
      * @param CategorySetupFactory $categorySetupFactory
      * @param ConfigInterface $config
-     * @param FrontendInterface $cache
+     * @param Config $cache
      */
-    public function __construct(CategorySetupFactory $categorySetupFactory, ConfigInterface $config, FrontendInterface $cache)
+    public function __construct(CategorySetupFactory $categorySetupFactory, ConfigInterface $config, Config $cache)
     {
         $this->categorySetupFactory = $categorySetupFactory;
         $this->config = $config;
