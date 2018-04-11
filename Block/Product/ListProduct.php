@@ -36,15 +36,14 @@ class ListProduct
                                 \Magento\Catalog\Model\Layer\Resolver $layerResolver,
                                 CategoryRepositoryInterface $categoryRepository,
                                 \Magento\Framework\Url\Helper\Data $urlHelper,
+                                \Magento\Framework\Pricing\Helper\Data $pricingHelper,
                                 \HawkSearch\Proxy\Helper\Data $hawkHelper,
+                                \Magento\Framework\App\Response\Http $response,
                                 array $data = [])
     {
+        $this->_pricingHelper = $pricingHelper;
         $this->hawkHelper = $hawkHelper;
-
-        /** @var \Magento\Framework\App\Request\Http $req */
-        $req = $context->getRequest();
-        $this->controller = $req->getControllerName();
-
+        $this->response = $response;
         parent::__construct($context, $postDataHelper, $layerResolver, $categoryRepository, $urlHelper, $data);
     }
 
@@ -71,17 +70,33 @@ class ListProduct
             return parent::getToolbarHtml();
         }
         if ($this->pagers) {
-
+            $baseUrl = $this->_storeManager->getStore()->getBaseUrl();
             if ($this->topseen) {
-                return '<div id="hawkbottompager">' . $this->hawkHelper->getResultData()->Data->BottomPager . '</div>';
+                return '<div id="hawkbottompager">' . str_replace($baseUrl.'/', $baseUrl, $this->hawkHelper->getResultData()->Data->BottomPager) . '</div>';
             }
             $this->topseen = true;
-            return '<div id="hawktoppager">' . $this->hawkHelper->getResultData()->Data->TopPager . '</div>';
+            return '<div id="hawktoppager">' . str_replace($baseUrl.'/', $baseUrl, $this->hawkHelper->getResultData()->Data->TopPager) . '</div>';
         } else {
             return '';
         }
     }
 
+    public function getIdentities()
+    {
+        $identities = [];
+        if(count($this->_getProductCollection()))
+        {
+            foreach ($this->_getProductCollection() as $item) {
+                $identities = array_merge($identities, $item->getIdentities());
+            }
+        }
+        $category = $this->getLayer()->getCurrentCategory();
+        if ($category)
+        {
+            $identities[] = \Magento\Catalog\Model\Product::CACHE_PRODUCT_CATEGORY_TAG . '_' . $category->getId();
+        }
+        return $identities;
+    }
 
     protected function _getProductCollection()
     {
@@ -116,4 +131,38 @@ class ListProduct
         $this->setData('module_name', 'HawkSearch_Proxy');
         return $ret;
     }
+
+    public function getProductPrice(\Magento\Catalog\Model\Product $product)
+    {
+	$block = $this->getLayout()->getBlock('product.price.render.default');
+	if ($block) {
+        	$priceRender = $this->getPriceRender();
 } 
+
+        $price = '';
+        if ($priceRender) {
+            $price = $priceRender->render(
+                \Magento\Catalog\Pricing\Price\FinalPrice::PRICE_CODE,
+                $product,
+                [
+                    'include_container' => true,
+                    'display_minimal_price' => true,
+                    'zone' => \Magento\Framework\Pricing\Render::ZONE_ITEM_LIST
+                ]
+            );
+        } else {
+            $priceamount = $this->_pricingHelper->currency(number_format($product->getFinalPrice(), 2), true, false);
+            $price='<div class="price-box price-final_price" data-role="priceBox" data-product-id="'.$product->getId().'">
+
+
+<span class="price-container price-final_price tax weee">
+        <span id="product-price-'.$product->getId().'" data-price-amount="'.$priceamount.'" data-price-type="finalPrice" class="price-wrapper ">
+        <span class="price">'.$priceamount.'</span>    </span>
+        </span>
+
+</div>';
+        }
+
+        return $price;
+    }
+}

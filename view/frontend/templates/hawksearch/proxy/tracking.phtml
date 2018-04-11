@@ -1,7 +1,6 @@
 <?php
 /** @var Magento\Catalog\Model\Session $sess */
-$objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-$sess = $objectManager->get('Magento\Catalog\Model\Session');
+$sess = $block->getSession();
 $pData = $sess->getHawkTrackingData();
 if(isset($pData)){
 	$conversionUrl = $pData;

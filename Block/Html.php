@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2013 Hawksearch (www.hawksearch.com) - All Rights Reserved
+ * Copyright (c) 2017 Hawksearch (www.hawksearch.com) - All Rights Reserved
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -10,6 +10,7 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
+
 namespace HawkSearch\Proxy\Block;
 
 use Magento\Framework\View\Element\Template;
@@ -22,89 +23,91 @@ class Html
 {
 
     private $helper;
-    private $banner;
+    private $bannerFactory;
 
-    public function __construct(Template\Context $context,
-                                \HawkSearch\Proxy\Helper\Data $helper,
-                                \HawkSearch\Proxy\Model\Banner $banner,
-                                array $data = [])
+    public function __construct(
+        Template\Context $context,
+        \HawkSearch\Proxy\Helper\Data $helper,
+        \HawkSearch\Proxy\Model\BannerFactory $bannerFactory,
+        array $data = [])
     {
         $helper->setUri($context->getRequest()->getParams());
         $helper->setClientIp($context->getRequest()->getClientIp());
         $helper->setClientUa($context->getRequest()->getHeader('UserAgent'));
         $helper->setIsHawkManaged(true);
         $this->helper = $helper;
-        $this->banner = $banner;
+        $this->bannerFactory = $bannerFactory;
 
         parent::__construct($context, $data);
     }
 
-    public function getBanner() {
-        return $this->banner;
+    public function getBanner()
+    {
+        return $this->bannerFactory->create();
     }
 
-    function getFacets()
+    public function getFacets()
     {
 
         return $this->helper->getResultData()->Data->Facets;
     }
 
-    function getTopPager()
+    public function getTopPager()
     {
         return $this->helper->getResultData()->Data->TopPager;
     }
 
-    function getBottomPager()
+    public function getBottomPager()
     {
         return $this->helper->getResultData()->Data->BottomPager;
     }
 
-    function getMetaRobots()
+    public function getMetaRobots()
     {
         return $this->helper->getResultData()->MetaRobots;
     }
 
-    function getHeaderTitle()
+    public function getHeaderTitle()
     {
         return $this->helper->getResultData()->HeaderTitle;
     }
 
-    function getMetaDescription()
+    public function getMetaDescription()
     {
         return $this->helper->getResultData()->MetaDescription;
     }
 
-    function getMetaKeywords()
+    public function getMetaKeywords()
     {
         return $this->helper->getResultData()->MetaKeywords;
     }
 
-    function getRelCanonical()
+    public function getRelCanonical()
     {
         return $this->helper->getResultData()->RelCanonical;
     }
 
-    function getTopText()
+    public function getTopText()
     {
         return $this->helper->getResultData()->Data->TopText;
     }
 
-    function getRelated()
+    public function getRelated()
     {
         return $this->helper->getResultData()->Data->Related;
     }
 
-    function getBreadCrumb()
+    public function getBreadCrumb()
     {
         return $this->helper->getResultData()->Data->BreadCrumb;
     }
 
-    function getTitle()
+    public function getTitle()
     {
         return $this->helper->getResultData()->Data->Title;
     }
 
-    function getItemList()
+    public function getItemList()
     {
         $layout = $this->getLayout();
         $block = $layout->createBlock('HawkSearch\Proxy\Block\Product\ListProduct');
@@ -112,7 +115,31 @@ class Html
         $block->setTemplate('Magento_Catalog::product/list.phtml');
 
         return $block->toHtml();
-
     }
 
+    public function getFeaturedZone($zone)
+    {
+        $layout = $this->getLayout();
+        $block = $layout->createBlock('HawkSearch\Proxy\Block\Product\ListFeatured');
+        $block->setZone($zone);
+        $productCollection = $block->getLoadedProductCollection();
+        if ($productCollection->count() > 0) {
+            $block->setTemplate('Magento_Catalog::product/list.phtml');
+            return $block->toHtml();
+        }
+        return "";
+    }
+
+    public function getFeaturedLeftZone($zone)
+    {
+        $layout = $this->getLayout();
+        $block = $layout->createBlock('HawkSearch\Proxy\Block\Product\ListFeatured');
+        $block->setZone($zone);
+        $productCollection = $block->getLoadedProductCollection();
+        if ($productCollection->count() > 0) {
+            $block->setTemplate('HawkSearch_Proxy::hawksearch/proxy/left/featured.phtml');
+            return $block->toHtml(false);
+        }
+        return "";
+    }
 }
