@@ -79,7 +79,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         if(is_array($params) && isset($params['q'])){
             $this->setUri($context->getRequest()->getParams());
         } else {
-            $this->setUri(array('lpurl' => $context->getRequest()->getAlias('rewrite_request_path'), 'output' => 'custom', 'hawkitemlist' => 'json'));
+            $this->setUri(array('lpurl' => $context->getRequest()->getAlias('rewrite_request_path'), 'output' => 'custom', 'hawkitemlist' => 'json', 'hawkfeatured' => 'json'));
         }
         $this->setClientIp($context->getRequest()->getClientIp());
         $this->setClientUa($context->getHttpHeader()->getHttpUserAgent());
@@ -299,6 +299,58 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $sorted = array();
         if ($collection->count() > 0) {
 
+            $it = $collection->getIterator();
+            while ($it->valid()) {
+                $prod = $it->current();
+                $sorted[$map[trim($prod->getSku())]] = $prod;
+                $it->next();
+            }
+            ksort($sorted);
+            foreach ($sorted as $p) {
+                $collection->removeItemByKey($p->getId());
+                $collection->addItem($p);
+            }
+        }
+
+        return $collection;
+    }
+
+    public function getFeaturedProductCollection($zone)
+    {
+        if (empty($this->hawkData)) {
+            $this->fetchResponse();
+        }
+        $skus = array();
+        $map = array();
+        $i = 0;
+
+        if (count($this->hawkData->Data->FeaturedItems->Items) == 0) {
+            return null;
+        } else {
+            foreach ($this->hawkData->Data->FeaturedItems->Items as $banner) {
+                if ($banner->Zone == $zone && isset($banner->Items)) {
+                    foreach ($banner->Items as $item) {
+                        if (isset($item->Custom->sku)) {
+                            $skus[] = $item->Custom->sku;
+                            $map[$item->Custom->sku] = $i;
+                            $i++;
+                        }
+                    }
+                }
+            }
+        }
+
+        $productCollection = $this->collectionFactory->create();
+        $collection = $productCollection
+            ->addAttributeToSelect($this->catalogConfig->getProductAttributes())
+            ->addAttributeToFilter('sku', array('in' => $skus))
+            ->addMinimalPrice()
+            ->addFinalPrice()
+            ->addTaxPercents()
+            ->addUrlRewrite();
+
+        $sorted = array();
+        if ($collection->count() > 0) {
             $it = $collection->getIterator();
             while ($it->valid()) {
                 $prod = $it->current();
@@ -946,6 +998,5 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         }
         return true;
     }
-
-
 }
+
