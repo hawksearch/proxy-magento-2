@@ -225,7 +225,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     public function getTrackingUrl()
     {
-        $trackingUrl = $this->getConfigurationData(sprintf('hawksearch_proxy/proxy/tracking_url_%', $this->getMode()));
+        $trackingUrl = $this->getConfigurationData(sprintf('hawksearch_proxy/proxy/tracking_url_%s', $this->getMode()));
         if ('/' == substr($trackingUrl, -1)) {
             return $trackingUrl . 'sites/' . $this->getEngineName();
         }
@@ -234,7 +234,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     public function getTrackingPixelUrl($args)
     {
-        $trackingUrl = $this->getConfigurationData(sprintf('hawksearch_proxy/proxy/tracking_url_%', $this->getMode()));
+        $trackingUrl = $this->getConfigurationData(sprintf('hawksearch_proxy/proxy/tracking_url_%s', $this->getMode()));
         if ('/' == substr($trackingUrl, -1)) {
             return $trackingUrl . 'sites/_hawk/hawkconversion.aspx?' . http_build_query($args);
         }
