@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2013 Hawksearch (www.hawksearch.com) - All Rights Reserved
+ * Copyright (c) 2017 Hawksearch (www.hawksearch.com) - All Rights Reserved
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -11,28 +11,34 @@
  * IN THE SOFTWARE.
  */
 namespace HawkSearch\Proxy\Block\System\Config;
-use Magento\Framework\App\Config\ScopeConfigInterface;
+
+use Magento\Backend\Block\Template\Context;
+use Magento\Framework\Data\Form\Element\AbstractElement;
+use Magento\Framework\Module\ModuleListInterface;
+
 class Version extends \Magento\Config\Block\System\Config\Form\Field
 {
     private $moduleList;
+
     /**
      * Version constructor.
+     * @param ModuleListInterface $moduleList
+     * @param Context $context
+     * @param array $data
      */
-    public function __construct(\Magento\Framework\Module\ModuleListInterface $moduleList,
-                                \Magento\Backend\Block\Template\Context $contex,
+    public function __construct(ModuleListInterface $moduleList,
+                                Context $context,
                                 array $data = []) {
         $this->moduleList = $moduleList;
-        parent::__construct($contex, $data);
+        parent::__construct($context, $data);
 
     }
 
     /**
-     *
-     *
-     * @param \Magento\Framework\Data\Form\Element\AbstractElement $element
+     * @param AbstractElement $element
      * @return string
      */
-    protected function _getElementHtml(\Magento\Framework\Data\Form\Element\AbstractElement $element)
+    protected function _getElementHtml(AbstractElement $element)
     {
         return $this->moduleList->getOne('HawkSearch_Proxy')['setup_version'];
     }

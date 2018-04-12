@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!--
 /**
- * Copyright (c) 2013 Hawksearch (www.hawksearch.com) - All Rights Reserved
+ * Copyright (c) 2017 Hawksearch (www.hawksearch.com) - All Rights Reserved
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -37,7 +37,7 @@
                     <label>Enable Logging</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
-                <field id="version" translate="label comment" showInDefault="1" showInWebsite="0" showInStore="0"
+                <field id="version" translate="label comment" showInDefault="1" showInWebsite="1" showInStore="1"
                        sortOrder="15">
                     <label>Version</label>
                     <frontend_model>HawkSearch\Proxy\Block\System\Config\Version</frontend_model>
@@ -93,7 +93,8 @@
                        showInStore="1" sortOrder="45">
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <label>Manage All Categories</label>
-                    <comment>All categories in current store, or only those marked as hawk-managed in category setup</comment>
+                    <comment>All categories in current store, or only those marked as hawk-managed in category setup
+                    </comment>
                     <depends>
                         <field id="manage_categories">1</field>
                     </depends>
