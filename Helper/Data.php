@@ -158,7 +158,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     private function fetchResponse()
     {
-
         if (empty($this->uri)) {
             throw new \Exception('No URI set.');
         }
@@ -324,10 +323,13 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $map = array();
         $i = 0;
 
-        if (count($this->hawkData->Data->FeaturedItems->Items) == 0) {
+        if(!$this->hawkData->Data->FeaturedItems instanceof \stdClass) {
+            $this->hawkData->Data->FeaturedItems = json_decode($this->hawkData->Data->FeaturedItems);
+        }
+        if (count($this->hawkData->Data->FeaturedItems->Items->Items) == 0) {
             return null;
         } else {
-            foreach ($this->hawkData->Data->FeaturedItems->Items as $banner) {
+            foreach ($this->hawkData->Data->FeaturedItems->Items->Items as $banner) {
                 if ($banner->Zone == $zone && isset($banner->Items)) {
                     foreach ($banner->Items as $item) {
                         if (isset($item->Custom->sku)) {
