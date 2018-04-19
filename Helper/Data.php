@@ -19,6 +19,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 {
     const HAWK_LANDING_PAGE_URL = 'LandingPage/';
     const CONFIG_PROXY_RESULT_TYPE = 'hawksearch_proxy/proxy/result_type';
+    const CONFIG_PROXY_ENABLE_CUSTOM_SEARCH_ROUTE = 'hawksearch_proxy/proxy/enable_custom_search_route';
+    const CONFIG_PROXY_ENABLE_LANDING_PAGE_ROUTE = 'hawksearch_proxy/proxy/enable_hawk_landing_pages';
     const LP_CACHE_KEY = 'hawk_landing_pages';
     const LOCK_FILE_NAME = 'hawkcategorysync.lock';
 
@@ -326,10 +328,10 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         if(!$this->hawkData->Data->FeaturedItems instanceof \stdClass) {
             $this->hawkData->Data->FeaturedItems = json_decode($this->hawkData->Data->FeaturedItems);
         }
-        if (count($this->hawkData->Data->FeaturedItems->Items->Items) == 0) {
+        if (count($this->hawkData->Data->FeaturedItems->Items) == 0) {
             return null;
         } else {
-            foreach ($this->hawkData->Data->FeaturedItems->Items->Items as $banner) {
+            foreach ($this->hawkData->Data->FeaturedItems->Items as $banner) {
                 if ($banner->Zone == $zone && isset($banner->Items)) {
                     foreach ($banner->Items as $item) {
                         if (isset($item->Custom->sku)) {
@@ -999,6 +1001,16 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             }
         }
         return true;
+    }
+
+    public function getEnableCustomSearchRoute()
+    {
+        return $this->getConfigurationData(self::CONFIG_PROXY_ENABLE_CUSTOM_SEARCH_ROUTE);
+    }
+
+    public function getEnableLandingPageRoute()
+    {
+        return $this->getConfigurationData(self::CONFIG_PROXY_ENABLE_LANDING_PAGE_ROUTE);
     }
 }
 

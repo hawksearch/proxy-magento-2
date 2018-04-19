@@ -17,8 +17,13 @@
     <type name="Magento\Framework\App\RouterList">
         <arguments>
             <argument name="routerList" xsi:type="array">
-                <item name="hawksearch_proxy" xsi:type="array">
-                    <item name="class" xsi:type="string">HawkSearch\Proxy\Controller\Router</item>
+                <item name="hawksearch_search" xsi:type="array">
+                    <item name="class" xsi:type="string">HawkSearch\Proxy\Controller\SearchRouter</item>
+                    <item name="disable" xsi:type="boolean">false</item>
+                    <item name="sortOrder" xsi:type="string">70</item>
+                </item>
+                <item name="hawksearch_landingpage" xsi:type="array">
+                    <item name="class" xsi:type="string">HawkSearch\Proxy\Controller\LandingPageRouter</item>
                     <item name="disable" xsi:type="boolean">false</item>
                     <item name="sortOrder" xsi:type="string">70</item>
                 </item>
