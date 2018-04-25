@@ -30,6 +30,9 @@
         <hawksearch_include_css>1</hawksearch_include_css>
         <enable_hawk_landing_pages>1</enable_hawk_landing_pages>
       </proxy>
+      <sync>
+        <cron_string>0 0 * * *</cron_string>
+      </sync>
     </hawksearch_proxy>
   </default>
 </config>

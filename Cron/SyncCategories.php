@@ -41,6 +41,7 @@ class SyncCategories
                 $errors = $this->helper->synchronizeHawkLandingPages();
                 $subject = sprintf("HawkSearch Category Sync Completed %s errors", empty($errors) ? "without" : "WITH");
             }
+            $errors = implode("\n", $errors);
             $this->email->sendEmail(['errors' => $errors, 'subject' => $subject]);
         }
     }
