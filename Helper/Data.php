@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2013 Hawksearch (www.hawksearch.com) - All Rights Reserved
+ * Copyright (c) 2018 Hawksearch (www.hawksearch.com) - All Rights Reserved
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -12,8 +12,20 @@
  */
 namespace HawkSearch\Proxy\Helper;
 
+use HawkSearch\Proxy\Model\ProxyEmail;
+use Magento\Catalog\Model\Config;
+use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
+use Magento\Catalog\Model\Session;
+use Magento\Framework\App\CacheInterface as Cache;
 use Magento\Framework\App\Helper\Context;
+use Magento\Framework\Filesystem;
+use Magento\Store\Model\App\Emulation;
+use Magento\Store\Model\ResourceModel\Store\CollectionFactory as StoreCollectionFactory;
+use Magento\Store\Model\Store;
 use Magento\Store\Model\StoreManagerInterface;
+use Magento\Catalog\Model\ResourceModel\Category\CollectionFactory as CategoryCollectionFactory;
+use HawkSearch\Proxy\Model\Logger;
+
 
 class Data extends \Magento\Framework\App\Helper\AbstractHelper
 {
@@ -26,12 +38,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     const LP_CACHE_KEY = 'hawk_landing_pages';
     const LOCK_FILE_NAME = 'hawkcategorysync.lock';
 
-    protected $_logFilename = "/var/log/hawk_sync_categories.log";
-    protected $_exceptionLog = "hawk_sync_exception.log";
-
-    protected $_logger;
-    protected $_exceptionLogger;
-
     protected $_syncingExceptions = [];
 
     protected $storeManager;
@@ -42,38 +48,67 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     protected $uri; /***overrrided CatalogSearch/Helper/Data.php***/
     private $clientIP;
     private $clientUA;
-    private $_feedFilePath;
     private $isManaged;
-    private $pathGenerator;
     private $filesystem;
-    private $collection;
     /** @var \Magento\Framework\Logger\Monolog $logger */
     private $overwriteFlag;
     private $email_helper;
     private $collectionFactory;
     protected $session; /***overrrided CatalogSearch/Helper/Data.php***/
     private $catalogConfig;
+    /**
+     * @var CategoryCollectionFactory
+     */
+    private $categoryCollectionFactory;
+    /**
+     * @var Emulation
+     */
+    private $emulation;
+    /**
+     * @var StoreCollectionFactory
+     */
+    private $storeCollectionFactory;
+    /**
+     * @var Logger
+     */
+    private $logger;
+    /**
+     * @var Cache
+     */
+    private $cache;
 
-    /* this function needs to be eliminated */
-    public function createObj()
-    {
-        return \Magento\Framework\App\ObjectManager::getInstance();
-    }
-
+    /**
+     * Data constructor.
+     * @param Context $context
+     * @param StoreManagerInterface $storeManager
+     * @param Filesystem $filesystem
+     * @param ProxyEmail $email_helper
+     * @param CollectionFactory $collectionFactory
+     * @param CategoryCollectionFactory $categoryCollectionFactory
+     * @param Config $catalogConfig
+     * @param Emulation $emulation
+     * @param StoreCollectionFactory $storeCollectionFactory
+     * @param Logger $logger
+     * @param Cache $cache
+     * @param Session $session
+     */
     public function __construct(
         Context $context,
         StoreManagerInterface $storeManager,
-        \Magento\CatalogUrlRewrite\Model\CategoryUrlPathGenerator $pathGenerator,
-        \Magento\Framework\Filesystem $filesystem,
-        \HawkSearch\Proxy\Model\ProxyEmail $email_helper,
-        \Magento\Catalog\Model\ResourceModel\Product\CollectionFactory $collectionFactory,
-        \Magento\Catalog\Model\Config $catalogConfig,
-        \Magento\Catalog\Model\Session $session
+        Filesystem $filesystem,
+        ProxyEmail $email_helper,
+        CollectionFactory $collectionFactory,
+        CategoryCollectionFactory $categoryCollectionFactory,
+        Config $catalogConfig,
+        Emulation $emulation,
+        StoreCollectionFactory $storeCollectionFactory,
+        Logger $logger,
+        Cache $cache,
+        Session $session
     ) {
         // parent construct first so scopeConfig gets set for use in "setUri", etc.
         parent::__construct($context);
         $this->storeManager = $storeManager;
-        $this->pathGenerator = $pathGenerator;
         $this->filesystem = $filesystem;
         $this->collectionFactory = $collectionFactory;
         $this->session = $session;
@@ -88,21 +123,13 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $this->setClientIp($context->getRequest()->getClientIp());
         $this->setClientUa($context->getHttpHeader()->getHttpUserAgent());
         $this->overwriteFlag = false;
-        $writer = new \Zend\Log\Writer\Stream(BP . $this->_logFilename);
-        $this->_logger = new \Zend\Log\Logger();
-        $this->_logger->addWriter($writer);
         $this->email_helper = $email_helper;
 
-    }
-
-    public function logException(\Exception $e)
-    {
-        if (!$this->_exceptionLogger instanceof \Zend\Log\Logger) {
-            $writer = new \Zend\Log\Writer\Stream(BP . '/var/log/' . $this->_exceptionLog);
-            $this->_exceptionLogger = new \Zend\Log\Logger();
-            $this->_exceptionLogger->addWriter($writer);
-        }
-        $this->_exceptionLogger->info($e->getMessage() . ' - File: ' . $e->getFile() . ' on line ' . $e->getLine());
+        $this->categoryCollectionFactory = $categoryCollectionFactory;
+        $this->emulation = $emulation;
+        $this->storeCollectionFactory = $storeCollectionFactory;
+        $this->logger = $logger;
+        $this->cache = $cache;
     }
 
     public function getConfigurationData($data)
@@ -110,7 +137,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
 
         return $this->scopeConfig->getValue($data, $storeScope, $this->storeManager->getStore()->getCode());
-
     }
 
     public function isValidSearchRoute($route)
@@ -188,9 +214,10 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         return $this->hawkData;
     }
 
-    public  function getResultType() {
+    public function getResultType() {
         return $this->getConfigurationData(self::CONFIG_PROXY_RESULT_TYPE);
     }
+
     public function getBaseUrl()
     {
         return $this->getConfigurationData('web/secure/base_url') . 'hawkproxy';
@@ -393,25 +420,25 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             $response = $client->request();
             return $response->getBody();
         } catch (\Exception $e) {
-            $this->logException($e);
+            $this->log($e);
             return json_encode(['Message' => "Internal Error - " . $e->getMessage()]);
         }
     }
 
     public function getLPCacheKey()
     {
-        return self::LP_CACHE_KEY . $this->createObj()->get('Magento\Store\Model\StoreManagerInterface')->getStore()->getId();
+        return self::LP_CACHE_KEY . $this->storeManager->getStore()->getId();
     }
 
     public function getLandingPages($force = false)
     {
-        /** @var Varien_Cache_Core $cache */
-        $cache = $this->createObj()->get('Magento\Framework\Cache\Core');
-        $this->landingPages = json_decode($this->getHawkResponse(\Zend_Http_Client::GET, 'LandingPage/Urls'));
-        sort($this->landingPages, SORT_STRING);
-        // $cache->save(serialize($this->landingPages), $this->getLPCacheKey(), array(), 30);
-
-
+        if (($serialized = $this->cache->load($this->getLPCacheKey()))) {
+            $this->landingPages = unserialize($serialized);
+        } else {
+            $this->landingPages = json_decode($this->getHawkResponse(\Zend_Http_Client::GET, 'LandingPage/Urls'));
+            sort($this->landingPages, SORT_STRING);
+            $this->cache->save(serialize($this->landingPages), $this->getLPCacheKey(), array(), 300);
+        }
         return $this->landingPages;
     }
 
@@ -455,7 +482,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $code = $this->getConfigurationData('hawksearch_proxy/proxy/store_code');
 
         /** @var Mage_Core_Model_Resource_Store_Collection $store */
-        $store = $this->createObj()->get('Magento\Store\Model\ResourceModel\Store\Collection');
+        $store = $this->storeCollectionFactory->create();
         return $store->addFieldToFilter('code', $code)->getFirstItem()->getId();
 
     }
@@ -578,12 +605,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         return $lpObject['Custom'];
     }
 
-    private function syncHawkLandingByStore(\Magento\Store\Model\Store $store)
+    private function syncHawkLandingByStore(Store $store)
     {
         $this->log(sprintf('Starting environment for store %s', $store->getName()));
-        /** @var Mage_Core_Model_App_Emulation $appEmulation */
-        $appEmulation = $this->createObj()->get('Magento\Store\Model\App\Emulation');
-        $appEmulation->startEnvironmentEmulation($store->getId());
+
+        $this->emulation->startEnvironmentEmulation($store->getId());
         $this->log('starting synchronizeHawkLandingPages()');
         /*
          * ok, so here is the problem, if we put or post, and some landing page already has that "custom" value, we get
@@ -642,7 +668,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                 );
                 $customVal = $this->clearExistingCustomField($lpObject, $existingCustom);
                 $resp = $this->getHawkResponse(\Zend_Http_Client::POST, self::HAWK_LANDING_PAGE_URL, json_encode($lpObject));
-                $this->validateHawkLandingPageResponse($resp, \Zend_Http_Client::POST, $hawkList[$left]['hawkurl'], json_encode($lpObject));
+                $this->validateHawkLandingPageResponse($resp, \Zend_Http_Client::POST, $mageList[$right]['hawkurl'], json_encode($lpObject));
 
                 $this->log(sprintf('attempt to add page %s resulted in: %s', $mageList[$right]['hawkurl'], $resp));
                 $right++;
@@ -654,9 +680,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                     $this->getHawkNarrowXml($mageList[$right]['catid']),
                     $mageList[$right]['catid']
                 );
-                if($mageList[$right]['catid'] >= 1756 && $mageList[$right]['catid'] <= 1757) {
-                    $foo = 'bar';
-                }
                 $lpObject['PageId'] = $hawkList[$left]['pageid'];
                 $customVal = $this->clearExistingCustomField($lpObject, $existingCustom);
 
@@ -672,8 +695,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             }
         }
 
-        // end emulation
-        $appEmulation->stopEnvironmentEmulation();
+        $this->emulation->stopEnvironmentEmulation();
     }
 
     /**
@@ -684,7 +706,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $stores = $this->storeManager->getStores();
         $errors = [];
         foreach ($stores as $store) {
-            /** @var \Magento\Store\Model\Store $store */
+            /** @var Store $store */
             if ($store->getConfig('hawksearch_proxy/general/enabled') && $store->isActive()) {
                 try {
                     $this->syncHawkLandingByStore($store);
@@ -716,12 +738,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         return $hawkPages;
     }
 
-    public function getMagentoLandingPages()
-    {
-        $this->log('getting magento landing pages...');
-
-        /** @var Mage_Catalog_Helper_Category $helper */
-        $helper = $this->createObj()->get('Magento\Catalog\Helper\Category');
+    public function dead_getMagentoLandingPages() {
+        $helper = \Magento\Framework\App\ObjectManager::getInstance()->get('Magento\Catalog\Helper\Category');
 
         /** @var Mage_Catalog_Model_Resource_Category_Collection $categories */
         $categories = $helper->getStoreCategories(false, true, false);
@@ -733,19 +751,31 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $categories->addAttributeToSort('entity_id')
             ->addAttributeToSort('parent_id')
             ->addAttributeToSort('position');
+        foreach ($categories as $category) {
+            $hawkUrl = sprintf("/%s", $this->pathGenerator->getUrlPathWithSuffix($category, $this->getCategoryStoreId()));
+        }
+    }
 
-        $cats = array();
-        $categories->setPageSize(1000);
-        $pages = $categories->getLastPageNumber();
+
+    public function getMagentoLandingPages() {
+        $collection = $this->categoryCollectionFactory->create();
+        $collection->addAttributeToSelect(array('name', 'is_active', 'parent_id', 'position', 'include_in_menu'));
+        $collection->addAttributeToFilter('is_active', array('eq' => '1'));
+        $collection->addAttributeToSort('entity_id')->addAttributeToSort('parent_id')->addAttributeToSort('position');
+        $collection->addAttributeToFilter('level', ['gteq' => '2']);
+        $collection->joinUrlRewrite();
+        $collection->setPageSize(1000);
+        $pages = $collection->getLastPageNumber();
         $currentPage = 1;
+        $cats = [];
 
         do {
-            $categories->clear();
-            $categories->setCurPage($currentPage);
-            $categories->load();
-            foreach ($categories as $cat) {
+            $collection->clear();
+            $collection->setCurPage($currentPage);
+            $collection->load();
+            foreach ($collection as $cat) {
                 $cats[] = array(
-                    'hawkurl' => sprintf("/%s", $this->pathGenerator->getUrlPathWithSuffix($cat, $this->getCategoryStoreId())),
+                    'hawkurl' => sprintf("/%s", $cat->getRequestPath()),
                     'name' => $cat->getName(),
                     'catid' => $cat->getId(),
                     'pid' => $cat->getParentId()
@@ -760,13 +790,12 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function log($message)
     {
         if ($this->isLoggingEnabled()) {
-            $this->_logger->info($message);
+            $this->logger->debug($message);
         }
     }
 
     public function getManageAll()
     {
-
         return $this->getConfigurationData('hawksearch_proxy/proxy/manage_all');
     }
 
@@ -777,10 +806,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     public function getAjaxNotice($force = true)
     {
-
-        /** @var Mage_Catalog_Model_Resource_Category_Collection $collection */
-//        $categoryFactory = $this->createObj()->create('Magento\Catalog\Model\ResourceModel\Category\CollectionFactory');
-        $collection = $this->categoryFactory->create();
+        $collection = $this->categoryCollectionFactory->create();
         $collection->addAttributeToFilter('parent_id', array('neq' => '0'));
         $collection->addAttributeToFilter('hawk_landing_page', array('eq' => '1'));
         $collection->addAttributeToFilter('is_active', array('neq' => '0'));
@@ -809,13 +835,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function launchSyncProcess()
     {
         try {
-            $this->log('-');
-            $this->log('--');
-            $this->log('----');
-            $this->log('launching new sync process');
-
-            //$tmppath = sys_get_temp_dir();
-            $tmppath = $mediaRoot = $this->filesystem->getDirectoryWrite('tmp')->getAbsolutePath();
+            $tmppath = $this->filesystem->getDirectoryWrite('tmp')->getAbsolutePath();
             $tmpfile = tempnam($tmppath, 'hawkproxy_');
 
             $parts = explode(DIRECTORY_SEPARATOR, __FILE__);
@@ -823,29 +843,22 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             $parts[] = 'Runsync.php';
             $runfile = implode(DIRECTORY_SEPARATOR, $parts);
             $root = BP;
-            $this->log("get run file: {$runfile}");
 
-            $this->log("going to open new shell script: $tmpfile");
             $f = fopen($tmpfile, 'w');
 
             $phpbin = PHP_BINDIR . DIRECTORY_SEPARATOR . "php";
 
             if($this->overwriteFlag) {
-                $this->log("writing script: $phpbin -d memory_limit=6144M $runfile -r $root -t $tmpfile -f 1");
-                fwrite($f, "$phpbin -d memory_limit=6144M $runfile -r $root -t $tmpfile -f 1\n");
+                fwrite($f, "$phpbin -d memory_limit=-1 $runfile -r $root -t $tmpfile -f 1\n");
             } else {
-                $this->log("writing script: $phpbin -d memory_limit=6144M $runfile -r $root -t $tmpfile");
-                fwrite($f, "$phpbin -d memory_limit=6144M $runfile -r $root -t $tmpfile\n");
+                fwrite($f, "$phpbin -d memory_limit=-1 $runfile -r $root -t $tmpfile\n");
             }
 
-            $this->log('going to execute script');
-            $syncLog = implode(DIRECTORY_SEPARATOR, [BP, 'var', 'log', $this->_exceptionLog]);
+            $syncLog = implode(DIRECTORY_SEPARATOR, [BP, 'var', 'log', 'hawk_sync_exception.log']);
             shell_exec("/bin/sh $tmpfile > $syncLog 2>&1 &");
-            $this->log('sync script launched');
+
             return true;
         } catch (\Exception $e) {
-            $this->log('-- Error: ' . $e->getMessage() . ' - File: ' . $e->getFile() . ' on line ' . $e->getLine());
-            $this->logException($e);
             return $e->getMessage();
         }
 
@@ -939,12 +952,14 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function setOverwriteFlag($bool) {
         $this->overwriteFlag = $bool;
     }
+
     public function isCategorySyncCronEnabled()
     {
         //return $this->scopeConfig->getValue('hawksearch_proxy/sync/enabled');
         return $this->scopeConfig->isSetFlag(self::CONFIG_PROXY_CATEGORY_SYNC_CRON_ENABLED);
 
     }
+
     public function hasExceptions()
     {
         return count($this->_syncingExceptions) > 0 ? true : false;
@@ -995,7 +1010,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
             $extra_html = $this->_getEmailExtraHtml();
 
-            /** @var \HawkSearch\Proxy\Model\ProxyEmail $mail_helper */
+            /** @var ProxyEmail $mail_helper */
             $mail_helper = $this->email_helper;
 
             try {
@@ -1006,7 +1021,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                 return true;
             } catch (\Exception $e) {
                 $this->log('-- Error: ' . $e->getMessage() . ' - File: ' . $e->getFile() . ' on line ' . $e->getLine());
-                $this->logException($e);
                 return false;
             }
         }

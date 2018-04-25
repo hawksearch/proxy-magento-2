@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2013 Hawksearch (www.hawksearch.com) - All Rights Reserved
+ * Copyright (c) 2017 Hawksearch (www.hawksearch.com) - All Rights Reserved
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -40,7 +40,6 @@ if ($helper->isSyncLocked()) {
         }
     } catch (\Exception $e) {
         $helper->log('-- Error: ' . $e->getMessage() . ' - File: ' . $e->getFile() . ' on line ' . $e->getLine());
-        $helper->logException($e);
         $helper->log('email notification has not been sent successfully');
     }
 } else {
@@ -61,11 +60,6 @@ if ($helper->isSyncLocked()) {
         $helper->removeSyncLocks();
         $helper->log('-- Success.');
     }
-
 }
-// end
-$helper->log('----');
-$helper->log('--');
-$helper->log('-');
 unlink($opts['t']);
 exit(0);
