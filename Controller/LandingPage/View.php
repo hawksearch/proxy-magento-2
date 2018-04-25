@@ -10,7 +10,7 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
-namespace HawkSearch\Proxy\Controller\Index;
+namespace HawkSearch\Proxy\Controller\LandingPage;
 
 class View
     extends \Magento\Framework\App\Action\Action
@@ -38,18 +38,17 @@ class View
 
     public function execute()
     {
-
-
-
-        $this->_view->loadLayout($this->session->getHawkCurrentUpdateHandle());
-        $html = $this->_view->getLayout()->createBlock('HawkSearch\Proxy\Block\Html')->setTemplate('HawkSearch_Proxy::hawksearch/proxy/html.phtml')->toHtml();
+        $this->_view->loadLayout();
+/*        $html = $this->_view->getLayout()->createBlock('HawkSearch\Proxy\Block\Html')->setTemplate('HawkSearch_Proxy::hawksearch/proxy/html.phtml')->toHtml();
         $params = $this->getRequest()->getParams();
         $obj = array('Success' => 'true', 'html' => $html, 'location' => '');
 
         $result = $this->resultFactory->create(\Magento\Framework\Controller\ResultFactory::TYPE_RAW);
         $result->setHeader('Content-Type', 'text/html');
-        $result->setContents($params['callback'] . '(' . json_encode($obj) . ')');
+        $result->setContents($params['callback'] . '(' . json_encode($obj) . ')');*/
+        $this->_view->getLayout()->unsetChild('top.container', 'catalog_category_event');
+        $page = $this->resultPageFactory->create();
 
-        return $result;
+        return $page;
     }
 }

@@ -1,4 +1,15 @@
 <?php
+/**
+ * Copyright (c) 2017 Hawksearch (www.hawksearch.com) - All Rights Reserved
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+ * IN THE SOFTWARE.
+ */
 
 namespace HawkSearch\Proxy\Cron;
 
@@ -7,7 +18,7 @@ class SyncCategories
     /**
      * @var \HawkSearch\Proxy\Helper\Data
      */
-    protected $_helper;
+    protected $helper;
     /** @var \HawkSearch\Proxy\Model\ProxyEmail $email */
     private $email;
 
@@ -16,31 +27,21 @@ class SyncCategories
         \HawkSearch\Proxy\Model\ProxyEmail $email
     )
     {
-        $this->_helper = $helper;
+        $this->helper = $helper;
         $this->email = $email;
     }
 
-    public function execute()
-    {
-        if ($this->_helper->isCronEnabled()) {
-            if($this->_helper->isSyncLocked()) {
-                try {
-                    if ($receiver = $this->_helper->getEmailReceiver()) {
-                        $this->email->sendEmail($receiver, [
-                            'status_text' => 'with following message:',
-                            'extra_html' => "<p><strong>One or more HawkSearch Proxy feeds are being generated. Generation temporarily locked.</strong></p>"
-                        ]);
-                        $this->_helper->log('email notification has been sent');
-                    }
-                } catch (\Exception $e) {
-                    $this->_helper->log('-- Error: ' . $e->getMessage() . ' - File: ' . $e->getFile() . ' on line ' . $e->getLine());
-                    $this->_helper->logException($e);
-                    $this->_helper->log('email notification has not been sent successfully');
-                }
-
+    public function execute() {
+        $errors = [];
+        if($this->helper->isCategorySyncCronEnabled()) {
+            if (($timestamp = $this->helper->isSyncLocked())) {
+                $subject = "HawkSearch process is locked. Categories NOT synchronized.";
+                $errors[] = sprintf("HawkSearch Cron process locked since %s", $timestamp);
             } else {
-                $this->_helper->synchronizeHawkLandingPages();
+                $errors = $this->helper->synchronizeHawkLandingPages();
+                $subject = sprintf("HawkSearch Category Sync Completed %s errors", empty($errors) ? "without" : "WITH");
             }
+            $this->email->sendEmail(['errors' => $errors, 'subject' => $subject]);
         }
     }
 }

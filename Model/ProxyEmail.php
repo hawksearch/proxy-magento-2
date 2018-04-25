@@ -8,12 +8,7 @@ class ProxyEmail
     /**
      * @var \Magento\Framework\Mail\Template\TransportBuilder
      */
-    protected $_transportBuilder;
-
-    /**
-     * @var \Magento\Framework\Translate\Inline\StateInterface
-     */
-    protected $inlineTranslation;
+    protected $transportBuilder;
 
     /**
      * @var \Magento\Framework\App\Config\ScopeConfigInterface
@@ -25,40 +20,29 @@ class ProxyEmail
      */
     protected $storeManager;
 
-    /**
-     * @var \Magento\Framework\Escaper
-     */
-    protected $_escaper;
 
     /**
      * @param \Magento\Framework\App\Action\Context $context
      * @param \Magento\Framework\Mail\Template\TransportBuilder $transportBuilder
-     * @param \Magento\Framework\Translate\Inline\StateInterface $inlineTranslation
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
      * @param \Magento\Store\Model\StoreManagerInterface $storeManager
      */
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
         \Magento\Framework\Mail\Template\TransportBuilder $transportBuilder,
-        \Magento\Framework\Translate\Inline\StateInterface $inlineTranslation,
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
-        \Magento\Store\Model\StoreManagerInterface $storeManager,
-        \Magento\Framework\Escaper $escaper
+        \Magento\Store\Model\StoreManagerInterface $storeManager
     )
     {
 
-        $this->_transportBuilder = $transportBuilder;
-        $this->inlineTranslation = $inlineTranslation;
+        $this->transportBuilder = $transportBuilder;
         $this->scopeConfig = $scopeConfig;
         $this->storeManager = $storeManager;
-        $this->_escaper = $escaper;
     }
 
-    public function sendEmail($receiver, $templateParams)
+    public function sendEmail($templateParams)
     {
-        $this->inlineTranslation->suspend();
-        $sender = ['name' => $this->_getSenderName(), 'email' => $this->_getSenderEmail()];
-        $transport = $this->_transportBuilder
+        $transport = $this->transportBuilder
             ->setTemplateIdentifier('hawksearch_proxy_email')
             ->setTemplateOptions(
                 [
@@ -67,21 +51,21 @@ class ProxyEmail
                 ]
             )
             ->setTemplateVars($templateParams)
-            ->setFrom($sender)
-            ->addTo($receiver)
+            ->setFrom([
+                'name' => $this->scopeConfig->getValue('trans_email/ident_general/name'),
+                'email' => $this->scopeConfig->getValue('trans_email/ident_general/email')
+            ])
+            ->addTo(array_map(
+                function ($a) {
+                    if(preg_match('/(.*?) <(.*?)>/', trim($a), $m)) {
+                        return [$m[1] => $m[2]];
+                    }
+                    return trim($a);
+                },
+                explode(',',$this->scopeConfig->getValue('hawksearch_proxy/sync/email'))
+            ))
             ->getTransport();
         $transport->sendMessage();
-
-        $this->inlineTranslation->resume();
     }
 
-    protected function _getSenderName()
-    {
-        return $this->scopeConfig->getValue('trans_email/ident_general/name') ?: 'Russo Administrator';
-    }
-
-    protected function _getSenderEmail()
-    {
-        return $this->scopeConfig->getValue('trans_email/ident_general/email') ?: 'russo@russopower.com';
-    }
 }

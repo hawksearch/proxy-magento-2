@@ -21,6 +21,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     const CONFIG_PROXY_RESULT_TYPE = 'hawksearch_proxy/proxy/result_type';
     const CONFIG_PROXY_ENABLE_CUSTOM_SEARCH_ROUTE = 'hawksearch_proxy/proxy/enable_custom_search_route';
     const CONFIG_PROXY_ENABLE_LANDING_PAGE_ROUTE = 'hawksearch_proxy/proxy/enable_hawk_landing_pages';
+    const CONFIG_PROXY_CATEGORY_SYNC_CRON_ENABLED = 'hawksearch_proxy/sync/enabled';
+
     const LP_CACHE_KEY = 'hawk_landing_pages';
     const LOCK_FILE_NAME = 'hawkcategorysync.lock';
 
@@ -81,7 +83,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         if(is_array($params) && isset($params['q'])){
             $this->setUri($context->getRequest()->getParams());
         } else {
-            $this->setUri(array('lpurl' => $context->getRequest()->getAlias('rewrite_request_path'), 'output' => 'custom', 'hawkitemlist' => 'json', 'hawkfeatured' => 'json'));
+            $this->setUri(array('lpurl' => $context->getRequest()->getAlias('rewrite_request_path')));
         }
         $this->setClientIp($context->getRequest()->getClientIp());
         $this->setClientUa($context->getHttpHeader()->getHttpUserAgent());
@@ -142,6 +144,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         unset($args['json']);
         $args['output'] = 'custom';
         $args['hawkitemlist'] = 'json';
+        $args['hawkfeatured'] = 'json';
         if($this->getResultType()){
             $args['it'] = $this->getResultType();
 
@@ -328,10 +331,10 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         if(!$this->hawkData->Data->FeaturedItems instanceof \stdClass) {
             $this->hawkData->Data->FeaturedItems = json_decode($this->hawkData->Data->FeaturedItems);
         }
-        if (count($this->hawkData->Data->FeaturedItems->Items) == 0) {
+        if (count($this->hawkData->Data->FeaturedItems->Items->Items) == 0) {
             return null;
         } else {
-            foreach ($this->hawkData->Data->FeaturedItems->Items as $banner) {
+            foreach ($this->hawkData->Data->FeaturedItems->Items->Items as $banner) {
                 if ($banner->Zone == $zone && isset($banner->Items)) {
                     foreach ($banner->Items as $item) {
                         if (isset($item->Custom->sku)) {
@@ -673,21 +676,26 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $appEmulation->stopEnvironmentEmulation();
     }
 
+    /**
+     * @return array
+     */
     public function synchronizeHawkLandingPages()
     {
         $stores = $this->storeManager->getStores();
+        $errors = [];
         foreach ($stores as $store) {
             /** @var \Magento\Store\Model\Store $store */
             if ($store->getConfig('hawksearch_proxy/general/enabled') && $store->isActive()) {
                 try {
                     $this->syncHawkLandingByStore($store);
                 } catch (\Exception $e) {
-                    $this->log('-- Error: ' . $e->getMessage() . ' - File: ' . $e->getFile() . ' on line ' . $e->getLine());
-                    $this->logException($e);
+                    $errors[] = sprintf("Error syncing category pages for store '%s'", $store->getCode());
+                    $errors[] = sprintf("Exception message: %s", $e->getMessage());
                     continue;
                 }
             }
         }
+        return $errors;
     }
 
     public function getHawkLandingPages()
@@ -793,7 +801,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $filename = implode(DIRECTORY_SEPARATOR, array($path, self::LOCK_FILE_NAME));
         if (is_file($filename)) {
             $this->log('category sync lock file found, returning true');
-            return true;
+            return file_get_contents($filename);
         }
         return false;
     }
@@ -931,9 +939,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function setOverwriteFlag($bool) {
         $this->overwriteFlag = $bool;
     }
-    public function isCronEnabled()
+    public function isCategorySyncCronEnabled()
     {
-        return $this->scopeConfig->getValue('hawksearch_proxy/sync/enabled');
+        //return $this->scopeConfig->getValue('hawksearch_proxy/sync/enabled');
+        return $this->scopeConfig->isSetFlag(self::CONFIG_PROXY_CATEGORY_SYNC_CRON_ENABLED);
+
     }
     public function hasExceptions()
     {

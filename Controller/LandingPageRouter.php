@@ -10,6 +10,7 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
+
 namespace HawkSearch\Proxy\Controller;
 
 class LandingPageRouter
@@ -39,21 +40,18 @@ class LandingPageRouter
 
     public function match(\Magento\Framework\App\RequestInterface $request)
     {
-        if(!$this->helper->getEnableLandingPageRoute()) {
+        if (!$this->helper->getEnableLandingPageRoute()) {
             return false;
         }
-        if(!$this->helper->getIsHawkManaged(trim($request->getPathInfo(), '/'))) {
+        if (!$this->helper->getIsHawkManaged(trim($request->getPathInfo(), '/'))) {
             return false;
         }
 
-        $request->setModuleName('hawksearch_proxy')->setControllerName('landingPage')->setActionName('view');
+        $request->setModuleName('hawkproxy')->setControllerName('landingPage')->setActionName('view');
         /*
          * We have match and now we will forward action
          */
-        return $this->actionFactory->create(
-            'Magento\Framework\App\Action\Forward',
-            ['request' => $request]
-        );
+        return $this->actionFactory->create('Magento\Framework\App\Action\Forward');
     }
 
 }
