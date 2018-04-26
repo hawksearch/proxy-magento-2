@@ -114,14 +114,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $this->session = $session;
         $this->catalogConfig = $catalogConfig;
 
-        $params = $context->getRequest()->getParams();
-        if(is_array($params) && isset($params['q'])){
-            $this->setUri($context->getRequest()->getParams());
-        } else {
-            $this->setUri(array('lpurl' => $context->getRequest()->getAlias('rewrite_request_path')));
-        }
-        $this->setClientIp($context->getRequest()->getClientIp());
-        $this->setClientUa($context->getHttpHeader()->getHttpUserAgent());
         $this->overwriteFlag = false;
         $this->email_helper = $email_helper;
 
@@ -163,6 +155,27 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $this->clientUA = $ua;
     }
 
+    public function buildUri() {
+        $controller = implode('_', [$this->_request->getModuleName(), $this->_request->getControllerName()]);
+
+        switch ($controller) {
+            case 'hawkproxy_landingPage':
+                if($this->getConfigurationData('hawksearch_proxy/proxy/enable_hawk_landing_pages')) {
+                    $this->setUri(['lpurl' => $this->_request->getPathInfo()]);
+                }
+                break;
+            case 'catalog_category':
+                if($this->getConfigurationData('hawksearch_proxy/proxy/manage_categories')) {
+                    $this->setUri(array('lpurl' => $this->_request->getAlias('rewrite_request_path')));
+                };
+                break;
+            case 'catalogsearch_result':
+                if($this->getConfigurationData('hawksearch_proxy/proxy/manage_search')){
+                    $this->setUri($this->_request->getParams());
+                }
+        }
+    }
+
     public function setUri($args)
     {
         //$this->uri = $this->getTrackingUrl() . '/?fn=' .$args['fn'].'&Items='.$args['Items'];
@@ -190,8 +203,10 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     private function fetchResponse()
     {
         if (empty($this->uri)) {
-            throw new \Exception('No URI set.');
-        }
+            $this->buildUri();
+            $this->setClientIp($this->_request->getClientIp());
+            $this->setClientUa($this->_httpHeader->getHttpUserAgent());
+            }
         $client = new \Zend_Http_Client();
         $client->setConfig(['timeout' => 30]);
 
@@ -203,7 +218,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $this->rawResponse = $response->getBody();
 
         $this->hawkData = json_decode($this->rawResponse);
-
     }
 
     public function getResultData()
