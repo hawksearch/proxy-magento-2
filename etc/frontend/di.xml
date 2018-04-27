@@ -30,6 +30,9 @@
             </argument>
         </arguments>
     </type>
+    <type name="Magento\Catalog\Helper\Data">
+        <plugin name="landingPage_breadcrumb" type="HawkSearch\Proxy\Plugin\BreadcrumbPlugin"/>
+    </type>
     <preference for="Magento\Catalog\Block\Product\ListProduct" type="HawkSearch\Proxy\Block\Product\ListProduct" />
     <preference for="Magento\CatalogSearch\Block\SearchResult\ListProduct" type="HawkSearch\Proxy\Block\Product\ListProduct" />
 </config>

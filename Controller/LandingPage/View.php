@@ -10,7 +10,7 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
-namespace HawkSearch\Proxy\Controller\Index;
+namespace HawkSearch\Proxy\Controller\LandingPage;
 
 class View
     extends \Magento\Framework\App\Action\Action
@@ -18,38 +18,62 @@ class View
 
     protected $resultPageFactory;
     private $session;
+    /**
+     * @var \Magento\Framework\Registry
+     */
+    private $coreRegistry;
+    /**
+     * @var \Magento\Catalog\Model\CategoryFactory
+     */
+    private $categoryFactory;
+    /**
+     * @var \HawkSearch\Proxy\Helper\Data
+     */
+    private $helper;
 
 
     /**
      * View constructor.
      * @param \Magento\Framework\App\Action\Context $context
      * @param \Magento\Catalog\Model\Session $session
+     * @param \Magento\Framework\Registry $coreRegistry
+     * @param \Magento\Catalog\Model\CategoryFactory $categoryFactory
+     * @param \HawkSearch\Proxy\Helper\Data $helper
      * @param \Magento\Framework\View\Result\PageFactory $resultPageFactory
      */
-    public function __construct(\Magento\Framework\App\Action\Context $context,
-                                \Magento\Catalog\Model\Session $session,
-                                \Magento\Framework\View\Result\PageFactory $resultPageFactory)
+    public function __construct(
+        \Magento\Framework\App\Action\Context $context,
+        \Magento\Catalog\Model\Session $session,
+        \Magento\Framework\Registry $coreRegistry,
+        \Magento\Catalog\Model\CategoryFactory $categoryFactory,
+        \HawkSearch\Proxy\Helper\Data $helper,
+        \Magento\Framework\View\Result\PageFactory $resultPageFactory
+    )
     {
+        parent::__construct($context);
         $this->resultPageFactory = $resultPageFactory;
         $this->session = $session;
-        parent::__construct($context);
+        $this->coreRegistry = $coreRegistry;
+        $this->categoryFactory = $categoryFactory;
+        $this->helper = $helper;
     }
 
 
     public function execute()
     {
+        $category = $this->categoryFactory->create();
+        $category->setHawksearchLandingPage(true);
+        $category->setName($this->helper->getResultData()->Name);
+        $category->setHawkBreadcrumbPath([ 0 => [
+            'label' => $category->getName(),
+            'link' => ''
+        ]]);
 
+        $this->coreRegistry->register('current_category', $category);
 
+        $page = $this->resultPageFactory->create();
+        $page->getConfig()->addBodyClass('page-products');
 
-        $this->_view->loadLayout($this->session->getHawkCurrentUpdateHandle());
-        $html = $this->_view->getLayout()->createBlock('HawkSearch\Proxy\Block\Html')->setTemplate('HawkSearch_Proxy::hawksearch/proxy/html.phtml')->toHtml();
-        $params = $this->getRequest()->getParams();
-        $obj = array('Success' => 'true', 'html' => $html, 'location' => '');
-
-        $result = $this->resultFactory->create(\Magento\Framework\Controller\ResultFactory::TYPE_RAW);
-        $result->setHeader('Content-Type', 'text/html');
-        $result->setContents($params['callback'] . '(' . json_encode($obj) . ')');
-
-        return $result;
+        return $page;
     }
 }

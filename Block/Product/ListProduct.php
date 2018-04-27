@@ -23,7 +23,6 @@ class ListProduct
     private $hawkHelper;
     private $pagers = true;
     protected $_productCollection;
-    private $controller;
 
 
     public function setPagers($bool)
@@ -57,15 +56,12 @@ class ListProduct
 
     public function getToolbarHtml()
     {
-
-
         if ($this->hawkHelper->getLocation() != "") {
             $this->hawkHelper->log(sprintf('Redirecting to location: %s', $this->hawkHelper->getLocation()));
             return $this->_redirectUrl($this->hawkHelper->getLocation());
         }
 
-
-        if (!$this->hawkHelper->getIsHawkManaged()) {
+        if (!$this->hawkHelper->getIsHawkManaged($this->_request->getOriginalPathInfo())) {
             $this->hawkHelper->log('page not managed, returning core pager');
             return parent::getToolbarHtml();
         }
@@ -100,14 +96,9 @@ class ListProduct
 
     protected function _getProductCollection()
     {
-        if($this->controller == 'category') {
-            $contextActive = $this->hawkHelper->getConfigurationData('hawksearch_proxy/proxy/manage_categories');
-        } else {
-            $contextActive = $this->hawkHelper->getConfigurationData('hawksearch_proxy/proxy/manage_search');
-        }
         if ($this->_productCollection === null) {
 
-            if ($this->hawkHelper->getConfigurationData('hawksearch_proxy/general/enabled') && $contextActive) {
+            if ($this->hawkHelper->getConfigurationData('hawksearch_proxy/general/enabled')) {
 
                 if ($this->hawkHelper->getLocation() != "") {
                     $this->hawkHelper->log(sprintf('Redirecting to location: %s', $this->helper->getLocation()));

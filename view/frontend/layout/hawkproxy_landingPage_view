@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!--
 /**
- * Copyright (c) 2017 Hawksearch (www.hawksearch.com) - All Rights Reserved
+ * Copyright (c) 2018 Hawksearch (www.hawksearch.com) - All Rights Reserved
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -12,13 +12,11 @@
  * IN THE SOFTWARE.
  */
 -->
-<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:noNamespaceSchemaLocation="urn:magento:framework:Module/etc/module.xsd">
-    <module name="HawkSearch_Proxy" setup_version="2.2.2">
-        <sequence>
-            <module name="Magento_Search"/>
-            <module name="Magento_Catalog"/>
-            <module name="Magento_CatalogEvent"/>
-        </sequence>
-    </module>
-</config>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceContainer name="top.container">
+            <referenceBlock name="catalog_category_event" remove="true"/>
+        </referenceContainer>
+    </body>
+</page>

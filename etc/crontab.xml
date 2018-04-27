@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Cron:etc/crontab.xsd">
     <group id="default">
-        <job name="hawksearch_proxy" instance="HawkSearch\Proxy\Cron\SyncCategories" method="execute">
+        <job name="hawksearch_category_sync" instance="HawkSearch\Proxy\Cron\SyncCategories" method="execute">
             <schedule>26 11 * * *</schedule>
         </job>
     </group>

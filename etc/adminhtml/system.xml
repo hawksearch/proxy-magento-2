@@ -206,7 +206,7 @@
                        showInStore="1" sortOrder="30">
                     <label>Cron expression</label>
                     <comment>Integer and modular values only, named values and lists not allowed</comment>
-                    <backend_model>HawkSearch\Datafeed\Model\Config\Backend\Cron</backend_model>
+                    <backend_model>HawkSearch\Proxy\Model\Config\Backend\Cron</backend_model>
                     <depends>
                         <field id="enabled">1</field>
                     </depends>

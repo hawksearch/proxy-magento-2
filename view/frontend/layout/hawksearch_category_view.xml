@@ -26,6 +26,9 @@
             <block class="HawkSearch\Proxy\Block\Product\Facets" name="hawksearch_facets" as="hawksearch_facets"
                    template="HawkSearch_Proxy::hawksearch/proxy/left/facets.phtml"/>
         </referenceContainer>
+        <!--<referenceContainer name="top.container">-->
+            <!--<referenceBlock name="catalog_category_event" remove="true"/>-->
+        <!--</referenceContainer>-->
         <referenceBlock name="catalog.leftnav" remove="true" />
     </body>
 </page>
