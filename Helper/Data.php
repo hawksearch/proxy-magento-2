@@ -214,6 +214,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $client->setUri($this->uri);
         $client->setHeaders('HTTP-TRUE-CLIENT-IP', $this->clientIP);
         $response = $client->request();
+        if($response->getStatus() == '500'){
+            throw new \Exception($response->getMessage());
+        }
         $this->log(sprintf('requesting url %s', $client->getUri()));
         $this->rawResponse = $response->getBody();
 
