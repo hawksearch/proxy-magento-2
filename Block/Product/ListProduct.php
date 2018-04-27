@@ -56,15 +56,12 @@ class ListProduct
 
     public function getToolbarHtml()
     {
-
-
         if ($this->hawkHelper->getLocation() != "") {
             $this->hawkHelper->log(sprintf('Redirecting to location: %s', $this->hawkHelper->getLocation()));
             return $this->_redirectUrl($this->hawkHelper->getLocation());
         }
 
-
-        if (!$this->hawkHelper->getIsHawkManaged()) {
+        if (!$this->hawkHelper->getIsHawkManaged($this->_request->getOriginalPathInfo())) {
             $this->hawkHelper->log('page not managed, returning core pager');
             return parent::getToolbarHtml();
         }

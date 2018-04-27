@@ -315,7 +315,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         if (empty($this->hawkData)) {
             $this->fetchResponse();
         }
-        $this->setIsHawkManaged(true);
+        //$this->setIsHawkManaged(true);
         $skus = array();
         $map = array();
         $i = 0;
@@ -470,6 +470,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         if (substr($path, 0, 1) != '/') {
             $path = '/' . $path;
         }
+        if(in_array($path, ['/catalogsearch/result/', '/hawkproxy/']) && $this->getConfigurationData('hawksearch_proxy/proxy/manage_search')){
+            return true;
+        }
         $hs = $this->getLandingPages();
 
 
@@ -487,7 +490,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                 $high = $p - 1;
             }
         }
-        $this->isManaged = true;
+        $this->isManaged = false;
         return $this->isManaged;
     }
 
@@ -777,6 +780,10 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $collection->addAttributeToFilter('is_active', array('eq' => '1'));
         $collection->addAttributeToSort('entity_id')->addAttributeToSort('parent_id')->addAttributeToSort('position');
         $collection->addAttributeToFilter('level', ['gteq' => '2']);
+        if(!$this->getManageAll()){
+            $collection->addAttributeToFilter('hawk_landing_page', ['eq' => '1']);
+        }
+
         $collection->joinUrlRewrite();
         $collection->setPageSize(1000);
         $pages = $collection->getLastPageNumber();
