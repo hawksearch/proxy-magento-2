@@ -1,11 +1,14 @@
 <?php
 /** @var Magento\Catalog\Model\Session $sess */
 $sess = $block->getSession();
-$pData = $sess->getHawkTrackingData();
-if(isset($pData)){
-	$conversionUrl = $pData;
-	$sess->unsetData('hawk_tracking_data');
-	echo '<img src="', $pData, '" style="width:0px; height:0px" />';
+if($sess) {
+    $pData = $sess->getHawkTrackingData();
+
+    if(isset($pData)){
+        $conversionUrl = $pData;
+        $sess->unsetData('hawk_tracking_data');
+        echo '<img src="', $pData, '" style="width:0px; height:0px" />';
+    }
 }
 
 

@@ -32,7 +32,9 @@ class Index
 
     public function execute()
     {
-        $this->_view->loadLayout($this->session->getHawkCurrentUpdateHandle());
+        if($this->_view->isLayoutLoaded()){
+            $this->_view->loadLayout($this->session->getHawkCurrentUpdateHandle());
+        }
         $html = $this->_view->getLayout()->createBlock('HawkSearch\Proxy\Block\Html')->setTemplate('HawkSearch_Proxy::hawksearch/proxy/html.phtml')->toHtml();
         $params = $this->getRequest()->getParams();
         $obj = array('Success' => 'true', 'html' => $html, 'location' => '');
