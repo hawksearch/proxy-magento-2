@@ -125,35 +125,35 @@ class ListProduct
 
     public function getProductPrice(\Magento\Catalog\Model\Product $product)
     {
-	$block = $this->getLayout()->getBlock('product.price.render.default');
-	if ($block) {
-        	$priceRender = $this->getPriceRender();
-} 
+        $block = $this->getLayout()->getBlock('product.price.render.default');
+        if ($block) {
+            $priceRender = $this->getPriceRender();
 
-        $price = '';
-        if ($priceRender) {
-            $price = $priceRender->render(
-                \Magento\Catalog\Pricing\Price\FinalPrice::PRICE_CODE,
-                $product,
-                [
-                    'include_container' => true,
-                    'display_minimal_price' => true,
-                    'zone' => \Magento\Framework\Pricing\Render::ZONE_ITEM_LIST
-                ]
-            );
-        } else {
-            $priceamount = $this->_pricingHelper->currency(number_format($product->getFinalPrice(), 2), true, false);
-            $price='<div class="price-box price-final_price" data-role="priceBox" data-product-id="'.$product->getId().'">
+            $price = '';
+            if ($priceRender) {
+                $price = $priceRender->render(
+                    \Magento\Catalog\Pricing\Price\FinalPrice::PRICE_CODE,
+                    $product,
+                    [
+                        'include_container' => true,
+                        'display_minimal_price' => true,
+                        'zone' => \Magento\Framework\Pricing\Render::ZONE_ITEM_LIST
+                    ]
+                );
+            } else {
+                $priceamount = $this->_pricingHelper->currency(number_format($product->getFinalPrice(), 2), true, false);
+                $price = '<div class="price-box price-final_price" data-role="priceBox" data-product-id="' . $product->getId() . '">
 
 
 <span class="price-container price-final_price tax weee">
-        <span id="product-price-'.$product->getId().'" data-price-amount="'.$priceamount.'" data-price-type="finalPrice" class="price-wrapper ">
-        <span class="price">'.$priceamount.'</span>    </span>
+        <span id="product-price-' . $product->getId() . '" data-price-amount="' . $priceamount . '" data-price-type="finalPrice" class="price-wrapper ">
+        <span class="price">' . $priceamount . '</span>    </span>
         </span>
 
 </div>';
-        }
+            }
 
-        return $price;
+            return $price;
+        }
     }
 }
