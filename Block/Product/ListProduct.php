@@ -19,10 +19,11 @@ class ListProduct
 {
 
     private $topseen = false;
-    public $helper;
     private $hawkHelper;
     private $pagers = true;
     protected $_productCollection;
+    private $pricingHelper;
+    protected $response;
 
 
     public function setPagers($bool)
@@ -40,7 +41,7 @@ class ListProduct
                                 \Magento\Framework\App\Response\Http $response,
                                 array $data = [])
     {
-        $this->_pricingHelper = $pricingHelper;
+        $this->pricingHelper = $pricingHelper;
         $this->hawkHelper = $hawkHelper;
         $this->response = $response;
         parent::__construct($context, $postDataHelper, $layerResolver, $categoryRepository, $urlHelper, $data);
@@ -48,8 +49,8 @@ class ListProduct
 
     public function getHawkTrackingId()
     {
-        if (!empty($this->helper)) {
-            return $this->helper->getResultData()->TrackingId;
+        if (!empty($this->hawkHelper)) {
+            return $this->hawkHelper->getResultData()->TrackingId;
         }
         return '';
     }
@@ -58,7 +59,9 @@ class ListProduct
     {
         if ($this->hawkHelper->getLocation() != "") {
             $this->hawkHelper->log(sprintf('Redirecting to location: %s', $this->hawkHelper->getLocation()));
-            return $this->_redirectUrl($this->hawkHelper->getLocation());
+            $this->response->setRedirect($this->hawkHelper->getLocation());
+            $this->response->send();
+            exit();
         }
 
         if (!$this->hawkHelper->getIsHawkManaged($this->_request->getOriginalPathInfo())) {
@@ -101,8 +104,11 @@ class ListProduct
             if ($this->hawkHelper->getConfigurationData('hawksearch_proxy/general/enabled')) {
 
                 if ($this->hawkHelper->getLocation() != "") {
-                    $this->hawkHelper->log(sprintf('Redirecting to location: %s', $this->helper->getLocation()));
-                    return $this->helper->_redirectUrl($this->hawkHelper->getLocation());
+                    $this->hawkHelper->log(sprintf('Redirecting to location: %s', $this->hawkHelper->getLocation()));
+                    //return $this->helper->_redirectUrl($this->hawkHelper->getLocation());
+                    $this->response->setRedirect($this->hawkHelper->getLocation());
+                    $this->response->send();
+                    exit;
                 }
                 $this->_productCollection = $this->hawkHelper->getProductCollection();
             } else {
@@ -141,7 +147,7 @@ class ListProduct
                     ]
                 );
             } else {
-                $priceamount = $this->_pricingHelper->currency(number_format($product->getFinalPrice(), 2), true, false);
+                $priceamount = $this->pricingHelper->currency(number_format($product->getFinalPrice(), 2), true, false);
                 $price = '<div class="price-box price-final_price" data-role="priceBox" data-product-id="' . $product->getId() . '">
 
 

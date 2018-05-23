@@ -16,14 +16,11 @@ use \Magento\Catalog\Api\CategoryRepositoryInterface;
 
 class ListFeatured extends \Magento\Catalog\Block\Product\ListProduct
 {
-    private $topseen = false;
-    public $helper;
     private $hawkHelper;
     private $pagers = false;
     protected $_productCollection;
     private $_pricingHelper;
     private $_zone = "";
-    private $_title = "";
 
     public function setPagers($bool)
     {
@@ -51,8 +48,8 @@ class ListFeatured extends \Magento\Catalog\Block\Product\ListProduct
 
     public function getHawkTrackingId()
     {
-        if (!empty($this->helper)) {
-            return $this->helper->getResultData()->TrackingId;
+        if (!empty($this->hawkHelper)) {
+            return $this->hawkHelper->getResultData()->TrackingId;
         }
         return '';
     }

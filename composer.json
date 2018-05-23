@@ -1,22 +1,22 @@
 {
-    "name": "hawksearch/proxy",
-    "description": "Hawksearch Proxy module for Magento 2",
-    "type": "magento2-module",
-    "version": "2.2.4",
-    "license": [
-        "OSL-3.0",
-        "AFL-3.0"
-    ],
-    "require": {
-        "php": "~5.6|~7.0|~7.1",
-        "magento/magento-composer-installer": "*"
+  "name": "hawksearch/proxy",
+  "description": "Hawksearch Proxy module for Magento 2",
+  "type": "magento2-module",
+  "version": "2.2.5",
+  "license": [
+    "OSL-3.0",
+    "AFL-3.0"
+  ],
+  "require": {
+    "php": "~5.6|~7.0|~7.1",
+    "magento/magento-composer-installer": "*"
+  },
+  "autoload": {
+    "psr-4": {
+      "HawkSearch\\Proxy\\": ""
     },
-    "autoload": {
-	"psr-4": {
-	    "HawkSearch\\Proxy\\": ""
-	},
-	"files": [
-	    "registration.php"
-	]
-    }
+    "files": [
+      "registration.php"
+    ]
+  }
 }
