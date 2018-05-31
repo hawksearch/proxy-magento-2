@@ -12,6 +12,7 @@
  */
 
 namespace HawkSearch\Proxy\Cron;
+use Magento\Framework\Filesystem\DirectoryList;
 
 class SyncCategories
 {
@@ -21,17 +22,22 @@ class SyncCategories
     protected $helper;
     /** @var \HawkSearch\Proxy\Model\ProxyEmail $email */
     private $email;
+    private $dir;
 
     public function __construct(
         \HawkSearch\Proxy\Helper\Data $helper,
-        \HawkSearch\Proxy\Model\ProxyEmail $email
+        \HawkSearch\Proxy\Model\ProxyEmail $email,
+        DirectoryList $dir
     )
     {
         $this->helper = $helper;
         $this->email = $email;
+        $this->dir = $dir;
     }
 
     public function execute() {
+        chdir($this->dir->getRoot());
+
         $errors = [];
         if($this->helper->isCategorySyncCronEnabled()) {
             if (($timestamp = $this->helper->isSyncLocked())) {

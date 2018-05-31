@@ -76,6 +76,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @var Cache
      */
     private $cache;
+    private $urlFinder;
 
     /**
      * Data constructor.
