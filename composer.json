@@ -2,7 +2,7 @@
   "name": "hawksearch/proxy",
   "description": "Hawksearch Proxy module for Magento 2",
   "type": "magento2-module",
-  "version": "2.2.5",
+  "version": "2.2.6",
   "license": [
     "OSL-3.0",
     "AFL-3.0"

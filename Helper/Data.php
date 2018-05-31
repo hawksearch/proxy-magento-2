@@ -104,7 +104,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         StoreCollectionFactory $storeCollectionFactory,
         Logger $logger,
         Cache $cache,
-        Session $session
+        Session $session,
+        \Magento\UrlRewrite\Model\UrlFinderInterface $urlFinder
+
     ) {
         // parent construct first so scopeConfig gets set for use in "setUri", etc.
         parent::__construct($context);
@@ -122,6 +124,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $this->storeCollectionFactory = $storeCollectionFactory;
         $this->logger = $logger;
         $this->cache = $cache;
+        $this->urlFinder = $urlFinder;
     }
 
     public function getConfigurationData($data)
@@ -799,7 +802,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             $collection->load();
             foreach ($collection as $cat) {
                 $cats[] = array(
-                    'hawkurl' => sprintf("/%s", $cat->getRequestPath()),
+                    'hawkurl' => sprintf("/%s", $this->getRequestPath($cat)),
                     'name' => $cat->getName(),
                     'catid' => $cat->getId(),
                     'pid' => $cat->getParentId()
@@ -811,6 +814,20 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         return $cats;
     }
 
+    protected function getRequestPath(\Magento\Catalog\Model\Category $category) {
+        if($category->hasData('request_path') && $category->getRequestPath() != null){
+            return $category->getRequestPath();
+        }
+        $rewrite = $this->urlFinder->findOneByData([
+            \Magento\UrlRewrite\Service\V1\Data\UrlRewrite::ENTITY_ID => $category->getId(),
+            \Magento\UrlRewrite\Service\V1\Data\UrlRewrite::ENTITY_TYPE => \Magento\CatalogUrlRewrite\Model\CategoryUrlRewriteGenerator::ENTITY_TYPE,
+            \Magento\UrlRewrite\Service\V1\Data\UrlRewrite::STORE_ID => $category->getStoreId(),
+        ]);
+        if ($rewrite) {
+            return $rewrite->getRequestPath();
+        }
+        return null;
+    }
     public function log($message)
     {
         if ($this->isLoggingEnabled()) {
