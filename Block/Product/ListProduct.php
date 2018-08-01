@@ -57,27 +57,31 @@ class ListProduct
 
     public function getToolbarHtml()
     {
-        if ($this->hawkHelper->getLocation() != "") {
-            $this->hawkHelper->log(sprintf('Redirecting to location: %s', $this->hawkHelper->getLocation()));
-            $this->response->setRedirect($this->hawkHelper->getLocation());
-            $this->response->send();
-            exit();
-        }
+        if ($this->hawkHelper->getConfigurationData('hawksearch_proxy/general/enabled')) {
 
-        if (!$this->hawkHelper->getIsHawkManaged($this->_request->getOriginalPathInfo())) {
-            $this->hawkHelper->log('page not managed, returning core pager');
-            return parent::getToolbarHtml();
-        }
-        if ($this->pagers) {
-            $baseUrl = $this->_storeManager->getStore()->getBaseUrl();
-            if ($this->topseen) {
-                return '<div id="hawkbottompager">' . str_replace($baseUrl.'/', $baseUrl, $this->hawkHelper->getResultData()->Data->BottomPager) . '</div>';
+            if ($this->hawkHelper->getLocation() != "") {
+                $this->hawkHelper->log(sprintf('Redirecting to location: %s', $this->hawkHelper->getLocation()));
+                $this->response->setRedirect($this->hawkHelper->getLocation());
+                $this->response->send();
+                exit();
             }
-            $this->topseen = true;
-            return '<div id="hawktoppager">' . str_replace($baseUrl.'/', $baseUrl, $this->hawkHelper->getResultData()->Data->TopPager) . '</div>';
-        } else {
-            return '';
+
+            if (!$this->hawkHelper->getIsHawkManaged($this->_request->getOriginalPathInfo())) {
+                $this->hawkHelper->log('page not managed, returning core pager');
+                return parent::getToolbarHtml();
+            }
+            if ($this->pagers) {
+                $baseUrl = $this->_storeManager->getStore()->getBaseUrl();
+                if ($this->topseen) {
+                    return '<div id="hawkbottompager">' . str_replace($baseUrl . '/', $baseUrl, $this->hawkHelper->getResultData()->Data->BottomPager) . '</div>';
+                }
+                $this->topseen = true;
+                return '<div id="hawktoppager">' . str_replace($baseUrl . '/', $baseUrl, $this->hawkHelper->getResultData()->Data->TopPager) . '</div>';
+            } else {
+                return '';
+            }
         }
+        return parent::getToolbarHtml();
     }
 
     public function getIdentities()
