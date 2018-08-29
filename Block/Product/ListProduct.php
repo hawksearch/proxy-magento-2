@@ -59,11 +59,15 @@ class ListProduct
     {
         if ($this->hawkHelper->getConfigurationData('hawksearch_proxy/general/enabled')) {
 
-            if ($this->hawkHelper->getLocation() != "") {
-                $this->hawkHelper->log(sprintf('Redirecting to location: %s', $this->hawkHelper->getLocation()));
-                $this->response->setRedirect($this->hawkHelper->getLocation());
-                $this->response->send();
-                exit();
+            try {
+                if ($this->hawkHelper->getLocation() != "") {
+                    $this->hawkHelper->log(sprintf('Redirecting to location: %s', $this->hawkHelper->getLocation()));
+                    $this->response->setRedirect($this->hawkHelper->getLocation());
+                    $this->response->send();
+                    exit();
+                }
+            } catch (\Exception $e) {
+                return parent::getToolbarHtml();
             }
 
             if (!$this->hawkHelper->getIsHawkManaged($this->_request->getOriginalPathInfo())) {
@@ -106,8 +110,13 @@ class ListProduct
         if ($this->_productCollection === null) {
 
             if ($this->hawkHelper->getConfigurationData('hawksearch_proxy/general/enabled')) {
-
-                if ($this->hawkHelper->getLocation() != "") {
+                $location = null;
+                try {
+                    $location = $this->hawkHelper->getLocation();
+                } catch (\Exception $e) {
+                    return parent::_getProductCollection();
+                }
+                if ($location != "") {
                     $this->hawkHelper->log(sprintf('Redirecting to location: %s', $this->hawkHelper->getLocation()));
                     //return $this->helper->_redirectUrl($this->hawkHelper->getLocation());
                     $this->response->setRedirect($this->hawkHelper->getLocation());
