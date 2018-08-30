@@ -183,24 +183,21 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     public function setUri($args)
     {
-        //$this->uri = $this->getTrackingUrl() . '/?fn=' .$args['fn'].'&Items='.$args['Items'];
         unset($args['ajax']);
         unset($args['json']);
         $args['output'] = 'custom';
         $args['hawkitemlist'] = 'json';
         $args['hawkfeatured'] = 'json';
-        if($this->getResultType()){
+        if ($this->getResultType()) {
             $args['it'] = $this->getResultType();
-
         }
-        if (isset($args['q'])) {
-            unset($args['lpurl']);
-            //$args['keyword'] = $args['q'];
-            if(isset($args['keyword'])){
-                unset($args['keyword']);
-            }
+        if (isset($args['keyword'])) {
+            unset($args['keyword']);
         }
         $args['hawksessionid'] = $this->session->getSessionId();
+        if (isset($args['lpurl']) && (!$this->getIsHawkManaged($args['lpurl']) || $args['lpurl'] == '/catalogsearch/result/')) {
+            unset($args['lpurl']);
+        }
 
         $this->uri = $this->getTrackingUrl() . '/?' . http_build_query($args);
     }
