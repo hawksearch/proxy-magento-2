@@ -193,13 +193,13 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             $args['it'] = $this->getResultType();
 
         }
-        if (isset($args['q'])) {
+//        if (isset($args['q'])) {
             unset($args['lpurl']);
             //$args['keyword'] = $args['q'];
             if(isset($args['keyword'])){
                 unset($args['keyword']);
             }
-        }
+//        }
         $args['hawksessionid'] = $this->session->getSessionId();
 
         $this->uri = $this->getTrackingUrl() . '/?' . http_build_query($args);
