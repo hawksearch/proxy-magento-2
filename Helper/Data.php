@@ -343,6 +343,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                 $i++;
             }
         }
+        if(empty($skus)){
+            return null;
+        }
 
         /** @var \Magento\Catalog\Model\ResourceModel\Product\Collection $collection */
         $collection = $this->collectionFactory->create();
