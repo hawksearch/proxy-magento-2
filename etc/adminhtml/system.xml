@@ -177,7 +177,7 @@
                 </field>
                 <field id="result_type" type="text" showInStore="1" sortOrder="110">
                     <label>Result Type</label>
-                    <comment>Default is empty</comment>
+                    <comment>Default is 'item'</comment>
                 </field>
             </group>
             <group id="sync" translate="label" type="text" sortOrder="15" showInDefault="1" showInWebsite="1"

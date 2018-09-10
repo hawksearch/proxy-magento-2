@@ -16,33 +16,38 @@ class Index
     extends \Magento\Framework\App\Action\Action
 {
 
-    protected $resultPageFactory;
+    protected $result;
     private $session;
-
+    private $request;
 
     public function __construct(\Magento\Framework\App\Action\Context $context,
                                 \Magento\Catalog\Model\Session $session,
-                                \Magento\Framework\View\Result\PageFactory $resultPageFactory)
+                                \Magento\Framework\Controller\Result\Raw $result)
     {
-        $this->resultPageFactory = $resultPageFactory;
+        $this->result = $result;
         $this->session = $session;
+        $this->request = $context->getRequest();
         parent::__construct($context);
     }
 
 
     public function execute()
     {
-        if(!$this->_view->isLayoutLoaded()){
+        $tab = $this->getRequest()->getParam('it');
+        $html = '';
+        if(!empty($tab) && $tab !== 'item') {
+            $this->_view->loadLayout('hawksearch_proxy_tabbed');
+            $html =$this->_view->getLayout()->getBlock('hawksearch_proxy_block_tabbed')->toHtml();
+        } elseif(!$this->_view->isLayoutLoaded()){
             $this->_view->loadLayout($this->session->getHawkCurrentUpdateHandle());
+            $html = $this->_view->getLayout()->createBlock('HawkSearch\Proxy\Block\Html')->setTemplate('HawkSearch_Proxy::hawksearch/proxy/html.phtml')->toHtml();
         }
-        $html = $this->_view->getLayout()->createBlock('HawkSearch\Proxy\Block\Html')->setTemplate('HawkSearch_Proxy::hawksearch/proxy/html.phtml')->toHtml();
         $params = $this->getRequest()->getParams();
         $obj = array('Success' => 'true', 'html' => $html, 'location' => '');
 
-        $result = $this->resultFactory->create(\Magento\Framework\Controller\ResultFactory::TYPE_RAW);
-        $result->setHeader('Content-Type', 'text/html');
-        $result->setContents($params['callback'] . '(' . json_encode($obj) . ')');
+        $this->result->setHeader('Content-Type', 'application/javascript');
+        $this->result->setContents($params['callback'] . '(' . json_encode($obj) . ')');
 
-        return $result;
+        return $this->result;
     }
 }

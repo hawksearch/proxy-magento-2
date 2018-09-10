@@ -31,7 +31,6 @@ class Html
         \HawkSearch\Proxy\Model\BannerFactory $bannerFactory,
         array $data = [])
     {
-        $helper->setUri($context->getRequest()->getParams());
         $helper->setClientIp($context->getRequest()->getClientIp());
         $helper->setClientUa($context->getRequest()->getHeader('UserAgent'));
         $helper->setIsHawkManaged(true);
@@ -141,5 +140,10 @@ class Html
             return $block->toHtml(false);
         }
         return "";
+    }
+
+    public function getHawksearchTrackingId()
+    {
+        return $this->helper->getResultData()->TrackingId;
     }
 }

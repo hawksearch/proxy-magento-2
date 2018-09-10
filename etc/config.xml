@@ -29,6 +29,7 @@
         <autocomplete_query_params><![CDATA[/?fn=ajax&f=GetSuggestions]]></autocomplete_query_params>
         <hawksearch_include_css>1</hawksearch_include_css>
         <enable_hawk_landing_pages>1</enable_hawk_landing_pages>
+        <result_type>item</result_type>
       </proxy>
       <sync>
         <cron_string>0 0 * * *</cron_string>
