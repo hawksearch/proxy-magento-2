@@ -48,17 +48,6 @@ class Result
         parent::__construct($context, $layerResolver, $catalogSearchData, $queryFactory, $data);
     }
 
-    /**
-     * @return \Magento\CatalogSearch\Model\ResourceModel\Fulltext\Collection
-     */
-//    protected function _getProductCollection() {
-//        if (null === $this->productCollection) {
-//            $this->productCollection = $this->helper->getProductCollection();
-//        }
-//
-//        return $this->productCollection;
-//    }
-
     public function getSearchQueryText()
     {
         $qt = $this->_getQuery()->getQueryText();

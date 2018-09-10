@@ -172,11 +172,18 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             case 'catalog_category':
                 if($this->getConfigurationData('hawksearch_proxy/proxy/manage_categories')) {
                     $this->setUri(array('lpurl' => $this->_request->getAlias('rewrite_request_path')));
-                };
+                }
                 break;
             case 'catalogsearch_result':
                 if($this->getConfigurationData('hawksearch_proxy/proxy/manage_search')){
                     $this->setUri($this->_request->getParams());
+                }
+                break;
+            case 'hawkproxy_index':
+                $params = $this->_request->getParams();
+                if(isset($params['lpurl']) && (substr($params['lpurl'], 0, strlen('/catalogsearch/result')) === '/catalogsearch/result')) {
+                    unset($params['lpurl']);
+                    $this->setUri($params);
                 }
         }
     }
@@ -188,7 +195,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $args['output'] = 'custom';
         $args['hawkitemlist'] = 'json';
         $args['hawkfeatured'] = 'json';
-        if ($this->getResultType()) {
+        $args['hawktabs'] = 'html';
+        if (empty($args['it']) && $this->getResultType()) {
             $args['it'] = $this->getResultType();
         }
         if (isset($args['keyword'])) {
@@ -475,7 +483,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         if (substr($path, 0, 1) != '/') {
             $path = '/' . $path;
         }
-        if(in_array($path, ['/catalogsearch/result/', '/hawkproxy/']) && $this->getConfigurationData('hawksearch_proxy/proxy/manage_search')){
+        if(in_array($path, ['/catalogsearch/result/', '/catalogsearch/result', '/hawkproxy/']) && $this->getConfigurationData('hawksearch_proxy/proxy/manage_search')){
             return true;
         }
         $hs = $this->getLandingPages();

@@ -1,0 +1,50 @@
+<?php
+/**
+ * Copyright (c) 2018 Hawksearch (www.hawksearch.com) - All Rights Reserved
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+ * IN THE SOFTWARE.
+ */
+
+/** @var $block \HawkSearch\Proxy\Block\Html */
+$trackingId = $block->getHawksearchTrackingId();
+$increment = 1;
+
+?>
+
+<div>
+    <div id="hawktitle"><?php echo $block->getTitle() ?></div>
+    <div id="hawkbannertop"
+         class="bannerTop"> <?php echo $block->getBanner()->getFeaturedTop() ?><?php echo $block->getBanner()->getBannerTop() ?></div>
+    <div id="hawktoptext"><?php echo $block->getTopText(); ?></div>
+    <div id="hawkrelated"><?php echo $block->getRelated() ?></div>
+    <div id="hawktabs"><?php echo $block->getTabs(); ?></div>
+    <div id="hawktoppager"><?php echo $block->getTopPager(); ?></div>
+    <div id="hawkitemlist">
+        <div class="contentList">
+            <?php foreach ($block->getContent() as $item) : ?>
+                <div class="item hawk-contentItem">
+                    <div class="content hawk-contentWrapper">
+                        <h3 class="title hawk-contentTitle">
+                            <a href="<?php echo $item->CustomURL; ?>"
+                               onclick="<?php echo sprintf("return HawkSearch.link(this,'%s',%d,'%d',0);", $trackingId, $increment++, $item->Id); ?>"><?php echo $item->ItemName; ?>
+                            </a>
+                        </h3>
+                        <p class="hawk-contentCaption"><?php echo $item->BestFragment; ?></p>
+                    </div>
+                </div>
+                <div class="clear">&nbsp;</div>
+            <?php endforeach; ?>
+        </div>
+    </div>
+    <div id="hawkbottompager"><?php echo $block->getBottomPager(); ?></div>
+    <div id="hawkbannerbottom"
+         class="bannerBottom"> <?php echo $block->getBanner()->getFeaturedBottom() ?><?php echo $block->getBanner()->getBannerBottom() ?></div>
+    <div id="hawkbannerbottom2"
+         class="bannerBottom"> <?php echo $block->getBanner()->getBannerBottom2() ?><?php echo $block->getBanner()->getFeaturedBottom2() ?></div>
+</div>

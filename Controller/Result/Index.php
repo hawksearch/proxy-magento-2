@@ -25,9 +25,13 @@ class Index extends \Magento\CatalogSearch\Controller\Result\Index
     public function execute()
     {
         $query = $this->queryFactory->get();
+        $tab = $this->getRequest()->getParam('it');
         if ($query->getQueryText() == '' && $this->isTopCategoryRequest()) {
             $this->_view->loadLayout();
             $this->_view->getLayout()->unsetElement('page.main.title');
+            $this->_view->renderLayout();
+        } elseif(!empty($tab) && $tab !== 'item') {
+            $this->_view->loadLayout('hawksearch_proxy_tabbed');
             $this->_view->renderLayout();
         } else {
             parent::execute();

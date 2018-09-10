@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceContainer name="content">
+            <block class="HawkSearch\Proxy\Block\Tabbed"
+                   name="hawksearch_proxy_block_tabbed"
+                   template="HawkSearch_Proxy::hawksearch/proxy/content/tabbed.phtml">
+            </block>
+            <referenceBlock name="search.result" remove="true"/>
+        </referenceContainer>
+    </body>
+</page>

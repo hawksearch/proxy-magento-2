@@ -80,7 +80,8 @@ class ListProduct
                     return '<div id="hawkbottompager">' . str_replace($baseUrl . '/', $baseUrl, $this->hawkHelper->getResultData()->Data->BottomPager) . '</div>';
                 }
                 $this->topseen = true;
-                return '<div id="hawktoppager">' . str_replace($baseUrl . '/', $baseUrl, $this->hawkHelper->getResultData()->Data->TopPager) . '</div>';
+                $data = $this->hawkHelper->getResultData()->Data;
+                return sprintf('<div id="hawktabs">%s</div><div id="hawktoppager">%s</div>', $data->Tabs, $data->TopPager);
             } else {
                 return '';
             }

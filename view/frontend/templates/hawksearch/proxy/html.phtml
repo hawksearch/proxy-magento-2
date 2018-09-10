@@ -10,27 +10,31 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
- 
- /** @var $block \HawkSearch\Proxy\Block\Html */
+
+/** @var $block \HawkSearch\Proxy\Block\Html */
 ?>
 
 <div>
-  <div id="hawkmetarobots"><?php echo $block->getMetaRobots() ?></div>
-  <div id="hawkheadertitle"><?php echo $block->getHeaderTitle() ?></div>
-  <div id="hawkmetadescription"><?php echo $block->getMetaDescription() ?></div>
-  <div id="hawkmetakeywords"><?php echo $block->getMetaKeywords() ?></div>
-  <div id="hawkrelcanonical"><?php echo $block->getRelCanonical() ?></div>
-  <div id="hawktoptext"><?php echo $block->getTopText() ?></div>
-  <div id="hawkitemlist"><?php echo $block->getItemList() ?></div>
-  <div id="hawkexplain"></div>
-  <div id="hawksmartbug"></div>
-  <div id="hawkrelated"><?php echo $block->getRelated() ?></div>
-  <div id="hawkfacets"><?php echo $block->getFacets() ?></div>
-  <div id="hawkbannertop" class="bannerTop"> <?php echo $block->getBanner()->getFeaturedTop() ?> <?php echo $block->getBanner()->getBannerTop() ?></div>
-  <div id="hawkbannerlefttop" class="bannerLeftTop"><?php echo $block->getBanner()->getBannerLeftTop() ?></div>
-  <div id="hawkbannerleftbottom" class="bannerLeftBottom"><?php echo $block->getBanner()->getBannerLeftBottom() ?></div>
-  <div id="hawkbannerbottom" class="bannerBottom"> <?php echo $block->getBanner()->getFeaturedBottom() ?> <?php echo $block->getBanner()->getBannerBottom() ?></div>
-  <div id="hawkbannerbottom2" class="bannerBottom"> <?php echo $block->getBanner()->getBannerBottom2() ?> <?php echo $block->getBanner()->getFeaturedBottom2() ?></div>
-  <div id="hawkbreadcrumb"><?php echo $block->getBreadCrumb() ?></div>
-  <div id="hawktitle"><?php echo $block->getTitle() ?></div>
+    <div id="hawkmetarobots"><?php echo $block->getMetaRobots() ?></div>
+    <div id="hawkheadertitle"><?php echo $block->getHeaderTitle() ?></div>
+    <div id="hawkmetadescription"><?php echo $block->getMetaDescription() ?></div>
+    <div id="hawkmetakeywords"><?php echo $block->getMetaKeywords() ?></div>
+    <div id="hawkrelcanonical"><?php echo $block->getRelCanonical() ?></div>
+    <div id="hawktoptext"><?php echo $block->getTopText() ?></div>
+    <div id="hawkitemlist"><?php echo $block->getItemList() ?></div>
+    <div id="hawkexplain"></div>
+    <div id="hawksmartbug"></div>
+    <div id="hawkrelated"><?php echo $block->getRelated() ?></div>
+    <div id="hawkfacets"><?php echo $block->getFacets() ?></div>
+    <div id="hawkbannertop"
+         class="bannerTop"> <?php echo $block->getBanner()->getFeaturedTop() ?><?php echo $block->getBanner()->getBannerTop() ?></div>
+    <div id="hawkbannerlefttop" class="bannerLeftTop"><?php echo $block->getBanner()->getBannerLeftTop() ?></div>
+    <div id="hawkbannerleftbottom"
+         class="bannerLeftBottom"><?php echo $block->getBanner()->getBannerLeftBottom() ?></div>
+    <div id="hawkbannerbottom"
+         class="bannerBottom"> <?php echo $block->getBanner()->getFeaturedBottom() ?><?php echo $block->getBanner()->getBannerBottom() ?></div>
+    <div id="hawkbannerbottom2"
+         class="bannerBottom"> <?php echo $block->getBanner()->getBannerBottom2() ?><?php echo $block->getBanner()->getFeaturedBottom2() ?></div>
+    <div id="hawkbreadcrumb"><?php echo $block->getBreadCrumb() ?></div>
+    <div id="hawktitle"><?php echo $block->getTitle() ?></div>
 </div>
