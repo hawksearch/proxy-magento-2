@@ -109,15 +109,8 @@ class ListProduct
     protected function _getProductCollection()
     {
         if ($this->_productCollection === null) {
-
             if ($this->hawkHelper->getConfigurationData('hawksearch_proxy/general/enabled')) {
-                $location = null;
-                try {
-                    $location = $this->hawkHelper->getLocation();
-                } catch (\Exception $e) {
-                    return parent::_getProductCollection();
-                }
-                if ($location != "") {
+                if ($this->hawkHelper->getLocation() != "") {
                     $this->hawkHelper->log(sprintf('Redirecting to location: %s', $this->hawkHelper->getLocation()));
                     //return $this->helper->_redirectUrl($this->hawkHelper->getLocation());
                     $this->response->setRedirect($this->hawkHelper->getLocation());
@@ -129,9 +122,6 @@ class ListProduct
                 $this->hawkHelper->log('hawk not managing search');
                 return parent::_getProductCollection();
             }
-        }
-        if($this->_productCollection == null) {
-            $this->_productCollection = parent::_getProductCollection();
         }
         return $this->_productCollection;
     }
