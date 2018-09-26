@@ -30,6 +30,7 @@
         <hawksearch_include_css>1</hawksearch_include_css>
         <enable_hawk_landing_pages>1</enable_hawk_landing_pages>
         <result_type>item</result_type>
+        <show_tabs>0</show_tabs>
       </proxy>
       <sync>
         <cron_string>0 0 * * *</cron_string>
