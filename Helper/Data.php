@@ -1098,7 +1098,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     public function getShowTabs()
     {
-        return $this->scopeConfig->isSetFlag(self::CONFIG_PROXY_SHOWTABS);
+        return $this->getConfigurationData(self::CONFIG_PROXY_SHOWTABS);
+
     }
 }
 
