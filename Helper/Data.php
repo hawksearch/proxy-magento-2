@@ -184,8 +184,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                 $params = $this->_request->getParams();
                 if(isset($params['lpurl']) && (substr($params['lpurl'], 0, strlen('/catalogsearch/result')) === '/catalogsearch/result')) {
                     unset($params['lpurl']);
-                    $this->setUri($params);
                 }
+                $this->setUri($params);
         }
     }
 
