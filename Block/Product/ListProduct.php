@@ -81,7 +81,10 @@ class ListProduct
                 }
                 $this->topseen = true;
                 $data = $this->hawkHelper->getResultData()->Data;
-                return sprintf('<div id="hawktabs">%s</div><div id="hawktoppager">%s</div>', $data->Tabs, $data->TopPager);
+                if($this->hawkHelper->getShowTabs()) {
+                    return sprintf('<div id="hawktabs">%s</div><div id="hawktoppager">%s</div>', $data->Tabs, $data->TopPager);
+                }
+                return sprintf('<div id="hawktoppager">%s</div>', $data->TopPager);
             } else {
                 return '';
             }

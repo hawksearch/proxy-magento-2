@@ -35,6 +35,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     const CONFIG_PROXY_ENABLE_CUSTOM_SEARCH_ROUTE = 'hawksearch_proxy/proxy/enable_custom_search_route';
     const CONFIG_PROXY_ENABLE_LANDING_PAGE_ROUTE = 'hawksearch_proxy/proxy/enable_hawk_landing_pages';
     const CONFIG_PROXY_CATEGORY_SYNC_CRON_ENABLED = 'hawksearch_proxy/sync/enabled';
+    const CONFIG_PROXY_SHOWTABS = 'hawksearch_proxy/proxy/show_tabs';
 
     const LP_CACHE_KEY = 'hawk_landing_pages';
     const LOCK_FILE_NAME = 'hawkcategorysync.lock';
@@ -195,7 +196,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $args['output'] = 'custom';
         $args['hawkitemlist'] = 'json';
         $args['hawkfeatured'] = 'json';
-        $args['hawktabs'] = 'html';
+        if($this->getShowTabs()) {
+            $args['hawktabs'] = 'html';
+        }
         if (empty($args['it']) && $this->getResultType()) {
             $args['it'] = $this->getResultType();
         }
@@ -1091,6 +1094,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function getEnabled()
     {
         return $this->scopeConfig->isSetFlag(self::CONFIG_PROXY_ENABLED);
+    }
+
+    public function getShowTabs()
+    {
+        return $this->scopeConfig->isSetFlag(self::CONFIG_PROXY_SHOWTABS);
     }
 }
 

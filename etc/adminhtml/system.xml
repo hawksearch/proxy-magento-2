@@ -179,6 +179,12 @@
                     <label>Result Type</label>
                     <comment>Default is 'item'</comment>
                 </field>
+                <field id="show_tabs" type="select" showInDefault="0" showInWebsite="0"
+                       showInStore="1" sortOrder="120">
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <label>Show Hawk type tabs</label>
+                    <comment>Display the HawkSearch type tabs</comment>
+                </field>
             </group>
             <group id="sync" translate="label" type="text" sortOrder="15" showInDefault="1" showInWebsite="1"
                    showInStore="1">
