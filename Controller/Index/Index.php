@@ -19,15 +19,21 @@ class Index
     protected $result;
     private $session;
     private $request;
+    /**
+     * @var \HawkSearch\Proxy\Helper\Data
+     */
+    private $data;
 
     public function __construct(\Magento\Framework\App\Action\Context $context,
                                 \Magento\Catalog\Model\Session $session,
-                                \Magento\Framework\Controller\Result\Raw $result)
+                                \Magento\Framework\Controller\Result\Raw $result,
+                                \HawkSearch\Proxy\Helper\Data $data)
     {
         $this->result = $result;
         $this->session = $session;
         $this->request = $context->getRequest();
         parent::__construct($context);
+        $this->data = $data;
     }
 
 
@@ -35,7 +41,7 @@ class Index
     {
         $tab = $this->getRequest()->getParam('it');
         $html = '';
-        if(!empty($tab) && $tab !== 'item') {
+        if(!empty($tab) && $tab !== $this->data->getResultType()) {
             $this->_view->loadLayout('hawksearch_proxy_tabbed');
             $html =$this->_view->getLayout()->getBlock('hawksearch_proxy_block_tabbed')->toHtml();
         } elseif(!$this->_view->isLayoutLoaded()){
