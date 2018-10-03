@@ -63,7 +63,14 @@ class View
     {
         $category = $this->categoryFactory->create();
         $category->setHawksearchLandingPage(true);
-        $category->setName($this->helper->getResultData()->Name);
+        $data = $this->helper->getResultData();
+        if(property_exists($data, 'Name')) {
+            $category->setName($data->Name);
+        } elseif (property_exists($data, 'HeaderTitle')) {
+            $category->setName(strip_tags($data->HeaderTitle));
+        } else {
+            $category->setName('-');
+        }
         $category->setHawkBreadcrumbPath([ 0 => [
             'label' => $category->getName(),
             'link' => ''
