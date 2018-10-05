@@ -25,7 +25,6 @@
         <tracking_url_staging>https://test.hawksearch.net/</tracking_url_staging>
         <tracking_url_production>https://manage.hawksearch.com/</tracking_url_production>
         <search_box_ids>search</search_box_ids>
-        <autocomplete_div_id>search_autocomplete</autocomplete_div_id>
         <autocomplete_query_params><![CDATA[/?fn=ajax&f=GetSuggestions]]></autocomplete_query_params>
         <hawksearch_include_css>1</hawksearch_include_css>
         <enable_hawk_landing_pages>1</enable_hawk_landing_pages>
