@@ -57,27 +57,39 @@ class ListProduct
 
     public function getToolbarHtml()
     {
-        if ($this->hawkHelper->getLocation() != "") {
-            $this->hawkHelper->log(sprintf('Redirecting to location: %s', $this->hawkHelper->getLocation()));
-            $this->response->setRedirect($this->hawkHelper->getLocation());
-            $this->response->send();
-            exit();
-        }
+        if ($this->hawkHelper->getConfigurationData('hawksearch_proxy/general/enabled')) {
 
-        if (!$this->hawkHelper->getIsHawkManaged($this->_request->getOriginalPathInfo())) {
-            $this->hawkHelper->log('page not managed, returning core pager');
-            return parent::getToolbarHtml();
-        }
-        if ($this->pagers) {
-            $baseUrl = $this->_storeManager->getStore()->getBaseUrl();
-            if ($this->topseen) {
-                return '<div id="hawkbottompager">' . str_replace($baseUrl.'/', $baseUrl, $this->hawkHelper->getResultData()->Data->BottomPager) . '</div>';
+            try {
+                if ($this->hawkHelper->getLocation() != "") {
+                    $this->hawkHelper->log(sprintf('Redirecting to location: %s', $this->hawkHelper->getLocation()));
+                    $this->response->setRedirect($this->hawkHelper->getLocation());
+                    $this->response->send();
+                    exit();
+                }
+            } catch (\Exception $e) {
+                return parent::getToolbarHtml();
             }
-            $this->topseen = true;
-            return '<div id="hawktoppager">' . str_replace($baseUrl.'/', $baseUrl, $this->hawkHelper->getResultData()->Data->TopPager) . '</div>';
-        } else {
-            return '';
+
+            if (!$this->hawkHelper->getIsHawkManaged($this->_request->getOriginalPathInfo())) {
+                $this->hawkHelper->log('page not managed, returning core pager');
+                return parent::getToolbarHtml();
+            }
+            if ($this->pagers) {
+                $baseUrl = $this->_storeManager->getStore()->getBaseUrl();
+                if ($this->topseen) {
+                    return '<div id="hawkbottompager">' . str_replace($baseUrl . '/', $baseUrl, $this->hawkHelper->getResultData()->Data->BottomPager) . '</div>';
+                }
+                $this->topseen = true;
+                $data = $this->hawkHelper->getResultData()->Data;
+                if($this->hawkHelper->getShowTabs()) {
+                    return sprintf('<div id="hawktabs">%s</div><div id="hawktoppager">%s</div>', $data->Tabs, $data->TopPager);
+                }
+                return sprintf('<div id="hawktoppager">%s</div>', $data->TopPager);
+            } else {
+                return '';
+            }
         }
+        return parent::getToolbarHtml();
     }
 
     public function getIdentities()
@@ -100,9 +112,7 @@ class ListProduct
     protected function _getProductCollection()
     {
         if ($this->_productCollection === null) {
-
             if ($this->hawkHelper->getConfigurationData('hawksearch_proxy/general/enabled')) {
-
                 if ($this->hawkHelper->getLocation() != "") {
                     $this->hawkHelper->log(sprintf('Redirecting to location: %s', $this->hawkHelper->getLocation()));
                     //return $this->helper->_redirectUrl($this->hawkHelper->getLocation());
@@ -115,9 +125,6 @@ class ListProduct
                 $this->hawkHelper->log('hawk not managing search');
                 return parent::_getProductCollection();
             }
-        }
-        if($this->_productCollection == null) {
-            $this->_productCollection = parent::_getProductCollection();
         }
         return $this->_productCollection;
     }

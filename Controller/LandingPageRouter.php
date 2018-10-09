@@ -40,6 +40,9 @@ class LandingPageRouter
 
     public function match(\Magento\Framework\App\RequestInterface $request)
     {
+        if(!$this->helper->getEnabled()) {
+            return false;
+        }
         if (!$this->helper->getEnableLandingPageRoute()) {
             return false;
         }

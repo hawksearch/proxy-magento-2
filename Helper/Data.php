@@ -30,10 +30,12 @@ use HawkSearch\Proxy\Model\Logger;
 class Data extends \Magento\Framework\App\Helper\AbstractHelper
 {
     const HAWK_LANDING_PAGE_URL = 'LandingPage/';
+    const CONFIG_PROXY_ENABLED = 'hawksearch_proxy/general/enabled';
     const CONFIG_PROXY_RESULT_TYPE = 'hawksearch_proxy/proxy/result_type';
     const CONFIG_PROXY_ENABLE_CUSTOM_SEARCH_ROUTE = 'hawksearch_proxy/proxy/enable_custom_search_route';
     const CONFIG_PROXY_ENABLE_LANDING_PAGE_ROUTE = 'hawksearch_proxy/proxy/enable_hawk_landing_pages';
     const CONFIG_PROXY_CATEGORY_SYNC_CRON_ENABLED = 'hawksearch_proxy/sync/enabled';
+    const CONFIG_PROXY_SHOWTABS = 'hawksearch_proxy/proxy/show_tabs';
 
     const LP_CACHE_KEY = 'hawk_landing_pages';
     const LOCK_FILE_NAME = 'hawkcategorysync.lock';
@@ -171,35 +173,42 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             case 'catalog_category':
                 if($this->getConfigurationData('hawksearch_proxy/proxy/manage_categories')) {
                     $this->setUri(array('lpurl' => $this->_request->getAlias('rewrite_request_path')));
-                };
+                }
                 break;
             case 'catalogsearch_result':
                 if($this->getConfigurationData('hawksearch_proxy/proxy/manage_search')){
                     $this->setUri($this->_request->getParams());
                 }
+                break;
+            case 'hawkproxy_index':
+                $params = $this->_request->getParams();
+                if(isset($params['lpurl']) && (substr($params['lpurl'], 0, strlen('/catalogsearch/result')) === '/catalogsearch/result')) {
+                    unset($params['lpurl']);
+                }
+                $this->setUri($params);
         }
     }
 
     public function setUri($args)
     {
-        //$this->uri = $this->getTrackingUrl() . '/?fn=' .$args['fn'].'&Items='.$args['Items'];
         unset($args['ajax']);
         unset($args['json']);
         $args['output'] = 'custom';
         $args['hawkitemlist'] = 'json';
         $args['hawkfeatured'] = 'json';
-        if($this->getResultType()){
-            $args['it'] = $this->getResultType();
-
+        if($this->getShowTabs()) {
+            $args['hawktabs'] = 'html';
         }
-        if (isset($args['q'])) {
-            unset($args['lpurl']);
-            //$args['keyword'] = $args['q'];
-            if(isset($args['keyword'])){
-                unset($args['keyword']);
-            }
+        if (empty($args['it']) && $this->getResultType()) {
+            $args['it'] = $this->getResultType();
+        }
+        if (isset($args['keyword'])) {
+            unset($args['keyword']);
         }
         $args['hawksessionid'] = $this->session->getSessionId();
+        if (isset($args['lpurl']) && (!$this->getIsHawkManaged($args['lpurl']) || $args['lpurl'] == '/catalogsearch/result/')) {
+            unset($args['lpurl']);
+        }
 
         $this->uri = $this->getTrackingUrl() . '/?' . http_build_query($args);
     }
@@ -336,6 +345,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                 $map[$item->Custom->sku] = $i;
                 $i++;
             }
+        }
+        if(empty($skus)){
+            return null;
         }
 
         /** @var \Magento\Catalog\Model\ResourceModel\Product\Collection $collection */
@@ -477,7 +489,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         if (substr($path, 0, 1) != '/') {
             $path = '/' . $path;
         }
-        if(in_array($path, ['/catalogsearch/result/', '/hawkproxy/']) && $this->getConfigurationData('hawksearch_proxy/proxy/manage_search')){
+        if(in_array($path, ['/catalogsearch/result/', '/catalogsearch/result', '/hawkproxy/']) && $this->getConfigurationData('hawksearch_proxy/proxy/manage_search')){
             return true;
         }
         $hs = $this->getLandingPages();
@@ -1077,6 +1089,17 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function getEnableLandingPageRoute()
     {
         return $this->getConfigurationData(self::CONFIG_PROXY_ENABLE_LANDING_PAGE_ROUTE);
+    }
+
+    public function getEnabled()
+    {
+        return $this->scopeConfig->isSetFlag(self::CONFIG_PROXY_ENABLED, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+    }
+
+    public function getShowTabs()
+    {
+        return $this->getConfigurationData(self::CONFIG_PROXY_SHOWTABS);
+
     }
 }
 
