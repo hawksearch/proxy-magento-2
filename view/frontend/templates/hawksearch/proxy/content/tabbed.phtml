@@ -14,6 +14,7 @@
 /** @var $block \HawkSearch\Proxy\Block\Html */
 $trackingId = $block->getHawksearchTrackingId();
 $increment = 1;
+$tabs = $block->getTabs();
 
 ?>
 
@@ -23,7 +24,7 @@ $increment = 1;
          class="bannerTop"> <?php echo $block->getBanner()->getFeaturedTop() ?><?php echo $block->getBanner()->getBannerTop() ?></div>
     <div id="hawktoptext"><?php echo $block->getTopText(); ?></div>
     <div id="hawkrelated"><?php echo $block->getRelated() ?></div>
-    <div id="hawktabs"><?php echo $block->getTabs(); ?></div>
+    <?php if(!empty($tabs)) { echo sprintf('<div id="hawktabs">%s</div>', $tabs); } ?>
     <div id="hawktoppager"><?php echo $block->getTopPager(); ?></div>
     <div id="hawkitemlist">
         <div class="contentList">

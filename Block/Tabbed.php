@@ -25,7 +25,11 @@ class Tabbed extends Html
 
     public function getTabs()
     {
-        return $this->helper->getResultData()->Data->Tabs;
+        $resultData = $this->helper->getResultData()->Data;
+        if(property_exists($resultData, 'Tabs')){
+            return $resultData->Tabs;
+        }
+        return null;
     }
     public function getContent()
     {
