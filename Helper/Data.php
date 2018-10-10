@@ -19,6 +19,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 {
     const HAWK_LANDING_PAGE_URL = 'LandingPage/';
     const CONFIG_PROXY_RESULT_TYPE = 'hawksearch_proxy/proxy/result_type';
+    const CONFIG_PROXY_MODE = 'hawksearch_proxy/proxy/mode';
 
     protected $_logFilename = "/var/log/hawk_sync_categories.log";
     protected $_exceptionLog = "hawk_sync_exception.log";
