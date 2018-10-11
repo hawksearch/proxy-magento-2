@@ -19,6 +19,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 {
     const HAWK_LANDING_PAGE_URL = 'LandingPage/';
     const CONFIG_PROXY_RESULT_TYPE = 'hawksearch_proxy/proxy/result_type';
+    const CONFIG_PROXY_MODE = 'hawksearch_proxy/proxy/mode';
 
     protected $_logFilename = "/var/log/hawk_sync_categories.log";
     protected $_exceptionLog = "hawk_sync_exception.log";
@@ -278,7 +279,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     public function getApiKey()
     {
-
         return $this->getConfigurationData('hawksearch_proxy/proxy/hawksearch_api_key');
     }
 
@@ -338,7 +338,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function getHawkResponse($method, $url, $data = null)
     {
         try {
-
             $client = new \Zend_Http_Client();
             $client->setConfig(['timeout' => 60]);
 
