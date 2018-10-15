@@ -351,14 +351,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         }
 
         /** @var \Magento\Catalog\Model\ResourceModel\Product\Collection $collection */
-        $collection = $this->collectionFactory->create();
-        $collection
-            ->addAttributeToSelect($this->catalogConfig->getProductAttributes())
-            ->addAttributeToFilter('sku', array('in' => $skus))
-            ->addMinimalPrice()
-            ->addFinalPrice()
-            ->addTaxPercents()
-            ->addUrlRewrite();
+        $collection = $this->getResourceCollection($skus);
 
         $sorted = array();
         if ($collection->count() > 0) {
@@ -1100,6 +1093,20 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->getConfigurationData(self::CONFIG_PROXY_SHOWTABS);
 
+    }
+
+    public function getResourceCollection(array $skus)
+    {
+        /** @var \Magento\Catalog\Model\ResourceModel\Product\Collection $collection */
+        $collection = $this->collectionFactory->create();
+        $collection
+            ->addAttributeToSelect($this->catalogConfig->getProductAttributes())
+            ->addAttributeToFilter('sku', array('in' => $skus))
+            ->addMinimalPrice()
+            ->addFinalPrice()
+            ->addTaxPercents()
+            ->addUrlRewrite();
+        return $collection;
     }
 }
 
