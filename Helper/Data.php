@@ -20,6 +20,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     const HAWK_LANDING_PAGE_URL = 'LandingPage/';
     const CONFIG_PROXY_RESULT_TYPE = 'hawksearch_proxy/proxy/result_type';
     const CONFIG_PROXY_MODE = 'hawksearch_proxy/proxy/mode';
+    const CONFIG_PROXY_SHOW_TOPTEXT = 'hawksearch_proxy/proxy/show_toptext';
 
     protected $_logFilename = "/var/log/hawk_sync_categories.log";
     protected $_exceptionLog = "hawk_sync_exception.log";
@@ -967,5 +968,15 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         return true;
     }
 
-
+    public function getTopText() {
+        if($this->getConfigurationData(self::CONFIG_PROXY_SHOW_TOPTEXT)){
+            if (empty($this->hawkData)) {
+                $this->fetchResponse();
+            }
+            if(isset($this->hawkData->Data->TopText)) {
+                return $this->hawkData->Data->TopText;
+            }
+        }
+        return '';
+    }
 }
