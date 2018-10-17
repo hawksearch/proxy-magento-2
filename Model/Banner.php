@@ -12,17 +12,20 @@
  */
 namespace HawkSearch\Proxy\Model;
 class Banner extends \Magento\Framework\DataObject {
+    /**
+     * @var \HawkSearch\Proxy\Helper\Data
+     */
+    protected $helper;
 
-	protected function _construct() {
-		
-		 /** @var \HawkSearch\Proxy\Helper\Data $helper */
-		$om=\Magento\Framework\App\ObjectManager::getInstance();		
-		$helper=$om->create('HawkSearch\Proxy\Helper\Data');
-		foreach($helper->getResultData()->Data->Merchandising->Items as $banner) {
-			$this->setData($this->_underscore($banner->Zone), $banner->Html);
-		}
-        foreach($helper->getResultData()->Data->FeaturedItems->Items as $banner) {
-            $this->setData($this->_underscore($banner->Zone), $banner->Html);
-        }
-	}
+    public function __construct(
+        \HawkSearch\Proxy\Helper\Data $helper,
+        array $data = [])
+    {
+        $this->helper = $helper;
+        parent::__construct($data);
+    }
+
+    public function getTopText() {
+        return $this->helper->getTopText();
+    }
 }

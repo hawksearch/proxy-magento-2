@@ -165,6 +165,11 @@
                     <label>Result Type</label>
                     <comment>Default is empty</comment>
                 </field>
+                <field id="show_toptext" type="select" showInStore="1" sortOrder="120">
+                    <label>Show Top Text</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Alternate results notice</comment>
+                </field>
             </group>
             <group id="sync" translate="label" type="text" sortOrder="15" showInDefault="1" showInWebsite="1"
                    showInStore="1">
