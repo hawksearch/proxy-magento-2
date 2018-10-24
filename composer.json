@@ -6,6 +6,7 @@
   "version": "2.2.12",
   "require": {
     "php": "^7.0.13|^7.1",
+    "magento/magento-composer-installer": "*"
   },
   "autoload": {
     "psr-4": {
