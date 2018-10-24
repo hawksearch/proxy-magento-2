@@ -12,10 +12,10 @@
  */
 namespace HawkSearch\Proxy\Helper;
 
-use HawkSearch\Proxy\Model\ProxyEmail;
+use HawkSearch\Proxy\Model\ProxyEmailFactory;
 use Magento\Catalog\Model\Config;
 use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
-use Magento\Catalog\Model\Session;
+use Magento\Catalog\Model\SessionFactory;
 use Magento\Framework\App\CacheInterface as Cache;
 use Magento\Framework\App\Helper\Context;
 use Magento\Framework\Filesystem;
@@ -36,6 +36,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     const CONFIG_PROXY_ENABLE_LANDING_PAGE_ROUTE = 'hawksearch_proxy/proxy/enable_hawk_landing_pages';
     const CONFIG_PROXY_CATEGORY_SYNC_CRON_ENABLED = 'hawksearch_proxy/sync/enabled';
     const CONFIG_PROXY_SHOWTABS = 'hawksearch_proxy/proxy/show_tabs';
+    const CONFIG_PROXY_MODE = 'hawksearch_proxy/proxy/mode';
 
     const LP_CACHE_KEY = 'hawk_landing_pages';
     const LOCK_FILE_NAME = 'hawkcategorysync.lock';
@@ -85,7 +86,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @param Context $context
      * @param StoreManagerInterface $storeManager
      * @param Filesystem $filesystem
-     * @param ProxyEmail $email_helper
+     * @param ProxyEmailFactory $email_helper
      * @param CollectionFactory $collectionFactory
      * @param CategoryCollectionFactory $categoryCollectionFactory
      * @param Config $catalogConfig
@@ -99,7 +100,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         Context $context,
         StoreManagerInterface $storeManager,
         Filesystem $filesystem,
-        ProxyEmail $email_helper,
+        ProxyEmailFactory $email_helper,
         CollectionFactory $collectionFactory,
         CategoryCollectionFactory $categoryCollectionFactory,
         Config $catalogConfig,
@@ -107,7 +108,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         StoreCollectionFactory $storeCollectionFactory,
         Logger $logger,
         Cache $cache,
-        Session $session,
+        SessionFactory $session,
         \Magento\UrlRewrite\Model\UrlFinderInterface $urlFinder
 
     ) {
@@ -205,7 +206,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         if (isset($args['keyword'])) {
             unset($args['keyword']);
         }
-        $args['hawksessionid'] = $this->session->getSessionId();
+        $args['hawksessionid'] = $this->session->create()->getSessionId();
         if (isset($args['lpurl']) && (!$this->getIsHawkManaged($args['lpurl']) || $args['lpurl'] == '/catalogsearch/result/')) {
             unset($args['lpurl']);
         }
@@ -315,7 +316,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     public function getMode()
     {
-        return $this->getConfigurationData('hawksearch_proxy/proxy/mode');
+        return $this->getConfigurationData(self::CONFIG_PROXY_MODE);
     }
 
     public function getApiKey()
@@ -1058,7 +1059,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             $extra_html = $this->_getEmailExtraHtml();
 
             /** @var ProxyEmail $mail_helper */
-            $mail_helper = $this->email_helper;
+            $mail_helper = $this->email_helper->create();
 
             try {
                 $mail_helper->sendEmail($receiver, [
