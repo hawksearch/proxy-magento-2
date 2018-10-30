@@ -63,7 +63,11 @@ class Html
 
     public function getMetaRobots()
     {
-        return $this->helper->getResultData()->MetaRobots;
+        $results = $this->helper->getResultData();
+        if(property_exists($results, 'MetaRobots')) {
+            return $results->MetaRobots;
+        }
+        return '';
     }
 
     public function getHeaderTitle()
