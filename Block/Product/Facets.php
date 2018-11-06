@@ -16,7 +16,7 @@ class Facets extends \Magento\Framework\View\Element\Template
     private $hawkHelper;
     private $banner;
     public function __construct(Template\Context $context,
-                                \HawkSearch\Proxy\Model\Banner $banner,
+                                \HawkSearch\Proxy\Block\Banner $banner,
                                 \HawkSearch\Proxy\Helper\Data $hawkHelper,
                                 array $data)
     {
