@@ -15,7 +15,7 @@ class HawkItems extends Template
     private $banner;
     public function __construct(
         Template\Context $context,
-        \HawkSearch\Proxy\Model\Banner $banner,
+        Banner $banner,
         array $data = [])
     {
         $this->banner = $banner;
