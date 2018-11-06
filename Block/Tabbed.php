@@ -17,7 +17,7 @@ class Tabbed extends Html
      */
     private $helper;
 
-    public function __construct(Template\Context $context, \HawkSearch\Proxy\Helper\Data $helper, \HawkSearch\Proxy\Banner\BannerFactory $bannerFactory, array $data = [])
+    public function __construct(Template\Context $context, \HawkSearch\Proxy\Helper\Data $helper, \HawkSearch\Proxy\Block\BannerFactory $bannerFactory, array $data = [])
     {
         parent::__construct($context, $helper, $bannerFactory, $data);
         $this->helper = $helper;
