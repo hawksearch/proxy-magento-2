@@ -28,7 +28,7 @@ class Html
     public function __construct(
         Template\Context $context,
         \HawkSearch\Proxy\Helper\Data $helper,
-        \HawkSearch\Proxy\Model\BannerFactory $bannerFactory,
+        \HawkSearch\Proxy\Banner\BannerFactory $bannerFactory,
         array $data = [])
     {
         $helper->setClientIp($context->getRequest()->getClientIp());
