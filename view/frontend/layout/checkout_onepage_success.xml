@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!--
 /**
- * Copyright (c) 2013 Hawksearch (www.hawksearch.com) - All Rights Reserved
+ * Copyright (c) 2018 Hawksearch (www.hawksearch.com) - All Rights Reserved
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -14,9 +14,8 @@
 -->
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="1column" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">   
     <body>     
-        <referenceContainer name="content">
-            <block class="Magento\Framework\View\Element\Template" name="checkout.hawksearch.success" template="HawkSearch_Proxy::hawksearch/proxy/tracking.phtml" />     
+        <referenceContainer name="order.success.additional.info">
+            <block class="HawkSearch\Proxy\Block\OnePage\Success" name="checkout.hawksearch.success" template="HawkSearch_Proxy::hawksearch/proxy/tracking.phtml" />
         </referenceContainer>
-      
     </body>
 </page>
