@@ -20,6 +20,7 @@
             <module name="Magento_Catalog"/>
             <module name="Magento_CatalogSearch"/>
             <module name="Magento_CatalogEvent"/>
+            <module name="Magento_AdvancedSearch"/>
         </sequence>
     </module>
 </config>
