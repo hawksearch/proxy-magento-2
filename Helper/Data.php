@@ -37,6 +37,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     const CONFIG_PROXY_CATEGORY_SYNC_CRON_ENABLED = 'hawksearch_proxy/sync/enabled';
     const CONFIG_PROXY_SHOWTABS = 'hawksearch_proxy/proxy/show_tabs';
     const CONFIG_PROXY_MODE = 'hawksearch_proxy/proxy/mode';
+    const CONFIG_PROXY_TYPE_LABEL = 'hawksearch_proxy/proxy/type_label';
+    const CONFIG_PROXY_SHOW_TYPE_LABELS = 'hawksearch_proxy/proxy/show_type_labels';
 
     const LP_CACHE_KEY = 'hawk_landing_pages';
     const LOCK_FILE_NAME = 'hawkcategorysync.lock';
@@ -1108,6 +1110,22 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             ->addTaxPercents()
             ->addUrlRewrite();
         return $collection;
+    }
+
+    public function getTypeLabelMap()
+    {
+        /** @var stdClass $map */
+        $obj = json_decode($this->getConfigurationData(self::CONFIG_PROXY_TYPE_LABEL));
+        $map = [];
+        foreach ($obj as $key => $item) {
+            $map[$item->code] = $item;
+        }
+        return $map;
+    }
+
+    public function getShowTypeLabels()
+    {
+        return $this->getConfigurationData(self::CONFIG_PROXY_SHOW_TYPE_LABELS);
     }
 }
 

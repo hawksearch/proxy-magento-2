@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!--
 /**
- * Copyright (c) 2017 Hawksearch (www.hawksearch.com) - All Rights Reserved
+ * Copyright (c) 2018 Hawksearch (www.hawksearch.com) - All Rights Reserved
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -184,6 +184,18 @@
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <label>Show Hawk type tabs</label>
                     <comment>Display the HawkSearch type tabs</comment>
+                </field>
+                <field id="show_type_labels" showInStore="1" showInWebsite="0" showInDefault="0" sortOrder="125" type="select">
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <label>Show Hawk type labels</label>
+                </field>
+                <field id="type_label" showInStore="1" showInDefault="0" showInWebsite="0" sortOrder="130">
+                    <label>Type Labels</label>
+                    <frontend_model>HawkSearch\Proxy\Block\System\Config\TypeLabel</frontend_model>
+                    <backend_model>HawkSearch\Proxy\Model\Config\Backend\TypeLabel</backend_model>
+                    <depends>
+                        <field id="show_type_labels">1</field>
+                    </depends>
                 </field>
             </group>
             <group id="sync" translate="label" type="text" sortOrder="15" showInDefault="1" showInWebsite="1"

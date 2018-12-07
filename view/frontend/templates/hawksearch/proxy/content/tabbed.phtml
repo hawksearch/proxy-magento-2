@@ -31,6 +31,7 @@ $tabs = $block->getTabs();
             <?php foreach ($block->getContent() as $item) : ?>
                 <div class="item hawk-contentItem">
                     <div class="content hawk-contentWrapper">
+                        <?php echo $block->getTypeLabel($item); ?>
                         <h3 class="title hawk-contentTitle">
                             <a href="<?php echo $item->CustomURL; ?>"
                                onclick="<?php echo sprintf("return HawkSearch.link(this,'%s',%d,'%d',0);", $trackingId, $increment++, $item->Id); ?>"><?php echo $item->ItemName; ?>
