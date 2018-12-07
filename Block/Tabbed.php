@@ -42,7 +42,7 @@ class Tabbed extends Html
 
     public function getTypeLabel($item)
     {
-        if(!$this->helper->getShowTypeLabels()) {
+        if(!$this->helper->getShowTypeLabels() || !isset($item->Custom->it)) {
             return '';
         }
         if(!$this->labelMap){
