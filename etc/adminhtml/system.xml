@@ -187,8 +187,9 @@
                 </field>
                 <field id="show_type_labels" showInStore="1" showInWebsite="0" showInDefault="0" sortOrder="125" type="select">
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                    <!--<backend_model>HawkSearch\Proxy\Model\Config\Backend\ShowTypeLabels</backend_model>-->
+                    <backend_model>HawkSearch\Proxy\Model\Config\Backend\ShowTypeLabels</backend_model>
                     <label>Show Hawk type labels</label>
+                    <comment>You will need to rebuild the index after changing this field</comment>
                 </field>
                 <field id="type_label" showInStore="1" showInDefault="0" showInWebsite="0" sortOrder="130">
                     <label>Type Labels</label>
