@@ -15,6 +15,7 @@
                            template="hawksearch/proxy/tabbed/default.phtml" />
                 </block>
             </block>
+            <referenceBlock name="hawksearch_hawkitems" remove="true" />
         </referenceContainer>
     </body>
 </page>
