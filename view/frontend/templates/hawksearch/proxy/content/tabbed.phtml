@@ -11,8 +11,7 @@
  * IN THE SOFTWARE.
  */
 
-/** @var $block \HawkSearch\Proxy\Block\Html */
-$trackingId = $block->getHawksearchTrackingId();
+/** @var $block \HawkSearch\Proxy\Block\Tabbed */
 $increment = 1;
 $tabs = $block->getTabs();
 
@@ -29,18 +28,7 @@ $tabs = $block->getTabs();
     <div id="hawkitemlist">
         <div class="contentList">
             <?php foreach ($block->getContent() as $item) : ?>
-                <div class="item hawk-contentItem">
-                    <div class="content hawk-contentWrapper">
-                        <?php echo $block->getTypeLabel($item); ?>
-                        <h3 class="title hawk-contentTitle">
-                            <a href="<?php echo $item->CustomURL; ?>"
-                               onclick="<?php echo sprintf("return HawkSearch.link(this,'%s',%d,'%d',0);", $trackingId, $increment++, $item->Id); ?>"><?php echo $item->ItemName; ?>
-                            </a>
-                        </h3>
-                        <p class="hawk-contentCaption"><?php echo $item->BestFragment; ?></p>
-                    </div>
-                </div>
-                <div class="clear">&nbsp;</div>
+            <?= $block->getTabbedItemHtml($item) ?>
             <?php endforeach; ?>
         </div>
     </div>
