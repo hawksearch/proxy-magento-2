@@ -1,0 +1,20 @@
+<?php
+/**
+ * Created by PhpStorm.
+ * User: dev
+ * Date: 12/11/18
+ * Time: 10:46 AM
+ */
+?>
+                <div class="item hawk-contentItem">
+                    <div class="content hawk-contentWrapper">
+                        <?php echo $block->getTypeLabel($item); ?>
+                        <h3 class="title hawk-contentTitle">
+                            <a href="<?php echo $item->CustomURL; ?>"
+                               onclick="<?php echo sprintf("return HawkSearch.link(this,'%s',%d,'%d',0);", $block->getHawksearchTrackingId(), $block->getIncrement(), $item->Id); ?>"><?php echo $item->ItemName; ?>
+                            </a>
+                        </h3>
+                        <p class="hawk-contentCaption"><?php echo $item->BestFragment; ?></p>
+                    </div>
+                </div>
+                <div class="clear">&nbsp;</div>

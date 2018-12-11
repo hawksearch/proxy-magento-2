@@ -18,6 +18,7 @@ class Tabbed extends Html
      */
     private $helper;
     private $labelMap;
+    public static $increment = 1;
 
     public function __construct(Template\Context $context, \HawkSearch\Proxy\Helper\Data $helper, \HawkSearch\Proxy\Block\BannerFactory $bannerFactory, array $data = [])
     {
@@ -38,6 +39,21 @@ class Tabbed extends Html
         $data = $this->helper->getResultData()->Data;
         $results = json_decode($data->Results);
         return $results->Items;
+    }
+
+    public function getTabbedItemHtml($item) {
+        $rendererList = $this->getChildBlock('item.renderers');
+        $type = 'default';
+        if($this->helper->getShowTypeLabels() && $this->getRequest()->getParam('it') != 'all') {
+            $type = strstr($item->Custom->it, '|^|', true);
+        }
+
+        $renderer = $rendererList->getRenderer($type, 'default');
+        $renderer->_viewVars = ['item' => $item];
+        return $renderer->toHtml();
+    }
+    public function getIncrement(){
+        return self::$increment++;
     }
 
     public function getTypeLabel($item)
