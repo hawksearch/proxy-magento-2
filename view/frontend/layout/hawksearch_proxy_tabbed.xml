@@ -14,6 +14,9 @@
                            as="default"
                            template="hawksearch/proxy/tabbed/default.phtml" />
                 </block>
+                <block class="HawkSearch\Proxy\Block\Product\Facets"
+                       name="hawksearch_facets" as="hawksearch_facets"
+                       template="HawkSearch_Proxy::hawksearch/proxy/left/facets.phtml"/>
             </block>
             <referenceBlock name="hawksearch_hawkitems" remove="true" />
         </referenceContainer>

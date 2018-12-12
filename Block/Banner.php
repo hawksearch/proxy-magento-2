@@ -38,7 +38,7 @@ class Banner extends Template {
             }
         }
         if(isset($resultData->FeaturedItems) && isset($resultData->FeaturedItems->Items)) {
-            foreach($this->helper->getResultData()->Data->FeaturedItems->Items as $banner) {
+            foreach($this->helper->getResultData()->Data->FeaturedItems->Items->Items as $banner) {
                 $this->setData($this->_underscore($banner->Zone), $banner->Html);
             }
         }
