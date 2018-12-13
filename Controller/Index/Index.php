@@ -41,12 +41,14 @@ class Index
     {
         $tab = $this->getRequest()->getParam('it');
         $html = '';
-        if(!empty($tab) && $tab !== $this->data->getResultType()) {
-            $this->_view->loadLayout('hawksearch_proxy_tabbed');
-            $html =$this->_view->getLayout()->getBlock('hawksearch_proxy_block_tabbed')->toHtml();
-        } elseif(!$this->_view->isLayoutLoaded()){
+
+        if(!$this->_view->isLayoutLoaded()){
             $this->_view->loadLayout($this->session->getHawkCurrentUpdateHandle());
-            $html = $this->_view->getLayout()->createBlock('HawkSearch\Proxy\Block\Html')->setTemplate('HawkSearch_Proxy::hawksearch/proxy/html.phtml')->toHtml();
+            $block = $this->_view->getLayout()->getBlock('hawksearch_proxy_response');
+            if(!empty($tab) && $tab !== $this->data->getResultType()) {
+                $block->setTabbedContent(true);
+            }
+            $html = $block->toHtml();
         }
         $params = $this->getRequest()->getParams();
         $obj = array('Success' => 'true', 'html' => $html, 'location' => '');

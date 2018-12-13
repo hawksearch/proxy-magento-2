@@ -44,11 +44,13 @@ class Index extends \Magento\CatalogSearch\Controller\Result\Index
         $query = $this->queryFactory->get();
         $tab = $this->getRequest()->getParam('it');
         $this->helper->checkNotes();
+        $this->_catalogSession->setHawkCurrentUpdateHandle($this->request->getFullActionName());
+
         if ($query->getQueryText() == '' && $this->isTopCategoryRequest()) {
             $this->_view->loadLayout();
             $this->_view->getLayout()->unsetElement('page.main.title');
             $this->_view->renderLayout();
-        } elseif (!empty($tab) && $tab !== 'item') {
+        } elseif (!empty($tab) && $tab !== $this->hawkHelper->getResultType()) {
             $this->_view->loadLayout('hawksearch_proxy_tabbed');
             $this->_view->renderLayout();
         } else {

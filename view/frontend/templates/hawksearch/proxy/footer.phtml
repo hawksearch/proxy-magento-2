@@ -28,15 +28,23 @@
         }
     }(window.HawkSearch = window.HawkSearch || {}));
 
-    require(["hawksearch"], function() {
+    (function (HawkCompare) {
+        HawkCompare.localReload = function() {
+            //var pd = jQuery.mage.dataPost();
+            var foo = 'bar';
+        };
+    }(window.HawkCompare = window.HawkCompare || {}));
+
+    require(["jquery", "hawksearch"], function ($) {
         HawkSearch.initAutoSuggest = function () {
-<?php foreach($block->getSearchBoxes() as $sbid) : ?>
+            <?php foreach($block->getSearchBoxes() as $sbid) : ?>
             HawkSearch.suggestInit('#<?php echo $sbid; ?>', {
                 lookupUrlPrefix: HawkSearch.TrackingUrl + '<?php echo $block->getAutosuggestParams() ?>',
                 hiddenDivName: '<?php echo $block->getHiddenDivName() ?>',
                 isAutoWidth: true
             });
-<?php endforeach; ?>
+            <?php endforeach; ?>
         };
+
     });
 </script>

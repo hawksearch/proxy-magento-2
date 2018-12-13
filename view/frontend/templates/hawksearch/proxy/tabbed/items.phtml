@@ -1,0 +1,6 @@
+
+        <div class="contentList">
+            <?php foreach ($block->getContent() as $item) : ?>
+            <?= $block->getTabbedItemHtml($item) ?>
+            <?php endforeach; ?>
+        </div>

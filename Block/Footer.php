@@ -14,17 +14,12 @@ use Magento\Framework\View\Element\Template;
 class Footer extends \Magento\Framework\View\Element\Template
 {
     private $helper;
-    private $session;
-    public function __construct(Template\Context $context,
-                                \HawkSearch\Proxy\Helper\Data $helper,
-                                \Magento\Catalog\Model\Session $session,
+    public function __construct(\HawkSearch\Proxy\Helper\Data $helper,
+                                Template\Context $context,
                                 array $data)
     {
-        $this->helper = $helper;
-        $this->session = $session;
-        $this->session->setHawkCurrentUpdateHandle($context->getRequest()->getFullActionName());
         parent::__construct($context, $data);
-        $this->helper->log(sprintf("handle: %s", $this->session->getHawkCurrentUpdateHandle()));
+        $this->helper = $helper;
     }
 
     public function getBaseUrl(){

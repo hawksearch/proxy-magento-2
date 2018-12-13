@@ -21,7 +21,8 @@ $includeCss = $block->getIncludeHawkCss();
     (function() {
         var config = {
             paths: {
-                "hawksearch": "<?php echo $trackingUrl; ?>/includes/hawksearch"
+                //"hawksearch": "<?php //echo $trackingUrl; ?>///includes/hawksearch",
+                "hawksearch": "HawkSearch_Proxy/js/hawksearch"
             }
         };
         require.config(config);
