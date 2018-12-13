@@ -113,9 +113,11 @@ class Html
     public function getItemList()
     {
         $layout = $this->getLayout();
-        $block = $layout->createBlock('HawkSearch\Proxy\Block\Product\ListProduct');
-        $block->getLoadedProductCollection();
-        $block->setTemplate('Magento_Catalog::product/list.phtml');
+        if($this->getTabbedContent()) {
+            $block = $layout->getBlock('hawksearch_tabbed_items');
+        } else {
+            $block = $layout->getBlock('hawksearch_hawkitems');
+        }
 
         return $block->toHtml();
     }
@@ -150,4 +152,13 @@ class Html
     {
         return $this->helper->getResultData()->TrackingId;
     }
+    public function getTabs()
+    {
+        $resultData = $this->helper->getResultData()->Data;
+        if(property_exists($resultData, 'Tabs')){
+            return $resultData->Tabs;
+        }
+        return null;
+    }
+
 }

@@ -8,12 +8,17 @@
             <block class="HawkSearch\Proxy\Block\Tabbed"
                    name="hawksearch_proxy_block_tabbed"
                    template="HawkSearch_Proxy::hawksearch/proxy/content/tabbed.phtml">
-                <block class="Magento\Framework\View\Element\RendererList" name="hawksearch.tabbed.item.renderers" as="item.renderers">
-                    <block class="HawkSearch\Proxy\Block\Tabbed\DefaultRenderer"
-                           name="hawksearch.tabbed.item.renderers.default"
-                           as="default"
-                           template="hawksearch/proxy/tabbed/default.phtml" />
+                <block class="HawkSearch\Proxy\Block\Tabbed" name="hawksearch_tabbed_items" as="hawksearch_tabbed_items" template="HawkSearch_Proxy::hawksearch/proxy/tabbed/items.phtml">
+                    <block class="Magento\Framework\View\Element\RendererList" name="hawksearch.tabbed.item.renderers" as="item.renderers">
+                        <block class="HawkSearch\Proxy\Block\Tabbed\DefaultRenderer"
+                               name="hawksearch.tabbed.item.renderers.default"
+                               as="default"
+                               template="hawksearch/proxy/tabbed/default.phtml" />
+                    </block>
                 </block>
+                <block class="HawkSearch\Proxy\Block\Product\Facets"
+                       name="hawksearch_facets" as="hawksearch_facets"
+                       template="HawkSearch_Proxy::hawksearch/proxy/left/facets.phtml"/>
             </block>
             <referenceBlock name="hawksearch_hawkitems" remove="true" />
         </referenceContainer>

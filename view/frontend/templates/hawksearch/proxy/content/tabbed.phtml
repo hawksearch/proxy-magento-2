@@ -26,11 +26,7 @@ $tabs = $block->getTabs();
     <?php if(!empty($tabs)) { echo sprintf('<div id="hawktabs">%s</div>', $tabs); } ?>
     <div id="hawktoppager"><?php echo $block->getTopPager(); ?></div>
     <div id="hawkitemlist">
-        <div class="contentList">
-            <?php foreach ($block->getContent() as $item) : ?>
-            <?= $block->getTabbedItemHtml($item) ?>
-            <?php endforeach; ?>
-        </div>
+        <?php echo $block->getChildHtml('hawksearch_tabbed_items'); ?>
     </div>
     <div id="hawkbottompager"><?php echo $block->getBottomPager(); ?></div>
     <div id="hawkbannerbottom"

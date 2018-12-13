@@ -12,6 +12,7 @@
  */
 
 /** @var $block \HawkSearch\Proxy\Block\Html */
+$tabs = $block->getTabs();
 ?>
 
 <div>
@@ -37,4 +38,9 @@
          class="bannerBottom"> <?php echo $block->getBanner()->getBannerBottom2() ?><?php echo $block->getBanner()->getFeaturedBottom2() ?></div>
     <div id="hawkbreadcrumb"><?php echo $block->getBreadCrumb() ?></div>
     <div id="hawktitle"><?php echo $block->getTitle() ?></div>
+    <?php if($block->getTabbedContent()) :?>
+    <div id="hawktoppager"><?php echo $block->getTopPager(); ?></div>
+    <div id="hawkbottompager"><?php echo $block->getBottomPager(); ?></div>
+    <?php endif; ?>
+    <?php if(!empty($tabs)) { echo sprintf('<div id="hawktabs">%s</div>', $tabs); } ?>
 </div>

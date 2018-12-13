@@ -16,7 +16,7 @@
       xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <body>
         <referenceBlock name="head.additional">
-            <block class="HawkSearch\Proxy\Block\Head\HawksearchJs"
+            <block class="HawkSearch\Proxy\Block\Head\HawkSearchJs"
                    name="hawksearch.head" as="hawksearch.head"
                    template="HawkSearch_Proxy::hawksearch/proxy/head/js.phtml"/>
         </referenceBlock>

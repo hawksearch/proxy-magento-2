@@ -28,15 +28,15 @@
         }
     }(window.HawkSearch = window.HawkSearch || {}));
 
-    require(["hawksearch"], function() {
+    require(["hawksearch"], function () {
         HawkSearch.initAutoSuggest = function () {
-<?php foreach($block->getSearchBoxes() as $sbid) : ?>
+            <?php foreach($block->getSearchBoxes() as $sbid) : ?>
             HawkSearch.suggestInit('#<?php echo $sbid; ?>', {
                 lookupUrlPrefix: HawkSearch.TrackingUrl + '<?php echo $block->getAutosuggestParams() ?>',
                 hiddenDivName: '<?php echo $block->getHiddenDivName() ?>',
                 isAutoWidth: true
             });
-<?php endforeach; ?>
+            <?php endforeach; ?>
         };
     });
 </script>

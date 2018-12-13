@@ -11,8 +11,7 @@ namespace HawkSearch\Proxy\Block\Head;
 
 use Magento\Framework\View\Element\Template;
 
-class HawksearchJs
-extends \Magento\Framework\View\Element\Template
+class HawkSearchJs extends \Magento\Framework\View\Element\Template
 {
     private $dataHelper;
 
@@ -30,5 +29,11 @@ extends \Magento\Framework\View\Element\Template
     }
     public function getIncludeHawkCss(){
         return $this->dataHelper->getConfigurationData('hawksearch_proxy/proxy/hawksearch_include_css');
+    }
+    public function getJsPath() {
+        if($this->dataHelper->getConfigurationData('hawksearch_proxy/proxy/local_js')){
+            return 'HawkSearch_Proxy/js/hawksearch';
+        }
+        return sprintf('%s/includes/hawksearch', $this->getTrackingUrl());
     }
 }
