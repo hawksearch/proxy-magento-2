@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2017 Hawksearch (www.hawksearch.com) - All Rights Reserved
+ * Copyright (c) 2018 Hawksearch (www.hawksearch.com) - All Rights Reserved
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -10,6 +10,8 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
+
+/** @var HawkSearch\Proxy\Block\Head\HawkSearchJs $block */
 $trackingUrl  = $block->getTrackingUrl();
 $includeCss = $block->getIncludeHawkCss();
 ?>
@@ -21,8 +23,7 @@ $includeCss = $block->getIncludeHawkCss();
     (function() {
         var config = {
             paths: {
-                //"hawksearch": "<?php //echo $trackingUrl; ?>///includes/hawksearch",
-                "hawksearch": "HawkSearch_Proxy/js/hawksearch"
+                "hawksearch": "<?php echo $block->getJsPath(); ?>"
             }
         };
         require.config(config);
