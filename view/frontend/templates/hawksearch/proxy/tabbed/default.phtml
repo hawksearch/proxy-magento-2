@@ -5,12 +5,13 @@
  * Date: 12/11/18
  * Time: 10:46 AM
  */
+/** @var \HawkSearch\Proxy\Block\Tabbed\DefaultRenderer $block */
 ?>
                 <div class="item hawk-contentItem">
                     <div class="content hawk-contentWrapper">
                         <?php echo $block->getTypeLabel($item); ?>
                         <h3 class="title hawk-contentTitle">
-                            <a href="<?php echo $item->CustomURL; ?>"
+                            <a href="<?php echo $block->getCustomUrl($item->CustomURL); ?>"
                                onclick="<?php echo sprintf("return HawkSearch.link(this,'%s',%d,'%d',0);", $block->getHawksearchTrackingId(), $block->getIncrement(), $item->Id); ?>"><?php echo $item->ItemName; ?>
                             </a>
                         </h3>
