@@ -157,7 +157,7 @@
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <label>Use HawkSearch CSS</label>
                 </field>
-                <field id="local_js" showInStore="1" showInDefault="0" showInWebsite="0" sortOrder="81">
+                <field id="local_js" showInStore="1" type="select" showInDefault="0" showInWebsite="0" sortOrder="81">
                     <label>Use Local Hawksearch.js file</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
