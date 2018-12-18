@@ -9,15 +9,22 @@
 namespace HawkSearch\Proxy\Model\Config\Backend;
 
 
+use Magento\Framework\Message\ManagerInterface;
+
 class ShowTypeLabels extends \Magento\Framework\App\Config\Value
 {
     /**
      * @var \HawkSearch\Proxy\Helper\Data
      */
     private $helper;
+    /**
+     * @var ManagerInterface
+     */
+    private $messageManager;
 
     public function __construct(
         \HawkSearch\Proxy\Helper\Data $helper,
+        \Magento\Framework\Message\ManagerInterface $messageManager,
         \Magento\Framework\Model\Context $context,
         \Magento\Framework\Registry $registry,
         \Magento\Framework\App\Config\ScopeConfigInterface $config,
@@ -29,6 +36,7 @@ class ShowTypeLabels extends \Magento\Framework\App\Config\Value
     {
         parent::__construct($context, $registry, $config, $cacheTypeList, $resource, $resourceCollection, $data);
         $this->helper = $helper;
+        $this->messageManager = $messageManager;
     }
 
     public function afterLoad()
@@ -89,10 +97,12 @@ class ShowTypeLabels extends \Magento\Framework\App\Config\Value
             if($res['code'] == 200) {
                 return 'OK';
             } else {
-                throw new \Exception(sprintf("Field '%s' could not be saved: %s", $this->getFieldConfig()['label'], $res['object']->Message));
+                $this->messageManager->addNoticeMessage("Unable to save field 'it'");
+                //throw new \Exception(sprintf("Field '%s' could not be saved: %s", $this->getFieldConfig()['label'], $res['object']->Message));
             }
         } else {
-            throw new \Exception(sprintf("Field '%s' could not be saved: %s", $this->getFieldConfig()['label'], $res['object']->Message));
+            $this->messageManager->addNoticeMessage("Unable to fetch field 'it' from hawksearch");
+            //throw new \Exception(sprintf("Field '%s' could not be saved: %s", $this->getFieldConfig()['label'], $res['object']->Message));
         }
     }
 

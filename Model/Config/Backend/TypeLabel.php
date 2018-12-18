@@ -8,31 +8,38 @@
 
 namespace HawkSearch\Proxy\Model\Config\Backend;
 
-
-use Magento\Framework\Serialize\Serializer\Json;
-
 class TypeLabel extends \Magento\Config\Model\Config\Backend\Serialized\ArraySerialized
 {
-    /**
-     * @var \HawkSearch\Proxy\Helper\DataFactory
-     */
-    private $dataFactory;
 
-    public function __construct(\HawkSearch\Proxy\Helper\DataFactory $dataFactory, \Magento\Framework\Model\Context $context, \Magento\Framework\Registry $registry, \Magento\Framework\App\Config\ScopeConfigInterface $config, \Magento\Framework\App\Cache\TypeListInterface $cacheTypeList, \Magento\Framework\Model\ResourceModel\AbstractResource $resource = null, \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null, array $data = [], Json $serializer = null)
+    /**
+     * @var \HawkSearch\Proxy\Helper\Data
+     */
+    private $helper;
+
+    public function __construct(\HawkSearch\Proxy\Helper\Data $hawkHelper,
+                                \Magento\Framework\Model\Context $context,
+                                \Magento\Framework\Registry $registry,
+                                \Magento\Framework\App\Config\ScopeConfigInterface $config,
+                                \Magento\Framework\App\Cache\TypeListInterface $cacheTypeList,
+                                \Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
+                                \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
+                                array $data = []
+    )
     {
-        parent::__construct($context, $registry, $config, $cacheTypeList, $resource, $resourceCollection, $data, $serializer);
-        $this->dataFactory = $dataFactory;
+        parent::__construct($context, $registry, $config, $cacheTypeList, $resource, $resourceCollection, $data);
+        $this->helper = $hawkHelper;
     }
 
     protected function _afterLoad()
     {
         parent::_afterLoad();
         if(count($this->getValue()) == 0) {
-            /** @var \HawkSearch\Proxy\Helper\Data $helper */
-            $helper = $this->dataFactory->create();
             $client = new \Zend_Http_Client();
-            $client->setUri($helper->getTrackingUrl() . '/?' . http_build_query(['q' => '', 'hawktabs' => 'json', 'it' => 'all', 'output' => 'custom']));
+            $client->setUri($this->helper->getTrackingUrl() . '/?' . http_build_query(['q' => '', 'hawktabs' => 'json', 'it' => 'all', 'output' => 'custom']));
             $response = $client->request();
+            if($response->getStatus() != 200) {
+                return;
+            }
             $result = json_decode($response->getBody());
             $tabs = json_decode($result->Data->Tabs);
             $value = [];

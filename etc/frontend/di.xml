@@ -41,6 +41,9 @@
     <type name="Magento\Framework\Controller\Result\Redirect">
         <plugin name="hawkproxy_redirect_url" type="HawkSearch\Proxy\Plugin\Redirect" />
     </type>
+    <type name="Magento\Store\App\Response\Redirect">
+        <plugin name="hawkproxy_redirect_url" type="HawkSearch\Proxy\Plugin\StoreRedirect" />
+    </type>
 </config>
 
 
