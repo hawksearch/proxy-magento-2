@@ -20,7 +20,7 @@
         <logging_enabled>0</logging_enabled>
       </general>
       <proxy>
-        <mode>0</mode>
+        <mode>develop</mode>
         <tracking_url_staging>https://dev.hawksearch.net/</tracking_url_staging>
         <tracking_url_live>https://manage.hawksearch.com/</tracking_url_live>
         <search_box_ids>hawksearch</search_box_ids>

@@ -2,8 +2,8 @@
 
 namespace HawkSearch\Proxy\Setup;
 
-use Magento\Framework\Module\Setup\Migration;
-use Magento\Framework\Setup\InstallDataInterface;
+use Magento\Framework\App\Cache\Type\Config;
+use Magento\Framework\App\Config\ConfigResource\ConfigInterface;
 use Magento\Framework\Setup\ModuleContextInterface;
 use Magento\Framework\Setup\ModuleDataSetupInterface;
 use Magento\Catalog\Setup\CategorySetupFactory;
@@ -16,14 +16,27 @@ class UpgradeData implements \Magento\Framework\Setup\UpgradeDataInterface
      * @var CategorySetupFactory
      */
     private $categorySetupFactory;
+    /**
+     * @var ConfigInterface
+     */
+    private $config;
+    /**
+     * @var Config
+     */
+    private $cache;
 
     /**
      * Init
      *
      * @param CategorySetupFactory $categorySetupFactory
+     * @param ConfigInterface $config
+     * @param Config $cache
      */
-    public function __construct(CategorySetupFactory $categorySetupFactory) {
+    public function __construct(CategorySetupFactory $categorySetupFactory, ConfigInterface $config, Config $cache)
+    {
         $this->categorySetupFactory = $categorySetupFactory;
+        $this->config = $config;
+        $this->cache = $cache;
     }
 
     /**
@@ -33,39 +46,73 @@ class UpgradeData implements \Magento\Framework\Setup\UpgradeDataInterface
 
     public function upgrade(ModuleDataSetupInterface $setup, ModuleContextInterface $context)
     {
-        // TODO: Implement upgrade() method.
         $setup->startSetup();
+        if (version_compare($context->getVersion(), '2.1.2', '<')) {
+            $this->upgradeTo_212($setup);
+        }
+        if(version_compare($context->getVersion(), '2.1.3.3', '<')) {
+            $this->upgradeTo_2133($setup);
+        }
+        $setup->endSetup();
+    }
 
-        /** @var \Magento\Eav\Setup\EavSetup $eavSetup */
+    private function upgradeTo_212(ModuleDataSetupInterface $setup) {
         $categorySetup = $this->categorySetupFactory->create(['setup' => $setup]);
         $entityTypeId = $categorySetup->getEntityTypeId(\Magento\Catalog\Model\Category::ENTITY);
         $attributeSetId = $categorySetup->getDefaultAttributeSetId($entityTypeId);
-        if (version_compare($context->getVersion(), '2.1.2', '<')) {
-            $attribute = $categorySetup->getAttribute(\Magento\Catalog\Model\Category::ENTITY, 'hawk_landing_page');
-            if($attribute){
-				$idg = $categorySetup->getAttributeGroupId($entityTypeId, $attributeSetId, 'Display Settings');
-				$categorySetup->addAttributeToGroup(
-				$entityTypeId,
-				$attributeSetId,
-				$idg,
-				'hawk_landing_page',
-				46
-			);
-			$categorySetup->updateAttribute(
-				\Magento\Catalog\Model\Category::ENTITY,
-				'group',
-				'hawk_landing_page',
-				'Display Settings'
-			);
-				
-				
-			// $attribute->setData('group', 'Display Settings')->save();
-			
-                
-            }
+        $attribute = $categorySetup->getAttribute(\Magento\Catalog\Model\Category::ENTITY, 'hawk_landing_page');
+        if ($attribute) {
+            $idg = $categorySetup->getAttributeGroupId($entityTypeId, $attributeSetId, 'Display Settings');
+            $categorySetup->addAttributeToGroup(
+                $entityTypeId,
+                $attributeSetId,
+                $idg,
+                'hawk_landing_page',
+                46
+            );
+            $categorySetup->updateAttribute(
+                \Magento\Catalog\Model\Category::ENTITY,
+                'group',
+                'hawk_landing_page',
+                'Display Settings'
+            );
         }
-        
-        
-        $setup->endSetup();
+    }
+
+    private function upgradeTo_2133(ModuleDataSetupInterface $setup)
+    {
+        /*
+         * configuration changes
+         * hawksearch_proxy/proxy/tracking_url_staging -> hawksearch_proxy/proxy/tracking_url_develop
+         * hawksearch_proxy/proxy/tracking_url_live -> hawksearch_proxy/proxy/tracking_url_production
+         * hawksearch_proxy/proxy/mode -> value "0" => "develop", value "1" => "production"
+         */
+        $select = $this->config->getConnection()
+            ->select()
+            ->from($setup->getTable('core_config_data'))
+            ->where('path in (?)', ['hawksearch_proxy/proxy/tracking_url_staging', 'hawksearch_proxy/proxy/tracking_url_live', 'hawksearch_proxy/proxy/mode'])
+            ->order('path');
+        foreach ($this->config->getConnection()->fetchAll($select) as $item) {
+            if($item['path'] == 'hawksearch_proxy/proxy/mode')  {
+                if($item['value'] == "0") {
+                    $item['value'] = 'develop';
+                } else {
+                    $item['value'] = 'production';
+                }
+            } elseif($item['path'] == 'hawksearch_proxy/proxy/tracking_url_live') {
+                $item['path'] = 'hawksearch_proxy/proxy/tracking_url_production';
+            } elseif($item['path'] == 'hawksearch_proxy/proxy/tracking_url_staging') {
+                $item['path'] = 'hawksearch_proxy/proxy/tracking_url_develop';
+            } else {
+                continue;
+            }
+            $this->config->saveConfig($item['path'], $item['value'] , $item['scope'], $item['scope_id']);
+        }
+        // delete old values:
+        $this->config->deleteConfig('hawksearch_proxy/proxy/tracking_url_staging', 'default', 0);
+        $this->config->deleteConfig('hawksearch_proxy/proxy/tracking_url_live', 'default', 0);
+        $this->cache->clean();
+
+
     }
 }
