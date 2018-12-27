@@ -14,6 +14,8 @@ namespace HawkSearch\Proxy\Helper;
 
 use Magento\Framework\App\Helper\Context;
 use Magento\Store\Model\StoreManagerInterface;
+use Magento\Framework\App\CacheInterface;
+
 
 class Data extends \Magento\Framework\App\Helper\AbstractHelper
 {
@@ -52,22 +54,40 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     private $collectionFactory;
     protected $session; /***overrrided CatalogSearch/Helper/Data.php***/
     private $catalogConfig;
+    /**
+     * @var CacheInterface
+     */
+    private $cache;
+    /**
+     * @var \Zend\Http\Client
+     */
+    private $zendClient;
 
-    /* this function needs to be eliminated */
-    public function createObj()
-    {
-        return \Magento\Framework\App\ObjectManager::getInstance();
-    }
-
+    /**
+     * Data constructor.
+     * @param Context $context
+     * @param StoreManagerInterface $storeManager
+     * @param \Magento\CatalogUrlRewrite\Model\CategoryUrlPathGenerator $pathGenerator
+     * @param \Magento\Framework\Filesystem $filesystem
+     * @param \HawkSearch\Proxy\Model\ProxyEmail $email_helper
+     * @param \Magento\Catalog\Model\ResourceModel\Product\CollectionFactory $collectionFactory
+     * @param \Magento\Catalog\Model\Config $catalogConfig
+     * @param \Magento\Catalog\Model\Session $session
+     * @param CacheInterface $cache
+     * @param \Zend\Http\Client $zendClient
+     */
     public function __construct(
-        Context $context,
         StoreManagerInterface $storeManager,
         \Magento\CatalogUrlRewrite\Model\CategoryUrlPathGenerator $pathGenerator,
         \Magento\Framework\Filesystem $filesystem,
         \HawkSearch\Proxy\Model\ProxyEmail $email_helper,
         \Magento\Catalog\Model\ResourceModel\Product\CollectionFactory $collectionFactory,
         \Magento\Catalog\Model\Config $catalogConfig,
-        \Magento\Catalog\Model\Session $session
+        \Magento\Catalog\Model\Session $session,
+        CacheInterface $cache,
+        \Zend\Http\Client $zendClient,
+        Context $context
+
     ) {
         // parent construct first so scopeConfig gets set for use in "setUri", etc.
         parent::__construct($context);
@@ -87,21 +107,20 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $this->setClientIp($context->getRequest()->getClientIp());
         $this->setClientUa($context->getHttpHeader()->getHttpUserAgent());
         $this->overwriteFlag = false;
-        $writer = new \Zend\Log\Writer\Stream(BP . $this->_logFilename);
-        $this->_logger = new \Zend\Log\Logger();
-        $this->_logger->addWriter($writer);
         $this->email_helper = $email_helper;
 
+        $this->cache = $cache;
+        $this->zendClient = $zendClient;
     }
 
     public function logException(\Exception $e)
     {
-        if (!$this->_exceptionLogger instanceof \Zend\Log\Logger) {
-            $writer = new \Zend\Log\Writer\Stream(BP . '/var/log/' . $this->_exceptionLog);
-            $this->_exceptionLogger = new \Zend\Log\Logger();
-            $this->_exceptionLogger->addWriter($writer);
-        }
-        $this->_exceptionLogger->info($e->getMessage() . ' - File: ' . $e->getFile() . ' on line ' . $e->getLine());
+//        if (!$this->_exceptionLogger instanceof \Zend\Log\Logger) {
+//            $writer = new \Zend\Log\Writer\Stream(BP . '/var/log/' . $this->_exceptionLog);
+//            $this->_exceptionLogger = new \Zend\Log\Logger();
+//            $this->_exceptionLogger->addWriter($writer);
+//        }
+//        $this->_exceptionLogger->info($e->getMessage() . ' - File: ' . $e->getFile() . ' on line ' . $e->getLine());
     }
 
     public function getConfigurationData($data)
@@ -113,7 +132,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     public function isValidSearchRoute($route)
     {
-        // currently only checking for presence of slash
         $valid = strpos($route, '/') === false;
         $valid = $valid && $route != 'hawksearch';
         return $valid;
@@ -137,7 +155,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     public function setUri($args)
     {
-        //$this->uri = $this->getTrackingUrl() . '/?fn=' .$args['fn'].'&Items='.$args['Items'];
         unset($args['ajax']);
         unset($args['json']);
         $args['output'] = 'custom';
@@ -160,22 +177,18 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     private function fetchResponse()
     {
-
         if (empty($this->uri)) {
             throw new \Exception('No URI set.');
         }
-        $client = new \Zend_Http_Client();
-        $client->setConfig(['timeout' => 30]);
-
-        $client->setConfig(array('useragent' => $this->clientUA));
-        $client->setUri($this->uri);
-        $client->setHeaders('HTTP-TRUE-CLIENT-IP', $this->clientIP);
-        $response = $client->request();
-        $this->log(sprintf('requesting url %s', $client->getUri()));
+        $this->zendClient->resetParameters();
+        $this->zendClient->setOptions(['timeout' => 30,'useragent' => $this->clientUA ]);
+        $this->zendClient->setUri($this->uri);
+        $this->zendClient->setHeaders(['HTTP-TRUE-CLIENT-IP' => $this->getClientIp()]);
+        $response = $this->zendClient->send();
+        $this->log(sprintf('requesting url %s', $this->zendClient->getUri()));
         $this->rawResponse = $response->getBody();
 
         $this->hawkData = json_decode($this->rawResponse);
-
     }
 
     public function getResultData()
@@ -323,19 +336,17 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function getHawkResponse($method, $url, $data = null)
     {
         try {
-            $client = new \Zend_Http_Client();
-            $client->setConfig(['timeout' => 60]);
-
-
-            $client->setUri($this->getApiUrl() . $url);
-            $client->setMethod($method);
+            $this->zendClient->resetParameters();
+            $this->zendClient->setOptions(['timeout' => 60]);
+            $this->zendClient->setUri($this->getApiUrl() . $url);
+            $this->zendClient->setMethod($method);
             if (isset($data)) {
-                $client->setRawData($data, 'application/json');
+                $this->zendClient->setRawBody($data);
+                $this->zendClient->setEncType('application/json');
             }
-            $client->setHeaders('X-HawkSearch-ApiKey', $this->getApiKey());
-            $client->setHeaders('Accept', 'application/json');
-            $this->log(sprintf('fetching request. URL: %s, Method: %s', $client->getUri(), $method));
-            $response = $client->request();
+            $this->zendClient->setHeaders(['X-HawkSearch-ApiKey' => $this->getApiKey(), 'Accept' => 'application/json']);
+            $this->log(sprintf('fetching request. URL: %s, Method: %s', $this->zendClient->getUri(), $method));
+            $response = $this->zendClient->send();
             return $response->getBody();
         } catch (\Exception $e) {
             $this->logException($e);
@@ -345,17 +356,15 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     public function getLPCacheKey()
     {
-        return self::LP_CACHE_KEY . $this->createObj()->get('Magento\Store\Model\StoreManagerInterface')->getStore()->getId();
+        return self::LP_CACHE_KEY . $this->_storeManager->getStore()->getId();
     }
 
-    public function getLandingPages($force = false)
+    public function getLandingPages()
     {
-        /** @var Varien_Cache_Core $cache */
-        $cache = $this->createObj()->get('Magento\Framework\Cache\Core');
+        $lp = $this->cache->load($this->getLPCacheKey());
         $this->landingPages = json_decode($this->getHawkResponse(\Zend_Http_Client::GET, 'LandingPage/Urls'));
         sort($this->landingPages, SORT_STRING);
         // $cache->save(serialize($this->landingPages), $this->getLPCacheKey(), array(), 30);
-
 
         return $this->landingPages;
     }
@@ -375,7 +384,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             $path = '/' . $path;
         }
         $hs = $this->getLandingPages();
-
 
         $low = 0;
         $high = count($hs) - 1;
