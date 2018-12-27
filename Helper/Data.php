@@ -189,6 +189,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public  function getResultType() {
         return $this->getConfigurationData(self::CONFIG_PROXY_RESULT_TYPE);
     }
+
     public function getBaseUrl()
     {
         return $this->getConfigurationData('web/secure/base_url') . 'hawkproxy';
@@ -196,13 +197,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     public function getApiUrl()
     {
-        if ($this->getMode() == '1') {
-
-            $apiUrl = $this->getConfigurationData('hawksearch_proxy/proxy/tracking_url_live');
-        } else {
-
-            $apiUrl = $this->getConfigurationData('hawksearch_proxy/proxy/tracking_url_staging');
-        }
+        $apiUrl = $this->getConfigurationData(sprintf('hawksearch_proxy/proxy/tracking_url_%s', $this->getMode()));
         $apiUrl = preg_replace('|^http://|', 'https://', $apiUrl);
         if ('/' == substr($apiUrl, -1)) {
             return $apiUrl . 'api/v3/';
@@ -233,11 +228,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     public function getTrackingUrl()
     {
-        if ($this->getMode() == '1') {
-            $trackingUrl = $this->getConfigurationData('hawksearch_proxy/proxy/tracking_url_live');
-        } else {
-            $trackingUrl = $this->getConfigurationData('hawksearch_proxy/proxy/tracking_url_staging');
-        }
+        $trackingUrl = $this->getConfigurationData(sprintf('hawksearch_proxy/proxy/tracking_url_%s', $this->getMode()));
         if ('/' == substr($trackingUrl, -1)) {
             return $trackingUrl . 'sites/' . $this->getEngineName();
         }
@@ -246,12 +237,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     public function getTrackingPixelUrl($args)
     {
-        if ($this->getMode() == '1') {
-
-            $trackingUrl = $this->getConfigurationData('hawksearch_proxy/proxy/tracking_url_live');
-        } else {
-            $trackingUrl = $this->getConfigurationData('hawksearch_proxy/proxy/tracking_url_staging');
-        }
+        $trackingUrl = $this->getConfigurationData(sprintf('hawksearch_proxy/proxy/tracking_url_%s', $this->getMode()));
         if ('/' == substr($trackingUrl, -1)) {
             return $trackingUrl . 'sites/_hawk/hawkconversion.aspx?' . http_build_query($args);
         }
@@ -260,13 +246,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     public function getOrderTackingKey()
     {
-
         return $this->getConfigurationData('hawksearch_proxy/proxy/order_tracking_key');
     }
 
     public function getEngineName()
     {
-
         return $this->getConfigurationData('hawksearch_proxy/proxy/engine_name');
     }
 
