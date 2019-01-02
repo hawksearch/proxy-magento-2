@@ -14,7 +14,7 @@ extends \Magento\CatalogSearch\Model\ResourceModel\Fulltext\Collection
 {
     protected function _renderFiltersBefore()
     {
-        if($this->_scopeConfig->getValue('hawksearch_proxy/proxy/manage_categories', 'stores')) {
+        if($this->_scopeConfig->getValue('hawksearch_proxy/proxy/manage_categories', 'stores') && !$this->getFlag('use-core-facets')) {
             return;
         }
         return parent::_renderFiltersBefore();

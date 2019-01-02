@@ -214,6 +214,10 @@
                         <field id="enabled">1</field>
                     </depends>
                 </field>
+                <field id="cache_lifetime" translate="label" sortOrder="50" type="text" showInDefault="1" showInWebsite="0" showInStore="1">
+                    <label>Landing page Cache Lifetime</label>
+                    <validate>validate-not-negative-number validate-digits</validate>
+                </field>
             </group>
         </section>
     </system>

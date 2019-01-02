@@ -66,7 +66,7 @@ class ListProduct
         }
 
 
-        if (!$this->hawkHelper->getIsHawkManaged()) {
+        if (!$this->hawkHelper->getIsHawkManaged($this->getRequest()->getAlias('rewrite_request_path'))) {
             $this->hawkHelper->log('page not managed, returning core pager');
             return parent::getToolbarHtml();
         }

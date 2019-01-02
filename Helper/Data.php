@@ -23,6 +23,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     const CONFIG_PROXY_RESULT_TYPE = 'hawksearch_proxy/proxy/result_type';
     const CONFIG_PROXY_MODE = 'hawksearch_proxy/proxy/mode';
     const CONFIG_PROXY_SHOW_TOPTEXT = 'hawksearch_proxy/proxy/show_toptext';
+    const CONFIG_PROXY_LPCACHE_LIFETIME = 'hawksearch_proxy/';
 
     protected $_logFilename = "/var/log/hawk_sync_categories.log";
     protected $_exceptionLog = "hawk_sync_exception.log";
@@ -362,9 +363,16 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function getLandingPages()
     {
         $lp = $this->cache->load($this->getLPCacheKey());
-        $this->landingPages = json_decode($this->getHawkResponse(\Zend_Http_Client::GET, 'LandingPage/Urls'));
-        sort($this->landingPages, SORT_STRING);
-        // $cache->save(serialize($this->landingPages), $this->getLPCacheKey(), array(), 30);
+        if($lp) {
+            $this->landingPages = json_decode($lp);
+        }
+        if(!$this->landingPages) {
+            $response = $this->getHawkResponse(\Zend_Http_Client::GET, 'LandingPage/Urls');
+            $decoded = json_decode($response);
+            sort($decoded, SORT_STRING);
+            $this->landingPages = array_flip($decoded);
+            $this->cache->save(json_encode($this->landingPages), $this->getLPCacheKey(), ['hawk_landing_pages'], $this->getLpCacheLifetime());
+        }
 
         return $this->landingPages;
     }
@@ -385,22 +393,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         }
         $hs = $this->getLandingPages();
 
-        $low = 0;
-        $high = count($hs) - 1;
-        while ($low <= $high) {
-            $p = (int)floor(($high + $low) / 2);
-            $sc = strcmp($hs[$p], $path);
-            if ($sc == 0) {
-                $this->isManaged = true;
-                return true;
-            } elseif ($sc < 0) {
-                $low = $p + 1;
-            } else {
-                $high = $p - 1;
-            }
-        }
-        $this->isManaged = true;
-        return $this->isManaged;
+        return array_key_exists($path, $hs);
     }
 
     public function getCategoryStoreId()
@@ -970,5 +963,10 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             }
         }
         return '';
+    }
+
+    private function getLpCacheLifetime()
+    {
+        return $this->getConfigurationData(self::CONFIG_PROXY_LPCACHE_LIFETIME);
     }
 }

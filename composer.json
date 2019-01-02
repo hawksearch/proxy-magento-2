@@ -9,6 +9,7 @@
   ],
   "require": {
     "php": "~5.5.0|~5.6.0|~7.0.0|~7.1.0",
+    "ext-json": "*",
     "magento/magento-composer-installer": "*",
     "magento/magento2-base": "2.1.*"
   },

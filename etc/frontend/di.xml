@@ -27,6 +27,9 @@
     </type>
     <preference for="Magento\Catalog\Block\Product\ListProduct" type="HawkSearch\Proxy\Block\Product\ListProduct" />
     <preference for="Magento\CatalogSearch\Block\SearchResult\ListProduct" type="HawkSearch\Proxy\Block\Product\ListProduct" />
+    <type name="Magento\CatalogSearch\Model\ResourceModel\Fulltext\Collection">
+        <plugin name="landing_page_plugin" type="HawkSearch\Proxy\Plugin\Facets" sortOrder="1" />
+    </type>
 </config>
 
 
