@@ -148,15 +148,6 @@
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <label>Use HawkSearch CSS</label>
                 </field>
-                <field id="autocomplete_div_id"
-                       type="text"
-                       showInWebsite="0"
-                       showInDefault="0"
-                       showInStore="1"
-                       sortOrder="90">
-                    <label>Autocomplete Div ID</label>
-                    <comment>The HTML id of the div that will hold autosuggest results</comment>
-                </field>
                 <field id="autocomplete_query_params"
                        type="text"
                        showInWebsite="0"

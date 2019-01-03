@@ -21,24 +21,27 @@ class Html
     extends Template
 {
 
-    private $helper;
-    private $banner;
+    protected $helper;
+    protected $banner;
 
     public function __construct(Template\Context $context,
                                 \HawkSearch\Proxy\Helper\Data $helper,
                                 \HawkSearch\Proxy\Model\Banner $banner,
                                 array $data = [])
     {
-        $helper->setUri($context->getRequest()->getParams());
-        $helper->setClientIp($context->getRequest()->getClientIp());
-        $helper->setClientUa($context->getRequest()->getHeader('UserAgent'));
-        $helper->setIsHawkManaged(true);
+//        $helper->setUri($context->getRequest()->getParams());
+//        $helper->setClientIp($context->getRequest()->getClientIp());
+//        $helper->setClientUa($context->getRequest()->getHeader('UserAgent'));
+//        $helper->setIsHawkManaged(true);
         $this->helper = $helper;
         $this->banner = $banner;
 
         parent::__construct($context, $data);
     }
 
+    /**
+     * @return \HawkSearch\Proxy\Model\Banner
+     */
     public function getBanner() {
         return $this->banner;
     }

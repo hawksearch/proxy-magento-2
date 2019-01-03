@@ -44,11 +44,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     protected $uri; /***overrrided CatalogSearch/Helper/Data.php***/
     private $clientIP;
     private $clientUA;
-    private $_feedFilePath;
-    private $isManaged;
+    protected $isManaged;
     private $pathGenerator;
     private $filesystem;
-    private $collection;
     /** @var \Magento\Framework\Logger\Monolog $logger */
     private $overwriteFlag;
     private $email_helper;
@@ -387,10 +385,13 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         if (empty($path)) {
             return $this->isManaged;
         }
-
         if (substr($path, 0, 1) != '/') {
             $path = '/' . $path;
         }
+        if(in_array($path, ['/catalogsearch/result/', '/catalogsearch/result', '/hawkproxy/']) && $this->getConfigurationData('hawksearch_proxy/proxy/manage_search')){
+            return true;
+        }
+
         $hs = $this->getLandingPages();
 
         return array_key_exists($path, $hs);
@@ -968,5 +969,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     private function getLpCacheLifetime()
     {
         return $this->getConfigurationData(self::CONFIG_PROXY_LPCACHE_LIFETIME);
+    }
+    public function getOriginalPathInfo() {
+        return $this->_getRequest()->getOriginalPathInfo();
     }
 }

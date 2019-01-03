@@ -19,9 +19,9 @@ class Facets
         $this->helper = $helper;
     }
 
-    public function beforeGetFacetedData(\HawkSearch\Proxy\Model\ResourceModel\Collection $subject, $field)
+    public function beforeGetFacetedData($subject, $field)
     {
-        if(!$this->helper->getIsHawkManaged()) {
+        if(!$this->helper->getIsHawkManaged($this->helper->getOriginalPathInfo())) {
             $subject->setFlag('use-core-facets', true);
         }
     }

@@ -20,7 +20,7 @@ class ListProduct
 
     private $topseen = false;
     public $helper;
-    private $hawkHelper;
+    protected $hawkHelper;
     private $pagers = true;
     protected $_productCollection;
     private $controller;
@@ -58,20 +58,17 @@ class ListProduct
 
     public function getToolbarHtml()
     {
-
-
         if ($this->hawkHelper->getLocation() != "") {
             $this->hawkHelper->log(sprintf('Redirecting to location: %s', $this->hawkHelper->getLocation()));
             return $this->_redirectUrl($this->hawkHelper->getLocation());
         }
 
-
         if (!$this->hawkHelper->getIsHawkManaged($this->getRequest()->getAlias('rewrite_request_path'))) {
             $this->hawkHelper->log('page not managed, returning core pager');
             return parent::getToolbarHtml();
         }
-        if ($this->pagers) {
 
+        if ($this->pagers) {
             if ($this->topseen) {
                 return '<div id="hawkbottompager">' . $this->hawkHelper->getResultData()->Data->BottomPager . '</div>';
             }
