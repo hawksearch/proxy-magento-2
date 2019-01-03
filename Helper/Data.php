@@ -383,7 +383,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function getIsHawkManaged($path = null)
     {
         if (empty($path)) {
-            return $this->isManaged;
+            $path = $this->getOriginalPathInfo();
         }
         if (substr($path, 0, 1) != '/') {
             $path = '/' . $path;
