@@ -882,10 +882,12 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function setOverwriteFlag($bool) {
         $this->overwriteFlag = $bool;
     }
+
     public function isCronEnabled()
     {
         return $this->scopeConfig->getValue('hawksearch_proxy/sync/enabled');
     }
+
     public function hasExceptions()
     {
         return count($this->_syncingExceptions) > 0 ? true : false;
@@ -970,6 +972,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->getConfigurationData(self::CONFIG_PROXY_LPCACHE_LIFETIME);
     }
+
     public function getOriginalPathInfo() {
         return $this->_getRequest()->getOriginalPathInfo();
     }

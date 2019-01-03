@@ -32,7 +32,7 @@ class Facets extends \Magento\Framework\View\Element\Template
         return $this->banner->getBannerLeftTop();
     }
     public function getFacets(){
-        if (!$this->hawkHelper->getIsHawkManaged($this->getRequest()->getAlias('rewrite_request_path'))) {
+        if (!$this->hawkHelper->getIsHawkManaged($this->hawkHelper->getOriginalPathInfo())) {
             $this->hawkHelper->log('page not managed, returning core pager');
             return '';
         }
