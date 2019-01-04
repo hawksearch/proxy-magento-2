@@ -25,6 +25,4 @@
             <argument name="instanceName" xsi:type="string">HawkSearch\Proxy\Model\ResourceModel\Collection</argument>
         </arguments>
     </virtualType>
-
-
 </config>

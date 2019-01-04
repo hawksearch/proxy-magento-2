@@ -84,7 +84,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         \Magento\Catalog\Model\Config $catalogConfig,
         \Magento\Catalog\Model\Session $session,
         CacheInterface $cache,
-        \Zend\Http\Client $zendClient,
+        \HawkSearch\Proxy\Model\ZendClientFactory $zendClient,
         Context $context
 
     ) {
@@ -109,7 +109,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $this->email_helper = $email_helper;
 
         $this->cache = $cache;
-        $this->zendClient = $zendClient;
+        $this->zendClient = $zendClient->create();
     }
 
     public function logException(\Exception $e)
