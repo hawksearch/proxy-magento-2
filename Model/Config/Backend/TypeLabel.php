@@ -18,7 +18,15 @@ class TypeLabel extends \Magento\Config\Model\Config\Backend\Serialized\ArraySer
      */
     private $dataFactory;
 
-    public function __construct(\HawkSearch\Proxy\Helper\DataFactory $dataFactory, \Magento\Framework\Model\Context $context, \Magento\Framework\Registry $registry, \Magento\Framework\App\Config\ScopeConfigInterface $config, \Magento\Framework\App\Cache\TypeListInterface $cacheTypeList, \Magento\Framework\Model\ResourceModel\AbstractResource $resource = null, \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null, array $data = [], Json $serializer = null)
+    public function __construct(\HawkSearch\Proxy\Helper\DataFactory $dataFactory,
+                                \Magento\Framework\Model\Context $context,
+                                \Magento\Framework\Registry $registry,
+                                \Magento\Framework\App\Config\ScopeConfigInterface $config,
+                                \Magento\Framework\App\Cache\TypeListInterface $cacheTypeList,
+                                \Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
+                                \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
+                                array $data = [],
+                                Json $serializer = null)
     {
         parent::__construct($context, $registry, $config, $cacheTypeList, $resource, $resourceCollection, $data, $serializer);
         $this->dataFactory = $dataFactory;
@@ -40,7 +48,14 @@ class TypeLabel extends \Magento\Config\Model\Config\Backend\Serialized\ArraySer
                 if($tab->Value == 'all') {
                     continue;
                 }
-                $value['_' . $tab->Value] = ['title' => $tab->Title, 'code' => $tab->Value, 'color' => $this->generateColor($tab->Value)];
+                $bg = $this->generateColor($tab->Value);
+                $fg = $this->generateTextColor($bg);
+                $value['_' . $tab->Value] = [
+                    'title' => $tab->Title,
+                    'code' => $tab->Value,
+                    'color' => $bg,
+                    'textColor' => $fg
+                ];
             }
             $this->setValue($value);
         }
@@ -49,6 +64,17 @@ class TypeLabel extends \Magento\Config\Model\Config\Backend\Serialized\ArraySer
     private function generateColor($value)
     {
         return sprintf('#%s', substr(md5($value), 0, 6));
+    }
+
+    private function generateTextColor($rgb)
+    {
+        $r = hexdec(substr($rgb, 1, 2));
+        $g = hexdec(substr($rgb, 3,2));
+        $b = hexdec(substr($rgb, 5, 2));
+        if(($r * 299 + $g * 587 + $b * 114) / 1000 < 123) {
+            return '#fff';
+        }
+        return '#000';
     }
 
 }
