@@ -35,7 +35,7 @@ class TypeLabel extends \Magento\Config\Model\Config\Backend\Serialized\ArraySer
     protected function _afterLoad()
     {
         parent::_afterLoad();
-        if(count($this->getValue()) == 0) {
+        if(!$this->getValue() || count($this->getValue()) == 0) {
             /** @var \HawkSearch\Proxy\Helper\Data $helper */
             $helper = $this->dataFactory->create();
             $client = new \Zend_Http_Client();
@@ -48,8 +48,8 @@ class TypeLabel extends \Magento\Config\Model\Config\Backend\Serialized\ArraySer
                 if($tab->Value == 'all') {
                     continue;
                 }
-                $bg = $this->generateColor($tab->Value);
-                $fg = $this->generateTextColor($bg);
+                $bg = $helper->generateColor($tab->Value);
+                $fg = $helper->generateTextColor($bg);
                 $value['_' . $tab->Value] = [
                     'title' => $tab->Title,
                     'code' => $tab->Value,
@@ -60,21 +60,4 @@ class TypeLabel extends \Magento\Config\Model\Config\Backend\Serialized\ArraySer
             $this->setValue($value);
         }
     }
-
-    private function generateColor($value)
-    {
-        return sprintf('#%s', substr(md5($value), 0, 6));
-    }
-
-    private function generateTextColor($rgb)
-    {
-        $r = hexdec(substr($rgb, 1, 2));
-        $g = hexdec(substr($rgb, 3,2));
-        $b = hexdec(substr($rgb, 5, 2));
-        if(($r * 299 + $g * 587 + $b * 114) / 1000 < 123) {
-            return '#fff';
-        }
-        return '#000';
-    }
-
 }

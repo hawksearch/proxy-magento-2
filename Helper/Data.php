@@ -1117,8 +1117,10 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         /** @var stdClass $map */
         $obj = json_decode($this->getConfigurationData(self::CONFIG_PROXY_TYPE_LABEL));
         $map = [];
-        foreach ($obj as $key => $item) {
-            $map[$item->code] = $item;
+        if(is_object($obj)) {
+            foreach ($obj as $key => $item) {
+                $map[$item->code] = $item;
+            }
         }
         return $map;
     }
@@ -1127,5 +1129,21 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->getConfigurationData(self::CONFIG_PROXY_SHOW_TYPE_LABELS);
     }
+    public function generateColor($value)
+    {
+        return sprintf('#%s', substr(md5($value), 0, 6));
+    }
+
+    public function generateTextColor($rgb)
+    {
+        $r = hexdec(substr($rgb, 1, 2));
+        $g = hexdec(substr($rgb, 3,2));
+        $b = hexdec(substr($rgb, 5, 2));
+        if(($r * 299 + $g * 587 + $b * 114) / 1000 < 123) {
+            return '#fff';
+        }
+        return '#000';
+    }
+
 }
 

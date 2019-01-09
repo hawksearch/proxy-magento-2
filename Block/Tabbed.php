@@ -20,7 +20,10 @@ class Tabbed extends Html
     private $labelMap;
     public static $increment = 1;
 
-    public function __construct(Template\Context $context, \HawkSearch\Proxy\Helper\Data $helper, \HawkSearch\Proxy\Block\BannerFactory $bannerFactory, array $data = [])
+    public function __construct(Template\Context $context,
+                                \HawkSearch\Proxy\Helper\Data $helper,
+                                \HawkSearch\Proxy\Block\BannerFactory $bannerFactory,
+                                array $data = [])
     {
         parent::__construct($context, $helper, $bannerFactory, $data);
         $this->helper = $helper;
@@ -76,7 +79,8 @@ class Tabbed extends Html
                     $obj = new \stdClass();
                     $obj->title = ucfirst($foundType);
                     $obj->code = $foundType;
-                    $obj->color = sprintf('#%s', substr(md5($foundType), 0, 6));
+                    $obj->color = $this->helper->generateColor($foundType);
+                    $obj->textColor = $this->helper->generateTextColor($obj->color);
                     $this->labelMap[$foundType] = $obj;
                 }
             }

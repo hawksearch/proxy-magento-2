@@ -141,10 +141,10 @@ class UpgradeData implements \Magento\Framework\Setup\UpgradeDataInterface
             ->where('scope = ?', 'stores');
         foreach ($this->config->getConnection()->fetchAll($select) as $item) {
             $tabs = $this->serializer->unserialize($item['value']);
-            for($i = 0; $i < count($tabs); $i++) {
-                $tabs[$i]['textColor'] = $this->generateTextColor($tabs[$i]['color']);
+            foreach (array_keys($tabs) as $tab) {
+                $tabs[$tab]['textColor'] = $this->generateTextColor($tabs[$tab]['color']);
             }
-            $this->config->saveConfig($item['path'], $item['value'] , $item['scope'], $item['scope_id']);
+            $this->config->saveConfig($item['path'], $this->serializer->serialize($tabs) , $item['scope'], $item['scope_id']);
         }
         $this->cache->clean();
     }
