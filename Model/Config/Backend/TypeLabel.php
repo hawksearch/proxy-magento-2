@@ -18,7 +18,15 @@ class TypeLabel extends \Magento\Config\Model\Config\Backend\Serialized\ArraySer
      */
     private $dataFactory;
 
-    public function __construct(\HawkSearch\Proxy\Helper\DataFactory $dataFactory, \Magento\Framework\Model\Context $context, \Magento\Framework\Registry $registry, \Magento\Framework\App\Config\ScopeConfigInterface $config, \Magento\Framework\App\Cache\TypeListInterface $cacheTypeList, \Magento\Framework\Model\ResourceModel\AbstractResource $resource = null, \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null, array $data = [], Json $serializer = null)
+    public function __construct(\HawkSearch\Proxy\Helper\DataFactory $dataFactory,
+                                \Magento\Framework\Model\Context $context,
+                                \Magento\Framework\Registry $registry,
+                                \Magento\Framework\App\Config\ScopeConfigInterface $config,
+                                \Magento\Framework\App\Cache\TypeListInterface $cacheTypeList,
+                                \Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
+                                \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
+                                array $data = [],
+                                Json $serializer = null)
     {
         parent::__construct($context, $registry, $config, $cacheTypeList, $resource, $resourceCollection, $data, $serializer);
         $this->dataFactory = $dataFactory;
@@ -27,7 +35,7 @@ class TypeLabel extends \Magento\Config\Model\Config\Backend\Serialized\ArraySer
     protected function _afterLoad()
     {
         parent::_afterLoad();
-        if(count($this->getValue()) == 0) {
+        if(!$this->getValue() || count($this->getValue()) == 0) {
             /** @var \HawkSearch\Proxy\Helper\Data $helper */
             $helper = $this->dataFactory->create();
             $client = new \Zend_Http_Client();
@@ -40,15 +48,16 @@ class TypeLabel extends \Magento\Config\Model\Config\Backend\Serialized\ArraySer
                 if($tab->Value == 'all') {
                     continue;
                 }
-                $value['_' . $tab->Value] = ['title' => $tab->Title, 'code' => $tab->Value, 'color' => $this->generateColor($tab->Value)];
+                $bg = $helper->generateColor($tab->Value);
+                $fg = $helper->generateTextColor($bg);
+                $value['_' . $tab->Value] = [
+                    'title' => $tab->Title,
+                    'code' => $tab->Value,
+                    'color' => $bg,
+                    'textColor' => $fg
+                ];
             }
             $this->setValue($value);
         }
     }
-
-    private function generateColor($value)
-    {
-        return sprintf('#%s', substr(md5($value), 0, 6));
-    }
-
 }

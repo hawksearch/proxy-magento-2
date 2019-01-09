@@ -20,7 +20,10 @@ class Tabbed extends Html
     private $labelMap;
     public static $increment = 1;
 
-    public function __construct(Template\Context $context, \HawkSearch\Proxy\Helper\Data $helper, \HawkSearch\Proxy\Block\BannerFactory $bannerFactory, array $data = [])
+    public function __construct(Template\Context $context,
+                                \HawkSearch\Proxy\Helper\Data $helper,
+                                \HawkSearch\Proxy\Block\BannerFactory $bannerFactory,
+                                array $data = [])
     {
         parent::__construct($context, $helper, $bannerFactory, $data);
         $this->helper = $helper;
@@ -76,7 +79,8 @@ class Tabbed extends Html
                     $obj = new \stdClass();
                     $obj->title = ucfirst($foundType);
                     $obj->code = $foundType;
-                    $obj->color = sprintf('#%s', substr(md5($foundType), 0, 6));
+                    $obj->color = $this->helper->generateColor($foundType);
+                    $obj->textColor = $this->helper->generateTextColor($obj->color);
                     $this->labelMap[$foundType] = $obj;
                 }
             }
@@ -84,16 +88,7 @@ class Tabbed extends Html
 
         $bg = $this->labelMap[$type]->color;
         $label = $this->labelMap[$type]->title;
-        $fg = $this->computeForground($bg);
+        $fg = $this->labelMap[$type]->textColor;
         return sprintf('<p style="background-color: %s; padding: 5px 10px; display:inline-block; font-weight: bold; color: %s">%s</p>', $bg, $fg, $label);
-    }
-    private function computeForground($rgb) {
-        $r = hexdec(substr($rgb, 1, 2));
-        $g = hexdec(substr($rgb, 3,2));
-        $b = hexdec(substr($rgb, 5, 2));
-        if(($r * 299 + $g * 587 + $b * 114) / 1000 < 123) {
-            return '#fff';
-        }
-        return '#000';
     }
 }

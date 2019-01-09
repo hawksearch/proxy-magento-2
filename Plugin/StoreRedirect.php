@@ -11,16 +11,15 @@
  * IN THE SOFTWARE.
  */
 
-
 namespace HawkSearch\Proxy\Plugin;
 
-class BreadcrumbPlugin
+class StoreRedirect extends \Magento\Store\App\Response\Redirect
 {
-    public function aroundGetBreadcrumbPath(\Magento\Catalog\Helper\Data $subject, callable $proceed) {
-        $category = $subject->getCategory();
-        if($category && $category->getHawksearchLandingPage()){
-            return $category->getHawkBreadcrumbPath();
+    public function afterGetRefererUrl($subject, $result) {
+        $baseurl = $this->_storeManager->getStore()->getBaseUrl();
+        if(substr($result, strlen($baseurl), 9) == 'hawkproxy'){
+            return $this->_request->getServer('HTTP_REFERER');
         }
-        return $proceed();
+        return $result;
     }
 }
