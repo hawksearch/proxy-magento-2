@@ -279,6 +279,18 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         return $this->hawkData->Location;
     }
 
+    public function getTrackingDataHtml() {
+        if(empty($this->hawkData)) {
+            $this->fetchResponse();
+        }
+        $counter = 1;
+        $obj = array();
+        foreach ($this->getProductCollection() as $item) {
+            $obj[] = ['url' => $item->getProductUrl(), 'tid' => $this->hawkData->TrackingId, 'sku' => $item->getSku(), 'i' => $counter++];
+        }
+        return sprintf('<div id="hawktrackingdata" style="display:none;" data-tracking="%s"></div>', htmlspecialchars(json_encode($obj, JSON_UNESCAPED_SLASHES), ENT_QUOTES));
+    }
+
     public function getFacets()
     {
         if (empty($this->hawkData)) {
@@ -334,9 +346,10 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         if (empty($this->hawkData)) {
             $this->fetchResponse();
         }
-        //$this->setIsHawkManaged(true);
+
         $skus = array();
         $map = array();
+        $bySku = array();
         $i = 0;
         $results = json_decode($this->hawkData->Data->Results);
         if (count((array)$results) == 0) {
@@ -346,6 +359,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             if (isset($item->Custom->sku)) {
                 $skus[] = $item->Custom->sku;
                 $map[$item->Custom->sku] = $i;
+                $bySku[$item->Custom->sku] = $item;
                 $i++;
             }
         }
@@ -367,6 +381,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             }
             ksort($sorted);
             foreach ($sorted as $p) {
+                $p->setHawkItem($bySku[$p->getSku()]);
                 $collection->removeItemByKey($p->getId());
                 $collection->addItem($p);
             }
