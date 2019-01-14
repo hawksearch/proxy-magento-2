@@ -28,7 +28,7 @@
         }
     }(window.HawkSearch = window.HawkSearch || {}));
 
-    require(["hawksearch"], function () {
+    require(["jquery", "hawksearch" ], function ($) {
         HawkSearch.initAutoSuggest = function () {
             <?php foreach($block->getSearchBoxes() as $sbid) : ?>
             HawkSearch.suggestInit('#<?php echo $sbid; ?>', {
@@ -37,6 +37,22 @@
                 isAutoWidth: true
             });
             <?php endforeach; ?>
+
+            HawkSearch.bindClickTracking = function(data) {
+                var items = $('#hawkitemlist');
+                for(var row in data) {
+                    items.find('a[href="' + data[row]["url"] + '"]').click({tid:data[row]["tid"], idx:data[row]["i"], sku:data[row]["sku"]}, function(e) {
+                        return HawkSearch.link(e, e.data.tid, e.data.idx, e.data.sku, 0);
+                    });
+                }
+            };
+            HawkSearch.origProcessFacets = HawkSearch.processFacets;
+            HawkSearch.processFacets = function(hash, json, queryGuid, backbutton) {
+                HawkSearch.origProcessFacets(hash, json, queryGuid, backbutton);
+                var data = $(json.html).find('#hawktrackingdata').data('tracking');
+                HawkSearch.bindClickTracking(data);
+            };
+            HawkSearch.bindClickTracking($(document).find('#hawktrackingdata').data('tracking'));
         };
     });
 </script>

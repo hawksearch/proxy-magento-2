@@ -16,7 +16,9 @@
     <?php echo $block->getBanner()->getFeaturedTop() ?>
 	<?php echo $block->getBanner()->getBannerTop() ?></div>
 <div id="hawkitemlist">
-	<?php echo $block->getChildHtml(); ?></div>
+	<?php echo $block->getChildHtml(); ?>
+</div>
+<?php echo $block->getClickTracking(); ?>
 <div id="hawkbannerbottom" class="bannerBottom">
     <?php echo $block->getBanner()->getFeaturedBottom() ?>
 	<?php echo $block->getBanner()->getBannerBottom() ?></div>
