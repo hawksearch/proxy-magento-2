@@ -20,10 +20,11 @@ $includeCss = $block->getIncludeHawkCss();
 	<?php endif; ?>
     (function() {
         var config = {
-            paths: {
+            "paths": {
                 "hawksearch": "<?php echo $trackingUrl; ?>/includes/hawksearch"
             }
         };
         require.config(config);
-    })();
+        // require(['hawksearch'], function() {});
+     })();
 </script>

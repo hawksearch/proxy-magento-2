@@ -12,7 +12,7 @@
  * IN THE SOFTWARE.
  */
 -->
-<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="2columns-left"
       xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <body>
         <referenceContainer name="content">
@@ -26,6 +26,6 @@
             <block class="HawkSearch\Proxy\Block\Product\Facets" name="hawksearch_facets" as="hawksearch_facets"
                    template="HawkSearch_Proxy::hawksearch/proxy/left/facets.phtml"/>
         </referenceContainer>
-        <referenceBlock name="catalog.leftnav" remove="true" />
+        <!--<referenceBlock name="catalog.leftnav" remove="true" />-->
     </body>
 </page>

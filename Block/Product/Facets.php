@@ -13,8 +13,8 @@ use Magento\Framework\View\Element\Template;
 
 class Facets extends \Magento\Framework\View\Element\Template
 {
-    private $hawkHelper;
-    private $banner;
+    protected $hawkHelper;
+    protected $banner;
     public function __construct(Template\Context $context,
                                 \HawkSearch\Proxy\Helper\Data $hawkHelper,
                                 \HawkSearch\Proxy\Model\Banner $banner,
@@ -32,6 +32,11 @@ class Facets extends \Magento\Framework\View\Element\Template
         return $this->banner->getBannerLeftTop();
     }
     public function getFacets(){
+        if (!$this->hawkHelper->getIsHawkManaged($this->hawkHelper->getOriginalPathInfo())) {
+            $this->hawkHelper->log('page not managed, returning core pager');
+            return '';
+        }
+
         return $this->hawkHelper->getFacets();
     }
     public function getFeaturedLeftBottom() {

@@ -29,6 +29,9 @@
         <hawksearch_include_css>1</hawksearch_include_css>
         <show_toptext>0</show_toptext>
       </proxy>
+      <sync>
+        <cache_lifetime>300</cache_lifetime>
+      </sync>
     </hawksearch_proxy>
   </default>
 </config>
