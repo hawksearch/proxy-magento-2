@@ -17,14 +17,9 @@ class ShowTypeLabels extends \Magento\Framework\App\Config\Value
      * @var \HawkSearch\Proxy\Helper\Data
      */
     private $helper;
-    /**
-     * @var ManagerInterface
-     */
-    private $messageManager;
 
     public function __construct(
         \HawkSearch\Proxy\Helper\Data $helper,
-        \Magento\Framework\Message\ManagerInterface $messageManager,
         \Magento\Framework\Model\Context $context,
         \Magento\Framework\Registry $registry,
         \Magento\Framework\App\Config\ScopeConfigInterface $config,
@@ -36,17 +31,16 @@ class ShowTypeLabels extends \Magento\Framework\App\Config\Value
     {
         parent::__construct($context, $registry, $config, $cacheTypeList, $resource, $resourceCollection, $data);
         $this->helper = $helper;
-        $this->messageManager = $messageManager;
     }
 
     public function afterLoad()
     {
-        if($this->getValue() === null) {
+        if ($this->getValue() === null) {
             //determine state from hawksearch
             $res = $this->apiGetCall('Field', ['fieldName' => 'it']);
-            if($res['code'] == 200) {
+            if ($res['code'] == 200) {
                 $it = $res['object'];
-                if($it->DoNotStore == false && $it->IsOutput == true) {
+                if ($it->DoNotStore == false && $it->IsOutput == true) {
                     $this->setValue(1);
                 }
             }
@@ -71,12 +65,12 @@ class ShowTypeLabels extends \Magento\Framework\App\Config\Value
     public function activateTypeInResult()
     {
         $res = $this->apiGetCall('Field', ['fieldName' => 'it']);
-        if($res['code'] == 200) {
+        if ($res['code'] == 200) {
             $it = $res['object'];
             $it->DoNotStore = false;
             $it->IsOutput = true;
             $res = $this->apiPutCall('Field/' . $it->SyncGuid, json_encode($it));
-            if($res['code'] == 200) {
+            if ($res['code'] == 200) {
                 return 'OK';
             } else {
                 return 'error';
@@ -89,24 +83,23 @@ class ShowTypeLabels extends \Magento\Framework\App\Config\Value
     public function deactivateTypeInResult()
     {
         $res = $this->apiGetCall('Field', ['fieldName' => 'it']);
-        if($res['code'] == 200) {
+        if ($res['code'] == 200) {
             $it = $res['object'];
             $it->DoNotStore = true;
             $it->IsOutput = false;
             $res = $this->apiPutCall('Field/' . $it->SyncGuid, json_encode($it));
-            if($res['code'] == 200) {
+            if ($res['code'] == 200) {
                 return 'OK';
             } else {
-                $this->messageManager->addNoticeMessage("Unable to save field 'it'");
-                //throw new \Exception(sprintf("Field '%s' could not be saved: %s", $this->getFieldConfig()['label'], $res['object']->Message));
+                return 'error';
             }
         } else {
-            $this->messageManager->addNoticeMessage("Unable to fetch field 'it' from hawksearch");
-            //throw new \Exception(sprintf("Field '%s' could not be saved: %s", $this->getFieldConfig()['label'], $res['object']->Message));
+            return 'error';
         }
     }
 
-    private function apiGetCall($path, $args) {
+    private function apiGetCall($path, $args)
+    {
         $client = new \Zend_Http_Client();
         $client->setUri($this->helper->getApiUrl() . $path . '?' . http_build_query($args));
         $client->setMethod(\Zend_Http_Client::GET);
@@ -117,9 +110,10 @@ class ShowTypeLabels extends \Magento\Framework\App\Config\Value
         return ['code' => $response->getStatus(), 'object' => json_decode($response->getBody())];
     }
 
-    private function apiPutCall($path, $body) {
+    private function apiPutCall($path, $body)
+    {
         $client = new \Zend_Http_Client();
-        $client->setUri($this->helper->getApiUrl() . $path . '?' );
+        $client->setUri($this->helper->getApiUrl() . $path . '?');
         $client->setMethod(\Zend_Http_Client::PUT);
         $client->setHeaders('X-HawkSearch-ApiKey', $this->helper->getApiKey());
         $client->setHeaders('Accept', 'application/json');
@@ -129,6 +123,4 @@ class ShowTypeLabels extends \Magento\Framework\App\Config\Value
         $response = $client->request();
         return ['code' => $response->getStatus(), 'object' => json_decode($response->getBody())];
     }
-
-
 }
