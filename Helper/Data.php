@@ -26,7 +26,6 @@ use Magento\Store\Model\StoreManagerInterface;
 use Magento\Catalog\Model\ResourceModel\Category\CollectionFactory as CategoryCollectionFactory;
 use HawkSearch\Proxy\Model\Logger;
 
-
 class Data extends \Magento\Framework\App\Helper\AbstractHelper
 {
     const HAWK_LANDING_PAGE_URL = 'LandingPage/';
@@ -74,10 +73,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     private $storeCollectionFactory;
     /**
-     * @var Logger
-     */
-    private $logger;
-    /**
      * @var Cache
      */
     private $cache;
@@ -94,9 +89,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @param Config $catalogConfig
      * @param Emulation $emulation
      * @param StoreCollectionFactory $storeCollectionFactory
-     * @param Logger $logger
      * @param Cache $cache
-     * @param Session $session
+     * @param SessionFactory $session
+     * @param \Magento\UrlRewrite\Model\UrlFinderInterface $urlFinder
      */
     public function __construct(
         Context $context,
@@ -108,11 +103,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         Config $catalogConfig,
         Emulation $emulation,
         StoreCollectionFactory $storeCollectionFactory,
-        Logger $logger,
         Cache $cache,
         SessionFactory $session,
         \Magento\UrlRewrite\Model\UrlFinderInterface $urlFinder
-
     ) {
         // parent construct first so scopeConfig gets set for use in "setUri", etc.
         parent::__construct($context);
@@ -128,7 +121,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $this->categoryCollectionFactory = $categoryCollectionFactory;
         $this->emulation = $emulation;
         $this->storeCollectionFactory = $storeCollectionFactory;
-        $this->logger = $logger;
         $this->cache = $cache;
         $this->urlFinder = $urlFinder;
     }
@@ -166,25 +158,27 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     public function buildUri() {
         $controller = implode('_', [$this->_request->getModuleName(), $this->_request->getControllerName()]);
-
+        $params = $this->_request->getParams();
         switch ($controller) {
             case 'hawkproxy_landingPage':
                 if($this->getConfigurationData('hawksearch_proxy/proxy/enable_hawk_landing_pages')) {
-                    $this->setUri(['lpurl' => $this->_request->getPathInfo()]);
+                    $params['lpurl'] = $this->_request->getAlias('rewrite_request_path');
+                    $this->setUri($params);
                 }
                 break;
             case 'catalog_category':
                 if($this->getConfigurationData('hawksearch_proxy/proxy/manage_categories')) {
-                    $this->setUri(array('lpurl' => $this->_request->getAlias('rewrite_request_path')));
+                    $params['lpurl'] = $this->_request->getAlias('rewrite_request_path');
+                    $this->setUri($params);
                 }
                 break;
             case 'catalogsearch_result':
                 if($this->getConfigurationData('hawksearch_proxy/proxy/manage_search')){
-                    $this->setUri($this->_request->getParams());
+                    $this->setUri($params);
                 }
                 break;
             case 'hawkproxy_index':
-                $params = $this->_request->getParams();
+
                 if(isset($params['lpurl']) && (substr($params['lpurl'], 0, strlen('/catalogsearch/result')) === '/catalogsearch/result')) {
                     unset($params['lpurl']);
                 }
@@ -208,7 +202,13 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         if (isset($args['keyword'])) {
             unset($args['keyword']);
         }
-        $args['hawksessionid'] = $this->session->create()->getSessionId();
+        $session = $this->session->create();
+        $sid = $session->getHawkSessionId();
+        if(!$sid) {
+            $sid = $session->getSessionId();
+            $session->setHawkSessionId($sid);
+        }
+        $args['HawkSessionId'] = $sid;
         if (isset($args['lpurl']) && (!$this->getIsHawkManaged($args['lpurl']) || $args['lpurl'] == '/catalogsearch/result/')) {
             unset($args['lpurl']);
         }
@@ -852,10 +852,14 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         }
         return null;
     }
+
+    /**
+     * @param $message
+     */
     public function log($message)
     {
         if ($this->isLoggingEnabled()) {
-            $this->logger->debug($message);
+            $this->_logger->addDebug($message);
         }
     }
 

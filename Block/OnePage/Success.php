@@ -35,10 +35,12 @@ class Success extends \Magento\Checkout\Block\Onepage\Success
     }
 
     public function getTrackingPixelUrl() {
+        $sid = $this->session->getHawkSessionId();
+        $this->helper->log(sprintf('using hawksessionid = %s, checkout session id = %s', $sid, $this->_checkoutSession->getSessionId()));
         $order = $this->_checkoutSession->getLastRealOrder();
         return $this->helper->getTrackingPixelUrl([
             'd' => $this->helper->getOrderTackingKey(),
-            'hawksessionid' => $this->session->getSessionId(),
+            'hawksessionid' => $sid,
             'orderno' => $order->getIncrementId(),
             'total' => $order->getGrandTotal()
         ]);
