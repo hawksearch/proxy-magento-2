@@ -44,7 +44,6 @@ class Index extends \Magento\CatalogSearch\Controller\Result\Index
         $query = $this->queryFactory->get();
         $tab = $this->getRequest()->getParam('it');
         $this->helper->checkNotes();
-        $this->_catalogSession->setHawkCurrentUpdateHandle($this->request->getFullActionName());
 
         if ($query->getQueryText() == '' && $this->isTopCategoryRequest()) {
             $this->_view->loadLayout();
