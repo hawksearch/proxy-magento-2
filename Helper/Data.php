@@ -391,6 +391,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         if(in_array($path, ['/catalogsearch/result/', '/catalogsearch/result', '/hawkproxy/']) && $this->getConfigurationData('hawksearch_proxy/proxy/manage_search')){
             return true;
         }
+        $path = rtrim($path, "/");
 
         $hs = $this->getLandingPages();
 
