@@ -63,10 +63,10 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @var \Zend\Http\Client
      */
     private $zendClient;
+    private $zendClientFactory;
 
     /**
      * Data constructor.
-     * @param Context $context
      * @param StoreManagerInterface $storeManager
      * @param \Magento\CatalogUrlRewrite\Model\CategoryUrlPathGenerator $pathGenerator
      * @param \Magento\Framework\Filesystem $filesystem
@@ -75,7 +75,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @param \Magento\Catalog\Model\Config $catalogConfig
      * @param \Magento\Catalog\Model\Session $session
      * @param CacheInterface $cache
-     * @param \Zend\Http\Client $zendClient
+     * @param \HawkSearch\Proxy\Model\ZendClientFactory $zendClientFactory
+     * @param Context $context
      */
     public function __construct(
         StoreManagerInterface $storeManager,
@@ -86,7 +87,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         \Magento\Catalog\Model\Config $catalogConfig,
         \Magento\Catalog\Model\Session $session,
         CacheInterface $cache,
-        \HawkSearch\Proxy\Model\ZendClientFactory $zendClient,
+        \HawkSearch\Proxy\Model\ZendClientFactory $zendClientFactory,
         Context $context
 
     ) {
@@ -99,29 +100,19 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $this->session = $session;
         $this->catalogConfig = $catalogConfig;
 
-        $params = $context->getRequest()->getParams();
-        if(is_array($params) && isset($params['q'])){
-            $this->setUri($context->getRequest()->getParams());
-        } else {
-            $this->setUri(array('lpurl' => $context->getRequest()->getAlias('rewrite_request_path'), 'output' => 'custom', 'hawkitemlist' => 'json'));
-        }
-        $this->setClientIp($context->getRequest()->getClientIp());
-        $this->setClientUa($context->getHttpHeader()->getHttpUserAgent());
+//        $params = $context->getRequest()->getParams();
+//        if(is_array($params) && isset($params['q'])){
+//            $this->setUri($context->getRequest()->getParams());
+//        } else {
+//            $this->setUri(array('lpurl' => $context->getRequest()->getAlias('rewrite_request_path'), 'output' => 'custom', 'hawkitemlist' => 'json'));
+//        }
+//        $this->setClientIp($context->getRequest()->getClientIp());
+//        $this->setClientUa($context->getHttpHeader()->getHttpUserAgent());
         $this->overwriteFlag = false;
         $this->email_helper = $email_helper;
 
         $this->cache = $cache;
-        $this->zendClient = $zendClient->create();
-    }
-
-    public function logException(\Exception $e)
-    {
-//        if (!$this->_exceptionLogger instanceof \Zend\Log\Logger) {
-//            $writer = new \Zend\Log\Writer\Stream(BP . '/var/log/' . $this->_exceptionLog);
-//            $this->_exceptionLogger = new \Zend\Log\Logger();
-//            $this->_exceptionLogger->addWriter($writer);
-//        }
-//        $this->_exceptionLogger->info($e->getMessage() . ' - File: ' . $e->getFile() . ' on line ' . $e->getLine());
+        $this->zendClientFactory = $zendClientFactory;
     }
 
     public function getConfigurationData($data)
@@ -176,20 +167,60 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $this->uri = $this->getTrackingUrl() . '/?' . http_build_query($args);
     }
 
-    private function fetchResponse()
+    protected function fetchResponse()
     {
-        if (empty($this->uri)) {
-            throw new \Exception('No URI set.');
+        if(empty($this->zendClient)){
+            $this->zendClient = $this->zendClientFactory->create();
         }
         $this->zendClient->resetParameters();
-        $this->zendClient->setOptions(['timeout' => 30,'useragent' => $this->clientUA ]);
-        $this->zendClient->setUri($this->uri);
-        $this->zendClient->setHeaders(['HTTP-TRUE-CLIENT-IP' => $this->getClientIp()]);
+        $this->zendClient->setOptions(['timeout' => 30,'useragent' => $this->_httpHeader->getHttpUserAgent()]);
+        $this->zendClient->setUri($this->getUri());
+        $this->zendClient->setHeaders(['HTTP-TRUE-CLIENT-IP' => $this->_request->getClientIp()]);
         $response = $this->zendClient->send();
         $this->log(sprintf('requesting url %s', $this->zendClient->getUri()));
         $this->rawResponse = $response->getBody();
 
         $this->hawkData = json_decode($this->rawResponse);
+    }
+    public function getUri()
+    {
+        if(empty($this->uri)){
+            $params = $this->_getRequest()->getParams();
+            if(is_array($params) && isset($params['q'])){
+                $this->uri = $this->formatUri($params);
+            } else {
+                if ((!isset($params['id'])) && isset($params['lpurl']) && $this->_request->getAlias('rewrite_request_path') == 'hawkproxy/') {
+                    $newUriParams = array('output' => 'custom', 'hawkitemlist' => 'json');
+                } else {
+                    $newUriParams = array('lpurl' => $this->getLpUrl(), 'output' => 'custom', 'hawkitemlist' => 'json');
+                }
+                if ($this->_request->getAlias('rewrite_request_path') == 'hawkproxy' && $params['lpurl'] !== null) {
+                    unset($newUriParams['lpurl']);
+                }
+                $oldUriParams = $this->_request->getParams();
+                unset($oldUriParams['id']);
+                $newUriParams = array_merge($oldUriParams, $newUriParams);
+                $this->uri = $this->formatUri($newUriParams, $this->_request->getParams());
+            }
+        }
+        return $this->uri;
+    }
+    public function formatUri($args, array $oldParams = [])
+    {
+        unset($args['ajax']);
+        unset($args['json']);
+        $args['output'] = 'custom';
+        $args['hawkitemlist'] = 'json';
+        if (isset($args['q'])) {
+            unset($args['lpurl']);
+            if(isset($args['keyword'])){
+                unset($args['keyword']);
+            }
+        }
+        $args['hawksessionid'] = $this->session->getSessionId();
+        $trackingUrl=$this->getTrackingUrl();
+
+        return $trackingUrl . '/?' . http_build_query($args);
     }
 
     public function getResultData()
@@ -337,6 +368,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function getHawkResponse($method, $url, $data = null)
     {
         try {
+            if(empty($this->zendClient)){
+                $this->zendClient = $this->zendClientFactory->create();
+            }
             $this->zendClient->resetParameters();
             $this->zendClient->setOptions(['timeout' => 60]);
             $this->zendClient->setUri($this->getApiUrl() . $url);
