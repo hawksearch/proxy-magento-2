@@ -22,6 +22,11 @@
                     <item name="disable" xsi:type="boolean">false</item>
                     <item name="sortOrder" xsi:type="string">70</item>
                 </item>
+                <item name="hawksearch_landingpage" xsi:type="array">
+                    <item name="class" xsi:type="string">HawkSearch\Proxy\Controller\LandingPageRouter</item>
+                    <item name="disable" xsi:type="boolean">false</item>
+                    <item name="sortOrder" xsi:type="string">70</item>
+                </item>
             </argument>
         </arguments>
     </type>

@@ -20,10 +20,12 @@ use Magento\Framework\App\CacheInterface;
 class Data extends \Magento\Framework\App\Helper\AbstractHelper
 {
     const HAWK_LANDING_PAGE_URL = 'LandingPage/';
+    const CONFIG_PROXY_ENABLED = 'hawksearch_proxy/general/enabled';
     const CONFIG_PROXY_RESULT_TYPE = 'hawksearch_proxy/proxy/result_type';
     const CONFIG_PROXY_MODE = 'hawksearch_proxy/proxy/mode';
     const CONFIG_PROXY_SHOW_TOPTEXT = 'hawksearch_proxy/proxy/show_toptext';
     const CONFIG_PROXY_LPCACHE_LIFETIME = 'hawksearch_proxy/';
+    const CONFIG_PROXY_ENABLE_LANDING_PAGE_ROUTE = 'hawksearch_proxy/proxy/enable_hawk_landing_pages';
 
     protected $_logFilename = "/var/log/hawk_sync_categories.log";
     protected $_exceptionLog = "hawk_sync_exception.log";
@@ -976,5 +978,13 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     public function getOriginalPathInfo() {
         return $this->_getRequest()->getOriginalPathInfo();
+    }
+    public function getEnableLandingPageRoute()
+    {
+        return $this->getConfigurationData(self::CONFIG_PROXY_ENABLE_LANDING_PAGE_ROUTE);
+    }
+    public function getEnabled()
+    {
+        return $this->scopeConfig->isSetFlag(self::CONFIG_PROXY_ENABLED, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
     }
 }
