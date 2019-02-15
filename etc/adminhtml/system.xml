@@ -98,6 +98,14 @@
                         <field id="manage_categories">1</field>
                     </depends>
                 </field>
+                <field id="enable_hawk_landing_pages" translate="label comment"
+                       type="select" showInDefault="0" showInWebsite="0" showInStore="1" sortOrder="46">
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <label>Enable HawkSearch Landing pages</label>
+                    <depends>
+                        <field id="manage_categories">1</field>
+                    </depends>
+                </field>
                 <field id="manage_search"
                        translate="label comment"
                        type="select" showInDefault="0" showInWebsite="0" showInStore="1" sortOrder="50">
