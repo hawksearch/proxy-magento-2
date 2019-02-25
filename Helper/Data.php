@@ -352,8 +352,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $bySku = array();
         $i = 0;
         $results = json_decode($this->hawkData->Data->Results);
-        if (count((array)$results) == 0) {
-            return null;
+        if (!property_exists($results, 'Items') || count($results->Items) == 0) {
+            return $this->getResourceCollection([]);
         }
         foreach ($results->Items as $item) {
             if (isset($item->Custom->sku)) {
