@@ -290,8 +290,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             foreach ($productCollection as $item) {
                 $obj[] = ['url' => $item->getProductUrl(), 'tid' => $this->hawkData->TrackingId, 'sku' => $item->getSku(), 'i' => $counter++];
             }
+            return sprintf('<div id="hawktrackingdata" style="display:none;" data-tracking="%s"></div>', htmlspecialchars(json_encode($obj, JSON_UNESCAPED_SLASHES), ENT_QUOTES));
         }
-        return sprintf('<div id="hawktrackingdata" style="display:none;" data-tracking="%s"></div>', htmlspecialchars(json_encode($obj, JSON_UNESCAPED_SLASHES), ENT_QUOTES));
+        return '<div id="hawktrackingdata" style="display:none;" data-tracking="[]"></div>';
     }
 
     public function getFacets()
