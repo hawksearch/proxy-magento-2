@@ -285,8 +285,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         }
         $counter = 1;
         $obj = array();
-        foreach ($this->getProductCollection() as $item) {
-            $obj[] = ['url' => $item->getProductUrl(), 'tid' => $this->hawkData->TrackingId, 'sku' => $item->getSku(), 'i' => $counter++];
+        $productCollection = $this->getProductCollection();
+        if($productCollection instanceof \Magento\Catalog\Model\ResourceModel\Product\Collection) {
+            foreach ($productCollection as $item) {
+                $obj[] = ['url' => $item->getProductUrl(), 'tid' => $this->hawkData->TrackingId, 'sku' => $item->getSku(), 'i' => $counter++];
+            }
         }
         return sprintf('<div id="hawktrackingdata" style="display:none;" data-tracking="%s"></div>', htmlspecialchars(json_encode($obj, JSON_UNESCAPED_SLASHES), ENT_QUOTES));
     }
