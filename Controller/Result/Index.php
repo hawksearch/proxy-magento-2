@@ -44,13 +44,15 @@ class Index extends \Magento\CatalogSearch\Controller\Result\Index
         $query = $this->queryFactory->get();
         $tab = $this->getRequest()->getParam('it');
         $this->helper->checkNotes();
-
+        $robots = $this->hawkHelper->getSearchRobots();
         if ($query->getQueryText() == '' && $this->isTopCategoryRequest()) {
             $this->_view->loadLayout();
             $this->_view->getLayout()->unsetElement('page.main.title');
+            $this->_view->getPage()->getConfig()->setRobots($robots);
             $this->_view->renderLayout();
         } elseif (!empty($tab) && $tab !== $this->hawkHelper->getResultType()) {
             $this->_view->loadLayout('hawksearch_proxy_tabbed');
+            $this->_view->getPage()->getConfig()->setRobots($robots);
             $this->_view->renderLayout();
         } else {
             // if no products, then load tabbed
@@ -59,6 +61,7 @@ class Index extends \Magento\CatalogSearch\Controller\Result\Index
             } else {
                 $this->_view->loadLayout();
             }
+            $this->_view->getPage()->getConfig()->setRobots($robots);
             $this->_view->renderLayout();
         }
     }

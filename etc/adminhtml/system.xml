@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!--
 /**
- * Copyright (c) 2018 Hawksearch (www.hawksearch.com) - All Rights Reserved
+ * Copyright (c) 2019 Hawksearch (www.hawksearch.com) - All Rights Reserved
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -113,6 +113,14 @@
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <label>Manage Search</label>
                 </field>
+                <field id="meta_robots" type="select" showInDefault="0" showInWebsite="0" showInStore="1" sortOrder="51">
+                    <label>Meta Robots</label>
+                    <comment>Meta robots used on "/catalogsearch/result" page only</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Design\Robots</source_model>
+                    <depends>
+                        <field id="manage_search">1</field>
+                    </depends>
+                </field>
                 <field id="search_box_ids" translate="label comment" type="text" showInDefault="0" showInWebsite="0"
                        showInStore="1" sortOrder="55">
                     <label>Search Box HTML ID's</label>
@@ -120,7 +128,6 @@
                     <depends>
                         <field id="manage_search">1</field>
                     </depends>
-
                 </field>
                 <field id="enable_custom_search_route"
                        translate="label comment"

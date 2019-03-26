@@ -41,6 +41,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     const LP_CACHE_KEY = 'hawk_landing_pages';
     const LOCK_FILE_NAME = 'hawkcategorysync.lock';
+    const CONFIG_PROXY_META_ROBOTS = 'hawksearch_proxy/proxy/meta_robots';
 
     protected $_syncingExceptions = [];
 
@@ -1167,6 +1168,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         }
         return '#000';
     }
+
+  public function getSearchRobots()
+  {
+      return $this->getConfigurationData(self::CONFIG_PROXY_META_ROBOTS);
+  }
 
 }
 
