@@ -26,7 +26,6 @@ use Magento\Store\Model\StoreManagerInterface;
 use Magento\Catalog\Model\ResourceModel\Category\CollectionFactory as CategoryCollectionFactory;
 use HawkSearch\Proxy\Model\Logger;
 
-
 class Data extends \Magento\Framework\App\Helper\AbstractHelper
 {
     const HAWK_LANDING_PAGE_URL = 'LandingPage/';
@@ -42,6 +41,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     const LP_CACHE_KEY = 'hawk_landing_pages';
     const LOCK_FILE_NAME = 'hawkcategorysync.lock';
+    const CONFIG_PROXY_META_ROBOTS = 'hawksearch_proxy/proxy/meta_robots';
 
     protected $_syncingExceptions = [];
 
@@ -74,10 +74,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     private $storeCollectionFactory;
     /**
-     * @var Logger
-     */
-    private $logger;
-    /**
      * @var Cache
      */
     private $cache;
@@ -94,9 +90,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @param Config $catalogConfig
      * @param Emulation $emulation
      * @param StoreCollectionFactory $storeCollectionFactory
-     * @param Logger $logger
      * @param Cache $cache
-     * @param Session $session
+     * @param SessionFactory $session
+     * @param \Magento\UrlRewrite\Model\UrlFinderInterface $urlFinder
      */
     public function __construct(
         Context $context,
@@ -108,11 +104,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         Config $catalogConfig,
         Emulation $emulation,
         StoreCollectionFactory $storeCollectionFactory,
-        Logger $logger,
         Cache $cache,
         SessionFactory $session,
         \Magento\UrlRewrite\Model\UrlFinderInterface $urlFinder
-
     ) {
         // parent construct first so scopeConfig gets set for use in "setUri", etc.
         parent::__construct($context);
@@ -128,7 +122,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $this->categoryCollectionFactory = $categoryCollectionFactory;
         $this->emulation = $emulation;
         $this->storeCollectionFactory = $storeCollectionFactory;
-        $this->logger = $logger;
         $this->cache = $cache;
         $this->urlFinder = $urlFinder;
     }
@@ -166,25 +159,27 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     public function buildUri() {
         $controller = implode('_', [$this->_request->getModuleName(), $this->_request->getControllerName()]);
-
+        $params = $this->_request->getParams();
         switch ($controller) {
             case 'hawkproxy_landingPage':
                 if($this->getConfigurationData('hawksearch_proxy/proxy/enable_hawk_landing_pages')) {
-                    $this->setUri(['lpurl' => $this->_request->getPathInfo()]);
+                    $params['lpurl'] = $this->_request->getAlias('rewrite_request_path');
+                    $this->setUri($params);
                 }
                 break;
             case 'catalog_category':
                 if($this->getConfigurationData('hawksearch_proxy/proxy/manage_categories')) {
-                    $this->setUri(array('lpurl' => $this->_request->getAlias('rewrite_request_path')));
+                    $params['lpurl'] = $this->_request->getAlias('rewrite_request_path');
+                    $this->setUri($params);
                 }
                 break;
             case 'catalogsearch_result':
                 if($this->getConfigurationData('hawksearch_proxy/proxy/manage_search')){
-                    $this->setUri($this->_request->getParams());
+                    $this->setUri($params);
                 }
                 break;
             case 'hawkproxy_index':
-                $params = $this->_request->getParams();
+
                 if(isset($params['lpurl']) && (substr($params['lpurl'], 0, strlen('/catalogsearch/result')) === '/catalogsearch/result')) {
                     unset($params['lpurl']);
                 }
@@ -208,7 +203,13 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         if (isset($args['keyword'])) {
             unset($args['keyword']);
         }
-        $args['hawksessionid'] = $this->session->create()->getSessionId();
+        $session = $this->session->create();
+        $sid = $session->getHawkSessionId();
+        if(!$sid) {
+            $sid = $session->getSessionId();
+            $session->setHawkSessionId($sid);
+        }
+        $args['HawkSessionId'] = $sid;
         if (isset($args['lpurl']) && (!$this->getIsHawkManaged($args['lpurl']) || $args['lpurl'] == '/catalogsearch/result/')) {
             unset($args['lpurl']);
         }
@@ -279,6 +280,22 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         return $this->hawkData->Location;
     }
 
+    public function getTrackingDataHtml() {
+        if(empty($this->hawkData)) {
+            $this->fetchResponse();
+        }
+        $counter = 1;
+        $obj = array();
+        $productCollection = $this->getProductCollection();
+        if($productCollection instanceof \Magento\Catalog\Model\ResourceModel\Product\Collection) {
+            foreach ($productCollection as $item) {
+                $obj[] = ['url' => $item->getProductUrl(), 'tid' => $this->hawkData->TrackingId, 'sku' => $item->getSku(), 'i' => $counter++];
+            }
+            return sprintf('<div id="hawktrackingdata" style="display:none;" data-tracking="%s"></div>', htmlspecialchars(json_encode($obj, JSON_UNESCAPED_SLASHES), ENT_QUOTES));
+        }
+        return '<div id="hawktrackingdata" style="display:none;" data-tracking="[]"></div>';
+    }
+
     public function getFacets()
     {
         if (empty($this->hawkData)) {
@@ -334,18 +351,20 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         if (empty($this->hawkData)) {
             $this->fetchResponse();
         }
-        //$this->setIsHawkManaged(true);
+
         $skus = array();
         $map = array();
+        $bySku = array();
         $i = 0;
         $results = json_decode($this->hawkData->Data->Results);
-        if (count((array)$results) == 0) {
-            return null;
+        if (!property_exists($results, 'Items') || count($results->Items) == 0) {
+            return $this->getResourceCollection([]);
         }
         foreach ($results->Items as $item) {
             if (isset($item->Custom->sku)) {
                 $skus[] = $item->Custom->sku;
                 $map[$item->Custom->sku] = $i;
+                $bySku[$item->Custom->sku] = $item;
                 $i++;
             }
         }
@@ -367,6 +386,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             }
             ksort($sorted);
             foreach ($sorted as $p) {
+                $p->setHawkItem($bySku[$p->getSku()]);
                 $collection->removeItemByKey($p->getId());
                 $collection->addItem($p);
             }
@@ -837,10 +857,14 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         }
         return null;
     }
+
+    /**
+     * @param $message
+     */
     public function log($message)
     {
         if ($this->isLoggingEnabled()) {
-            $this->logger->debug($message);
+            $this->_logger->addDebug($message);
         }
     }
 
@@ -1117,8 +1141,10 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         /** @var stdClass $map */
         $obj = json_decode($this->getConfigurationData(self::CONFIG_PROXY_TYPE_LABEL));
         $map = [];
-        foreach ($obj as $key => $item) {
-            $map[$item->code] = $item;
+        if(is_object($obj)) {
+            foreach ($obj as $key => $item) {
+                $map[$item->code] = $item;
+            }
         }
         return $map;
     }
@@ -1127,5 +1153,26 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->getConfigurationData(self::CONFIG_PROXY_SHOW_TYPE_LABELS);
     }
+    public function generateColor($value)
+    {
+        return sprintf('#%s', substr(md5($value), 0, 6));
+    }
+
+    public function generateTextColor($rgb)
+    {
+        $r = hexdec(substr($rgb, 1, 2));
+        $g = hexdec(substr($rgb, 3,2));
+        $b = hexdec(substr($rgb, 5, 2));
+        if(($r * 299 + $g * 587 + $b * 114) / 1000 < 123) {
+            return '#fff';
+        }
+        return '#000';
+    }
+
+  public function getSearchRobots()
+  {
+      return $this->getConfigurationData(self::CONFIG_PROXY_META_ROBOTS);
+  }
+
 }
 

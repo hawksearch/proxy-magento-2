@@ -13,15 +13,32 @@ use Magento\Framework\View\Element\Template;
 class HawkItems extends Template
 {
     private $banner;
+    /**
+     * @var \HawkSearch\Proxy\Helper\Data
+     */
+    private $helper;
+
+    /**
+     * HawkItems constructor.
+     * @param Banner $banner
+     * @param \HawkSearch\Proxy\Helper\Data $helper
+     * @param Template\Context $context
+     * @param array $data
+     */
     public function __construct(
-        Template\Context $context,
         Banner $banner,
+        \HawkSearch\Proxy\Helper\Data $helper,
+        Template\Context $context,
         array $data = [])
     {
-        $this->banner = $banner;
         parent::__construct($context, $data);
+        $this->banner = $banner;
+        $this->helper = $helper;
     }
     public function getBanner() {
         return $this->banner;
+    }
+    public function getClickTracking() {
+        return $this->helper->getTrackingDataHtml();
     }
 }

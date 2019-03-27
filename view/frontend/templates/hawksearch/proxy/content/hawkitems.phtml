@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2013 Hawksearch (www.hawksearch.com) - All Rights Reserved
+ * Copyright (c) 2019 Hawksearch (www.hawksearch.com) - All Rights Reserved
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -16,7 +16,9 @@
     <?php echo $block->getBanner()->getFeaturedTop() ?>
 	<?php echo $block->getBanner()->getBannerTop() ?></div>
 <div id="hawkitemlist">
-	<?php echo $block->getChildHtml(); ?></div>
+	<?php echo $block->getChildHtml(); ?>
+</div>
+<?php echo $block->getClickTracking(); ?>
 <div id="hawkbannerbottom" class="bannerBottom">
     <?php echo $block->getBanner()->getFeaturedBottom() ?>
 	<?php echo $block->getBanner()->getBannerBottom() ?></div>
