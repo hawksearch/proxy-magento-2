@@ -110,16 +110,18 @@ class Html
         return $this->helper->getResultData()->Data->Title;
     }
 
+    public function getHawkTrackingData() {
+        return $this->helper->getTrackingDataHtml();
+    }
+
     public function getItemList()
     {
         $layout = $this->getLayout();
         if($this->getTabbedContent()) {
-            $block = $layout->getBlock('hawksearch_tabbed_items');
+            return $layout->getBlock('hawksearch_tabbed_items')->toHtml();
         } else {
-            $block = $layout->getBlock('hawksearch_hawkitems');
+            return $layout->getBlock('hawksearch_hawkitems')->getChildHtml();
         }
-
-        return $block->toHtml();
     }
 
     public function getFeaturedZone($zone)

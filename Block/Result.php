@@ -64,5 +64,7 @@ class Result
         $this->setModuleName('HawkSearch_Proxy');
     }
 
-
+    public function getProductCollection() {
+        return $this->_getProductCollection();
+    }
 }

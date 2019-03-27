@@ -43,7 +43,7 @@ class Index
         $html = '';
 
         if(!$this->_view->isLayoutLoaded()){
-            $this->_view->loadLayout($this->session->getHawkCurrentUpdateHandle());
+            $this->_view->loadLayout();
             $block = $this->_view->getLayout()->getBlock('hawksearch_proxy_response');
             if(!empty($tab) && $tab !== $this->data->getResultType()) {
                 $block->setTabbedContent(true);
