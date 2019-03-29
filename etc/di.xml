@@ -20,7 +20,7 @@
     </virtualType>
     <virtualType name="hawkSearchProxyVirtualLogHandler" type="Magento\Framework\Logger\Handler\Base">
         <arguments>
-            <argument name="fileName" xsi:type="string">var/log/hawksearch_proxy.log</argument>
+            <argument name="filePath" xsi:type="string">var/log/hawksearch_proxy.log</argument>
         </arguments>
     </virtualType>
     <virtualType name="hawkSearchProxyVirtualLogger" type="Magento\Framework\Logger\Monolog">
