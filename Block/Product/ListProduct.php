@@ -24,6 +24,10 @@ class ListProduct
     protected $_productCollection;
     private $pricingHelper;
     protected $response;
+    /**
+     * @var string
+     */
+    private $mode;
 
 
     public function setPagers($bool)
@@ -39,12 +43,14 @@ class ListProduct
                                 \Magento\Framework\Pricing\Helper\Data $pricingHelper,
                                 \HawkSearch\Proxy\Helper\Data $hawkHelper,
                                 \Magento\Framework\App\Response\Http $response,
+                                string $mode,
                                 array $data = [])
     {
         $this->pricingHelper = $pricingHelper;
         $this->hawkHelper = $hawkHelper;
         $this->response = $response;
         parent::__construct($context, $postDataHelper, $layerResolver, $categoryRepository, $urlHelper, $data);
+        $this->mode = $mode;
     }
 
     public function getHawkTrackingId()
@@ -57,8 +63,7 @@ class ListProduct
 
     public function getToolbarHtml()
     {
-        if ($this->hawkHelper->getConfigurationData('hawksearch_proxy/general/enabled')) {
-
+        if ($this->hawkHelper->modeActive($this->mode)) {
             try {
                 if ($this->hawkHelper->getLocation() != "") {
                     $this->hawkHelper->log(sprintf('Redirecting to location: %s', $this->hawkHelper->getLocation()));
@@ -112,7 +117,7 @@ class ListProduct
     protected function _getProductCollection()
     {
         if ($this->_productCollection === null) {
-            if ($this->hawkHelper->getConfigurationData('hawksearch_proxy/general/enabled')) {
+            if ($this->hawkHelper->modeActive($this->mode)) {
                 if ($this->hawkHelper->getLocation() != "") {
                     $this->hawkHelper->log(sprintf('Redirecting to location: %s', $this->hawkHelper->getLocation()));
                     //return $this->helper->_redirectUrl($this->hawkHelper->getLocation());

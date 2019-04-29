@@ -45,22 +45,24 @@ class TypeLabel extends \Magento\Config\Model\Config\Backend\Serialized\ArraySer
                 return;
             }
             $result = json_decode($response->getBody());
-            $tabs = json_decode($result->Data->Tabs);
-            $value = [];
-            foreach ($tabs->Tabs as $tab) {
-                if($tab->Value == 'all') {
-                    continue;
+            if(isset($result->Data) && isset($result->Data->Tabs)) {
+                $tabs = json_decode($result->Data->Tabs);
+                $value = [];
+                foreach ($tabs->Tabs as $tab) {
+                    if($tab->Value == 'all') {
+                        continue;
+                    }
+                    $bg = $helper->generateColor($tab->Value);
+                    $fg = $helper->generateTextColor($bg);
+                    $value['_' . $tab->Value] = [
+                        'title' => $tab->Title,
+                        'code' => $tab->Value,
+                        'color' => $bg,
+                        'textColor' => $fg
+                    ];
                 }
-                $bg = $helper->generateColor($tab->Value);
-                $fg = $helper->generateTextColor($bg);
-                $value['_' . $tab->Value] = [
-                    'title' => $tab->Title,
-                    'code' => $tab->Value,
-                    'color' => $bg,
-                    'textColor' => $fg
-                ];
+                $this->setValue($value);
             }
-            $this->setValue($value);
         }
     }
 }

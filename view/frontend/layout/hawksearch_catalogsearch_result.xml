@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!--
 /**
- * Copyright (c) 2013 Hawksearch (www.hawksearch.com) - All Rights Reserved
+ * Copyright (c) 2019 Hawksearch (www.hawksearch.com) - All Rights Reserved
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -21,11 +21,11 @@
                    template="HawkSearch_Proxy::hawksearch/proxy/content/hawkitems.phtml">
             </block>
         </referenceContainer>
-        <move element="search.result" destination="hawksearch_hawkitems"/>
+        <move element="search.result" destination="hawksearch_hawkitems" />
         <referenceContainer name="sidebar.main">
             <block class="HawkSearch\Proxy\Block\Product\Facets"
                    name="hawksearch_facets" as="hawksearch_facets"
-                   template="HawkSearch_Proxy::hawksearch/proxy/left/facets.phtml"/>
+                   template="HawkSearch_Proxy::hawksearch/proxy/left/facets.phtml" />
         </referenceContainer>
         <referenceBlock name="catalogsearch.leftnav" remove="true" />
         <referenceContainer name="additional" remove="true" />
