@@ -50,14 +50,15 @@ class ShowTypeLabels extends \Magento\Framework\App\Config\Value
 
     public function beforeSave()
     {
-        if ($this->getValue() == 1) {
+        if ($this->getValue() === 1 && $this->getOldValue() === 0) {
             $res = $this->activateTypeInResult();
-        } else {
+        } elseif ($this->getValue() === 0 && $this->getOldValue() === 1) {
             $res = $this->deactivateTypeInResult();
+        } else {
+            return parent::beforeSave();
         }
         if ($res != 'OK') {
             $this->setValue($this->getOldValue());
-            // need to add a message to the page that the
         }
         return parent::beforeSave();
     }

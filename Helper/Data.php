@@ -21,6 +21,7 @@ use Magento\Framework\App\Helper\Context;
 use Magento\Framework\Filesystem;
 use Magento\Store\Model\App\Emulation;
 use Magento\Store\Model\ResourceModel\Store\CollectionFactory as StoreCollectionFactory;
+use Magento\Store\Model\ScopeInterface;
 use Magento\Store\Model\Store;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Catalog\Model\ResourceModel\Category\CollectionFactory as CategoryCollectionFactory;
@@ -30,6 +31,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 {
     const HAWK_LANDING_PAGE_URL = 'LandingPage/';
     const CONFIG_PROXY_ENABLED = 'hawksearch_proxy/general/enabled';
+    const CONFIG_PROXY_MANAGE_SEARCH = 'hawksearch_proxy/proxy/manage_search';
+    const CONFIG_PROXY_MANAGE_CATEGORIES = 'hawksearch_proxy/proxy/manage_categories';
+
     const CONFIG_PROXY_RESULT_TYPE = 'hawksearch_proxy/proxy/result_type';
     const CONFIG_PROXY_ENABLE_CUSTOM_SEARCH_ROUTE = 'hawksearch_proxy/proxy/enable_custom_search_route';
     const CONFIG_PROXY_ENABLE_LANDING_PAGE_ROUTE = 'hawksearch_proxy/proxy/enable_hawk_landing_pages';
@@ -128,9 +132,23 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     public function getConfigurationData($data)
     {
-        $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
+        $storeScope = ScopeInterface::SCOPE_STORE;
 
         return $this->scopeConfig->getValue($data, $storeScope, $this->storeManager->getStore()->getCode());
+    }
+
+    public function isManageSearch() {
+        return
+            $this->scopeConfig->getValue(self::CONFIG_PROXY_ENABLED, ScopeInterface::SCOPE_STORE)
+            &&
+            $this->scopeConfig->getValue(self::CONFIG_PROXY_MANAGE_SEARCH, ScopeInterface::SCOPE_STORE);
+    }
+
+    public function isManageCategories() {
+        return
+            $this->scopeConfig->getValue(self::CONFIG_PROXY_ENABLED, ScopeInterface::SCOPE_STORE)
+            &&
+            $this->scopeConfig->getValue(self::CONFIG_PROXY_MANAGE_CATEGORIES, ScopeInterface::SCOPE_STORE);
     }
 
     public function isValidSearchRoute($route)
@@ -1113,7 +1131,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     public function getEnabled()
     {
-        return $this->scopeConfig->isSetFlag(self::CONFIG_PROXY_ENABLED, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+        return $this->scopeConfig->isSetFlag(self::CONFIG_PROXY_ENABLED, ScopeInterface::SCOPE_STORE);
     }
 
     public function getShowTabs()
@@ -1169,10 +1187,21 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         return '#000';
     }
 
-  public function getSearchRobots()
+    public function getSearchRobots()
   {
       return $this->getConfigurationData(self::CONFIG_PROXY_META_ROBOTS);
   }
+
+    public function modeActive(string $mode)
+    {
+        switch ($mode) {
+            case 'catalogsearch':
+                return $this->isManageSearch();
+            case 'category':
+                return $this->isManageCategories();
+        }
+        return false;
+    }
 
 }
 

@@ -41,6 +41,9 @@ class Index extends \Magento\CatalogSearch\Controller\Result\Index
      */
     public function execute()
     {
+        if(!$this->hawkHelper->isManageSearch()){
+            return parent::execute();
+        }
         $query = $this->queryFactory->get();
         $tab = $this->getRequest()->getParam('it');
         $this->helper->checkNotes();
