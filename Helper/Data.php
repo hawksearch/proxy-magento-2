@@ -202,6 +202,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                     unset($params['lpurl']);
                 }
                 $this->setUri($params);
+                break;
+            default:
+                $this->setUri($params);
         }
     }
 
