@@ -10,6 +10,7 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
+
 namespace HawkSearch\Proxy\Helper;
 
 use HawkSearch\Proxy\Model\ProxyEmailFactory;
@@ -25,7 +26,6 @@ use Magento\Store\Model\ScopeInterface;
 use Magento\Store\Model\Store;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Catalog\Model\ResourceModel\Category\CollectionFactory as CategoryCollectionFactory;
-use HawkSearch\Proxy\Model\Logger;
 
 class Data extends \Magento\Framework\App\Helper\AbstractHelper
 {
@@ -54,7 +54,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     private $rawResponse;
     private $store = null;
     private $landingPages;
-    protected $uri; /***overrrided CatalogSearch/Helper/Data.php***/
+    protected $uri;
+    /***overrrided CatalogSearch/Helper/Data.php***/
     private $clientIP;
     private $clientUA;
     private $isManaged;
@@ -63,7 +64,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     private $overwriteFlag;
     private $email_helper;
     private $collectionFactory;
-    protected $session; /***overrrided CatalogSearch/Helper/Data.php***/
+    protected $session;
+    /***overrrided CatalogSearch/Helper/Data.php***/
     private $catalogConfig;
     /**
      * @var CategoryCollectionFactory
@@ -111,7 +113,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         Cache $cache,
         SessionFactory $session,
         \Magento\UrlRewrite\Model\UrlFinderInterface $urlFinder
-    ) {
+    )
+    {
         // parent construct first so scopeConfig gets set for use in "setUri", etc.
         parent::__construct($context);
         $this->storeManager = $storeManager;
@@ -137,14 +140,16 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         return $this->scopeConfig->getValue($data, $storeScope, $this->storeManager->getStore()->getCode());
     }
 
-    public function isManageSearch() {
+    public function isManageSearch()
+    {
         return
             $this->scopeConfig->getValue(self::CONFIG_PROXY_ENABLED, ScopeInterface::SCOPE_STORE)
             &&
             $this->scopeConfig->getValue(self::CONFIG_PROXY_MANAGE_SEARCH, ScopeInterface::SCOPE_STORE);
     }
 
-    public function isManageCategories() {
+    public function isManageCategories()
+    {
         return
             $this->scopeConfig->getValue(self::CONFIG_PROXY_ENABLED, ScopeInterface::SCOPE_STORE)
             &&
@@ -175,30 +180,31 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $this->clientUA = $ua;
     }
 
-    public function buildUri() {
+    public function buildUri()
+    {
         $controller = implode('_', [$this->_request->getModuleName(), $this->_request->getControllerName()]);
         $params = $this->_request->getParams();
         switch ($controller) {
             case 'hawkproxy_landingPage':
-                if($this->getConfigurationData('hawksearch_proxy/proxy/enable_hawk_landing_pages')) {
+                if ($this->getConfigurationData('hawksearch_proxy/proxy/enable_hawk_landing_pages')) {
                     $params['lpurl'] = $this->_request->getAlias('rewrite_request_path');
                     $this->setUri($params);
                 }
                 break;
             case 'catalog_category':
-                if($this->getConfigurationData('hawksearch_proxy/proxy/manage_categories')) {
+                if ($this->getConfigurationData('hawksearch_proxy/proxy/manage_categories')) {
                     $params['lpurl'] = $this->_request->getAlias('rewrite_request_path');
                     $this->setUri($params);
                 }
                 break;
             case 'catalogsearch_result':
-                if($this->getConfigurationData('hawksearch_proxy/proxy/manage_search')){
+                if ($this->getConfigurationData('hawksearch_proxy/proxy/manage_search')) {
                     $this->setUri($params);
                 }
                 break;
             case 'hawkproxy_index':
 
-                if(isset($params['lpurl']) && (substr($params['lpurl'], 0, strlen('/catalogsearch/result')) === '/catalogsearch/result')) {
+                if (isset($params['lpurl']) && (substr($params['lpurl'], 0, strlen('/catalogsearch/result')) === '/catalogsearch/result')) {
                     unset($params['lpurl']);
                 }
                 $this->setUri($params);
@@ -215,7 +221,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $args['output'] = 'custom';
         $args['hawkitemlist'] = 'json';
         $args['hawkfeatured'] = 'json';
-        if($this->getShowTabs()) {
+        if ($this->getShowTabs()) {
             $args['hawktabs'] = 'html';
         }
         if (empty($args['it']) && $this->getResultType()) {
@@ -226,7 +232,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         }
         $session = $this->session->create();
         $sid = $session->getHawkSessionId();
-        if(!$sid) {
+        if (!$sid) {
             $sid = $session->getSessionId();
             $session->setHawkSessionId($sid);
         }
@@ -244,7 +250,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             $this->buildUri();
             $this->setClientIp($this->_request->getClientIp());
             $this->setClientUa($this->_httpHeader->getHttpUserAgent());
-            }
+        }
         $client = new \Zend_Http_Client();
         $client->setConfig(['timeout' => 30]);
 
@@ -252,7 +258,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $client->setUri($this->uri);
         $client->setHeaders('HTTP-TRUE-CLIENT-IP', $this->clientIP);
         $response = $client->request();
-        if($response->getStatus() == '500'){
+        if ($response->getStatus() == '500') {
             throw new \Exception($response->getMessage());
         }
         $this->log(sprintf('requesting url %s', $client->getUri()));
@@ -269,7 +275,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         return $this->hawkData;
     }
 
-    public function getResultType() {
+    public function getResultType()
+    {
         return $this->getConfigurationData(self::CONFIG_PROXY_RESULT_TYPE);
     }
 
@@ -301,14 +308,15 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         return $this->hawkData->Location;
     }
 
-    public function getTrackingDataHtml() {
-        if(empty($this->hawkData)) {
+    public function getTrackingDataHtml()
+    {
+        if (empty($this->hawkData)) {
             $this->fetchResponse();
         }
         $counter = 1;
         $obj = array();
         $productCollection = $this->getProductCollection();
-        if($productCollection instanceof \Magento\Catalog\Model\ResourceModel\Product\Collection) {
+        if ($productCollection instanceof \Magento\Catalog\Model\ResourceModel\Product\Collection) {
             foreach ($productCollection as $item) {
                 $obj[] = ['url' => $item->getProductUrl(), 'tid' => $this->hawkData->TrackingId, 'sku' => $item->getSku(), 'i' => $counter++];
             }
@@ -345,7 +353,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     public function getOrderTackingKey()
     {
-
         return $this->getConfigurationData('hawksearch_proxy/proxy/order_tracking_key');
     }
 
@@ -366,6 +373,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     /**
      * @return null
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function getProductCollection()
     {
@@ -389,7 +397,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                 $i++;
             }
         }
-        if(empty($skus)){
+        if (empty($skus)) {
             return null;
         }
 
@@ -425,7 +433,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $map = array();
         $i = 0;
 
-        if(!$this->hawkData->Data->FeaturedItems instanceof \stdClass) {
+        if (!$this->hawkData->Data->FeaturedItems instanceof \stdClass) {
             $this->hawkData->Data->FeaturedItems = json_decode($this->hawkData->Data->FeaturedItems);
         }
         if (count($this->hawkData->Data->FeaturedItems->Items->Items) == 0) {
@@ -526,7 +534,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         if (substr($path, 0, 1) != '/') {
             $path = '/' . $path;
         }
-        if(in_array($path, ['/catalogsearch/result/', '/catalogsearch/result', '/hawkproxy/']) && $this->getConfigurationData('hawksearch_proxy/proxy/manage_search')){
+        if (in_array($path, ['/catalogsearch/result/', '/catalogsearch/result', '/hawkproxy/']) && $this->getConfigurationData('hawksearch_proxy/proxy/manage_search')) {
             return true;
         }
         $hs = $this->getLandingPages();
@@ -560,40 +568,10 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     }
 
-    public function addLandingPage($cid)
-    {
-        $sid = $this->getCategoryStoreId();
-        $cat = $this->createObj()->get('Magento\Catalog\Model\CategoryFactory')->setStoreId($sid)->load($cid);
-        $lpObject = $this->getLandingPageObject(
-            $cat->getName(),
-            $this->getHawkCategoryUrl($cat),
-            $this->getHawkNarrowXml($cat->getId()),
-            $cid
-        );
-
-        $this->log(sprintf("going to add landing page for landing page %s with id %d", $lpObject['CustomUrl'], $cat->getId()));
-        $resp = $this->getHawkResponse(\Zend_Http_Client::GET, 'LandingPage/Url/' . $lpObject['CustomUrl']);
-        if (empty($resp)) {
-            $this->log('getHawkResponse did not return any value for last request');
-            throw new \Exception('No response from hawk, unable to proceed');
-        }
-
-        $po = json_decode($resp);
-        if (isset($po->PageId)) {
-            $this->log(sprintf('pageid: %d, raw resp: %s', $po->PageId, $resp));
-            $lpObject['PageId'] = $po->PageId;
-            $resp = $this->getHawkResponse(\Zend_Http_Client::PUT, 'LandingPage/' . $po->PageId, json_encode($lpObject));
-        } else {
-            $resp = $this->getHawkResponse(\Zend_Http_Client::POST, 'LandingPage/', json_encode($lpObject));
-        }
-        $this->log(sprintf('posted: %s', json_encode($lpObject)));
-        $this->log(sprintf('response: %s', $resp));
-    }
-
     private function getLandingPageObject($name, $url, $xml, $cid, $clear = false)
     {
         $custom = '';
-        if(!$clear) {
+        if (!$clear) {
             $custom = "__mage_catid_{$cid}__";
         }
         return array(
@@ -607,17 +585,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             'NarrowXml' => $xml,
             'Custom' => $custom
         );
-    }
-
-    public function removeLandingPage($cid)
-    {
-        $sid = $this->getCategoryStoreId();
-        $cat = $this->createObj()->get('Magento\Catalog\Model\CategoryFactory')->setStoreId($sid)->load($cid);
-
-        $urlpath = $this->getHawkCategoryUrl($cat);
-        $this->log("going to remove landing page for catid: {$cat->getId()} and url {$urlpath}");
-        $res = $this->getHawkResponse(\Zend_Http_Client::DELETE, 'LandingPage/Url/' . $urlpath);
-        $this->log('remove got result: ' . $res);
     }
 
     private function getHawkNarrowXml($id)
@@ -636,39 +603,28 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         return $xml->asXML();
     }
 
-    public function getHawkCategoryUrl(\Magento\Catalog\Model\Category $cat)
+    private function createExistingCustomFieldMap($hawklist)
     {
-        $fullUrl = $this->createObj()->get('Magento\Catalog\Helper\Category')->getCategoryUrl($cat);
-        $base = $this->createObj()->get('Magento\Store\Model\StoreManagerInterface')->getStore()->getBaseUrl();
-        $url = substr($fullUrl, strlen($base) - 1);
-        $this->log(sprintf('full %s', $fullUrl));
-        if (substr($url, 0, 1) != '/') {
-            $url = '/' . $url;
-        }
-        return $url;
-    }
-
-    private function createExistingCustomFieldMap($hawklist) {
         $a = [];
         foreach ($hawklist as $item) {
-            if(isset($item['custom'])){
+            if (isset($item['custom'])) {
                 $a[$item['custom']] = $item;
             }
         }
         return $a;
     }
 
-    private function clearExistingCustomField($lpObject, $existingCustom){
-
-        if(isset($existingCustom[$lpObject['Custom']]) && $existingCustom[$lpObject['Custom']]['hawkurl'] != $lpObject['CustomUrl']) {
+    private function clearExistingCustomField($lpObject, $existingCustom)
+    {
+        if (isset($existingCustom[$lpObject['Custom']]) && $existingCustom[$lpObject['Custom']]['hawkurl'] != $lpObject['CustomUrl']) {
             preg_match('/__mage_catid_(\d+)__/', $existingCustom[$lpObject['Custom']]['custom'], $matches);
-            if($matches[1]){
+            if ($matches[1]) {
                 $otherObject = $this->getLandingPageObject(
-                   $existingCustom[$lpObject['Custom']]['name'],
-                   $existingCustom[$lpObject['Custom']]['hawkurl'],
-                   $this->getHawkNarrowXml($matches[1]),
-                   $matches[1],
-                   true
+                    $existingCustom[$lpObject['Custom']]['name'],
+                    $existingCustom[$lpObject['Custom']]['hawkurl'],
+                    $this->getHawkNarrowXml($matches[1]),
+                    $matches[1],
+                    true
                 );
                 $otherObject['PageId'] = $existingCustom[$lpObject['Custom']]['pageid'];
                 $resp = $this->getHawkResponse(\Zend_Http_Client::PUT, self::HAWK_LANDING_PAGE_URL . $otherObject['PageId'], json_encode($otherObject));
@@ -763,7 +719,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                 $left++;
                 $right++;
             }
-            if(isset($existingCustom[$customVal])){
+            if (isset($existingCustom[$customVal])) {
                 unset($existingCustom[$customVal]);
             }
         }
@@ -798,7 +754,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $hawkPages = array();
         $pages = json_decode($this->getHawkResponse(\Zend_Http_Client::GET, 'LandingPage'));
         foreach ($pages as $page) {
-            if (empty($page->Custom) && ! $this->overwriteFlag)
+            if (empty($page->Custom) && !$this->overwriteFlag)
                 continue;
             $hawkPages[] = array(
                 'pageid' => $page->PageId,
@@ -811,32 +767,14 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         return $hawkPages;
     }
 
-    public function dead_getMagentoLandingPages() {
-        $helper = \Magento\Framework\App\ObjectManager::getInstance()->get('Magento\Catalog\Helper\Category');
-
-        /** @var Mage_Catalog_Model_Resource_Category_Collection $categories */
-        $categories = $helper->getStoreCategories(false, true, false);
-
-        $categories->addAttributeToSelect('hawk_landing_page');
-        if (!$this->getConfigurationData('hawksearch_proxy/proxy/manage_all')) {
-            $categories->addAttributeToFilter('hawk_landing_page', array('eq' => '1'));
-        }
-        $categories->addAttributeToSort('entity_id')
-            ->addAttributeToSort('parent_id')
-            ->addAttributeToSort('position');
-        foreach ($categories as $category) {
-            $hawkUrl = sprintf("/%s", $this->pathGenerator->getUrlPathWithSuffix($category, $this->getCategoryStoreId()));
-        }
-    }
-
-
-    public function getMagentoLandingPages() {
+    public function getMagentoLandingPages()
+    {
         $collection = $this->categoryCollectionFactory->create();
         $collection->addAttributeToSelect(array('name', 'is_active', 'parent_id', 'position', 'include_in_menu'));
         $collection->addAttributeToFilter('is_active', array('eq' => '1'));
         $collection->addAttributeToSort('entity_id')->addAttributeToSort('parent_id')->addAttributeToSort('position');
         $collection->addAttributeToFilter('level', ['gteq' => '2']);
-        if(!$this->getManageAll()){
+        if (!$this->getManageAll()) {
             $collection->addAttributeToFilter('hawk_landing_page', ['eq' => '1']);
         }
 
@@ -864,8 +802,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         return $cats;
     }
 
-    protected function getRequestPath(\Magento\Catalog\Model\Category $category) {
-        if($category->hasData('request_path') && $category->getRequestPath() != null){
+    protected function getRequestPath(\Magento\Catalog\Model\Category $category)
+    {
+        if ($category->hasData('request_path') && $category->getRequestPath() != null) {
             return $category->getRequestPath();
         }
         $rewrite = $this->urlFinder->findOneByData([
@@ -943,7 +882,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
             $phpbin = PHP_BINDIR . DIRECTORY_SEPARATOR . "php";
 
-            if($this->overwriteFlag) {
+            if ($this->overwriteFlag) {
                 fwrite($f, "$phpbin -d memory_limit=-1 $runfile -r $root -t $tmpfile -f 1\n");
             } else {
                 fwrite($f, "$phpbin -d memory_limit=-1 $runfile -r $root -t $tmpfile\n");
@@ -956,7 +895,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         } catch (\Exception $e) {
             return $e->getMessage();
         }
-
     }
 
     private function validateHawkLandingPageResponse($response, $action, $url, $request_raw = null)
@@ -989,23 +927,22 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $this->log('getting sync lock file path');
         $relPath = $this->scopeConfig->getValue(\HawkSearch\Datafeed\Helper\Data::CONFIG_FEED_PATH);
 
-        if(!$relPath) {
+        if (!$relPath) {
             $relPath = \HawkSearch\Datafeed\Helper\Data::DEFAULT_FEED_PATH;
         }
         $mediaRoot = $this->filesystem->getDirectoryWrite('media')->getAbsolutePath();
 
-        if(strpos(strrev($mediaRoot), '/') !== 0) {
+        if (strpos(strrev($mediaRoot), '/') !== 0) {
             $fullPath = implode(DIRECTORY_SEPARATOR, array($mediaRoot, $relPath));
         } else {
             $fullPath = $mediaRoot . $relPath;
         }
 
-        if(!file_exists($fullPath)) {
+        if (!file_exists($fullPath)) {
             mkdir($fullPath, 0777, true);
         }
 
         return $fullPath;
-
     }
 
     public function createSyncLocks()
@@ -1020,7 +957,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             return false;
         }
         return true;
-
     }
 
     public function removeSyncLocks()
@@ -1036,7 +972,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     public function getSearchBoxes()
     {
-
         $sbids = explode(',', $this->getConfigurationData('hawksearch_proxy/proxy/search_box_ids'));
         foreach ($sbids as $id) {
             $id = trim($id);
@@ -1044,15 +979,14 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         return $sbids;
     }
 
-    public function setOverwriteFlag($bool) {
+    public function setOverwriteFlag($bool)
+    {
         $this->overwriteFlag = $bool;
     }
 
     public function isCategorySyncCronEnabled()
     {
-        //return $this->scopeConfig->getValue('hawksearch_proxy/sync/enabled');
         return $this->scopeConfig->isSetFlag(self::CONFIG_PROXY_CATEGORY_SYNC_CRON_ENABLED);
-
     }
 
     public function hasExceptions()
@@ -1162,7 +1096,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         /** @var stdClass $map */
         $obj = json_decode($this->getConfigurationData(self::CONFIG_PROXY_TYPE_LABEL));
         $map = [];
-        if(is_object($obj)) {
+        if (is_object($obj)) {
             foreach ($obj as $key => $item) {
                 $map[$item->code] = $item;
             }
@@ -1174,6 +1108,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->getConfigurationData(self::CONFIG_PROXY_SHOW_TYPE_LABELS);
     }
+
     public function generateColor($value)
     {
         return sprintf('#%s', substr(md5($value), 0, 6));
@@ -1182,18 +1117,18 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function generateTextColor($rgb)
     {
         $r = hexdec(substr($rgb, 1, 2));
-        $g = hexdec(substr($rgb, 3,2));
+        $g = hexdec(substr($rgb, 3, 2));
         $b = hexdec(substr($rgb, 5, 2));
-        if(($r * 299 + $g * 587 + $b * 114) / 1000 < 123) {
+        if (($r * 299 + $g * 587 + $b * 114) / 1000 < 123) {
             return '#fff';
         }
         return '#000';
     }
 
     public function getSearchRobots()
-  {
-      return $this->getConfigurationData(self::CONFIG_PROXY_META_ROBOTS);
-  }
+    {
+        return $this->getConfigurationData(self::CONFIG_PROXY_META_ROBOTS);
+    }
 
     public function modeActive(string $mode)
     {
@@ -1205,6 +1140,5 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         }
         return false;
     }
-
 }
 
