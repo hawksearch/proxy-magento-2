@@ -193,7 +193,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                 break;
             case 'catalog_category':
                 if ($this->getConfigurationData('hawksearch_proxy/proxy/manage_categories')) {
-                    $params['lpurl'] = $this->_request->getAlias('rewrite_request_path');
+                    if(empty($params['lpurl'])){
+                        $params['lpurl'] = $this->_request->getAlias('rewrite_request_path');
+                    }
                     $this->setUri($params);
                 }
                 break;
@@ -1133,6 +1135,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function modeActive(string $mode)
     {
         switch ($mode) {
+            case 'proxy':
+                return true;
             case 'catalogsearch':
                 return $this->isManageSearch();
             case 'category':
