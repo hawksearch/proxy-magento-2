@@ -184,6 +184,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         $controller = implode('_', [$this->_request->getModuleName(), $this->_request->getControllerName()]);
         $params = $this->_request->getParams();
+        if(isset($params['lpurl'])){
+            $params['lpurl'] = rtrim($params['lpurl'], "/");
+        }
         switch ($controller) {
             case 'hawkproxy_landingPage':
                 if ($this->getConfigurationData('hawksearch_proxy/proxy/enable_hawk_landing_pages')) {
@@ -205,7 +208,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                 }
                 break;
             case 'hawkproxy_index':
-
                 if (isset($params['lpurl']) && (substr($params['lpurl'], 0, strlen('/catalogsearch/result')) === '/catalogsearch/result')) {
                     unset($params['lpurl']);
                 }
