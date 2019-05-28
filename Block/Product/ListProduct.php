@@ -43,7 +43,7 @@ class ListProduct
                                 \Magento\Framework\Pricing\Helper\Data $pricingHelper,
                                 \HawkSearch\Proxy\Helper\Data $hawkHelper,
                                 \Magento\Framework\App\Response\Http $response,
-                                string $mode,
+                                string $mode = 'proxy',
                                 array $data = [])
     {
         $this->pricingHelper = $pricingHelper;

@@ -184,6 +184,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         $controller = implode('_', [$this->_request->getModuleName(), $this->_request->getControllerName()]);
         $params = $this->_request->getParams();
+        if(isset($params['lpurl'])){
+            $params['lpurl'] = rtrim($params['lpurl'], "/");
+        }
         switch ($controller) {
             case 'hawkproxy_landingPage':
                 if ($this->getConfigurationData('hawksearch_proxy/proxy/enable_hawk_landing_pages')) {
@@ -193,7 +196,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                 break;
             case 'catalog_category':
                 if ($this->getConfigurationData('hawksearch_proxy/proxy/manage_categories')) {
-                    $params['lpurl'] = $this->_request->getAlias('rewrite_request_path');
+                    if(empty($params['lpurl'])){
+                        $params['lpurl'] = $this->_request->getAlias('rewrite_request_path');
+                    }
                     $this->setUri($params);
                 }
                 break;
@@ -534,7 +539,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         if (substr($path, 0, 1) != '/') {
             $path = '/' . $path;
         }
-        if (in_array($path, ['/catalogsearch/result/', '/catalogsearch/result', '/hawkproxy/']) && $this->getConfigurationData('hawksearch_proxy/proxy/manage_search')) {
+        $path = rtrim($path, "/");
+        if (in_array($path, ['/catalogsearch/result', '/hawkproxy']) && $this->getConfigurationData('hawksearch_proxy/proxy/manage_search')) {
             return true;
         }
         $hs = $this->getLandingPages();
@@ -1133,6 +1139,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function modeActive(string $mode)
     {
         switch ($mode) {
+            case 'proxy':
+                return true;
             case 'catalogsearch':
                 return $this->isManageSearch();
             case 'category':
