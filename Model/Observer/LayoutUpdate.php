@@ -60,6 +60,11 @@ class LayoutUpdate implements ObserverInterface
                 ->addHandle('hawksearch_category_view')
                 ->addHandle('catalog_category_view_type_layered')
                 ->addHandle('catalog_category_view_type_layered_without_children');
+        } elseif ($observer->getFullActionName() == 'hawkproxy_index_index') {
+            $layout = $observer->getLayout();
+            $layout->getUpdate()
+                ->addHandle('catalogsearch_result_index')
+                ->addHandle('hawksearch_catalogsearch_result');
         }
     }
 }
