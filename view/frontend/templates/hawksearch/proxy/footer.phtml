@@ -51,6 +51,7 @@
                 HawkSearch.origProcessFacets(hash, json, queryGuid, backbutton);
                 var data = $(json.html).find('#hawktrackingdata').data('tracking');
                 HawkSearch.bindClickTracking(data);
+                $('#hawkitemlist').trigger('contentUpdated');
             };
             HawkSearch.bindClickTracking($(document).find('#hawktrackingdata').data('tracking'));
         };
