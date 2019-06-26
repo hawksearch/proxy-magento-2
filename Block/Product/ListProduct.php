@@ -22,7 +22,7 @@ class ListProduct
     private $hawkHelper;
     private $pagers = true;
     protected $_productCollection;
-    private $pricingHelper;
+    protected $pricingHelper;
     protected $response;
     /**
      * @var string
