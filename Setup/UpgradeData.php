@@ -62,7 +62,9 @@ class UpgradeData implements \Magento\Framework\Setup\UpgradeDataInterface
             $this->upgradeTo_212($setup);
         }
         if(version_compare($context->getVersion(), '2.2.0', '<')) {
-            $this->upgradeTo_220($setup);
+            if($context->getVersion() != '2.1.3.6'){
+                $this->upgradeTo_220($setup);
+            }
         }
         if(version_compare($context->getVersion(), '2.2.23', '<')) {
             $this->upgradeTo_2223($setup);

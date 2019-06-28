@@ -39,6 +39,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     const CONFIG_PROXY_ENABLE_LANDING_PAGE_ROUTE = 'hawksearch_proxy/proxy/enable_hawk_landing_pages';
     const CONFIG_PROXY_CATEGORY_SYNC_CRON_ENABLED = 'hawksearch_proxy/sync/enabled';
     const CONFIG_PROXY_SHOWTABS = 'hawksearch_proxy/proxy/show_tabs';
+    const CONFIG_PROXY_SHOW_TOPTEXT = 'hawksearch_proxy/proxy/show_toptext';
     const CONFIG_PROXY_MODE = 'hawksearch_proxy/proxy/mode';
     const CONFIG_PROXY_TYPE_LABEL = 'hawksearch_proxy/proxy/type_label';
     const CONFIG_PROXY_SHOW_TYPE_LABELS = 'hawksearch_proxy/proxy/show_type_labels';
@@ -1059,6 +1060,18 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             }
         }
         return true;
+    }
+
+    public function getTopText() {
+        if($this->getConfigurationData(self::CONFIG_PROXY_SHOW_TOPTEXT)){
+            if (empty($this->hawkData)) {
+                $this->fetchResponse();
+            }
+            if(isset($this->hawkData->Data->TopText)) {
+                return $this->hawkData->Data->TopText;
+            }
+        }
+        return '';
     }
 
     public function getEnableCustomSearchRoute()
