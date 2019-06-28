@@ -92,7 +92,7 @@ class Html
 
     public function getTopText()
     {
-        return $this->helper->getResultData()->Data->TopText;
+        return $this->helper->getTopText();
     }
 
     public function getRelated()

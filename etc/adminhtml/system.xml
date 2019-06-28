@@ -190,6 +190,11 @@
                     <label>Result Type</label>
                     <comment>Default is 'item'</comment>
                 </field>
+                <field id="show_toptext" type="select" showInStore="1" sortOrder="120">
+                    <label>Show Top Text</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Alternate results notice</comment>
+                </field>
                 <field id="show_tabs" type="select" showInDefault="0" showInWebsite="0"
                        showInStore="1" sortOrder="120">
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>

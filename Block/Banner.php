@@ -43,4 +43,7 @@ class Banner extends Template {
             }
         }
 	}
+    public function getTopText() {
+        return $this->helper->getTopText();
+    }
 }
