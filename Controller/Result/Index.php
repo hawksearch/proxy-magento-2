@@ -53,13 +53,13 @@ class Index extends \Magento\CatalogSearch\Controller\Result\Index
             $this->_view->getLayout()->unsetElement('page.main.title');
             $this->_view->getPage()->getConfig()->setRobots($robots);
             $this->_view->renderLayout();
-        } elseif (!empty($tab) && $tab !== $this->hawkHelper->getResultType()) {
+        } elseif (!empty($tab) && $tab !== $this->hawkHelper->getResultType() && $this->hawkHelper->getShowTabs()) {
             $this->_view->loadLayout('hawksearch_proxy_tabbed');
             $this->_view->getPage()->getConfig()->setRobots($robots);
             $this->_view->renderLayout();
         } else {
             // if no products, then load tabbed
-            if ($this->hawkHelper->getProductCollection() == null) {
+            if ($this->hawkHelper->getProductCollection() == null && $this->hawkHelper->getShowTabs()) {
                 $this->_view->loadLayout('hawksearch_proxy_tabbed');
             } else {
                 $this->_view->loadLayout();

@@ -34,12 +34,16 @@ class Banner extends Template {
         $resultData = $this->helper->getResultData()->Data;
         if(isset($resultData->Merchandising) && isset($resultData->Merchandising->Items)) {
             foreach($resultData->Merchandising->Items as $banner) {
-                $this->setData($this->_underscore($banner->Zone), $banner->Html);
+                if(isset($banner) && property_exists($banner, 'Zone') && property_exists($banner, 'Html')) {
+                    $this->setData($this->_underscore($banner->Zone), $banner->Html);
+                }
             }
         }
         if(isset($resultData->FeaturedItems) && isset($resultData->FeaturedItems->Items)) {
             foreach($this->helper->getResultData()->Data->FeaturedItems->Items->Items as $banner) {
-                $this->setData($this->_underscore($banner->Zone), $banner->Html);
+                if(isset($banner) && property_exists($banner, 'Zone') && property_exists($banner, 'Html')) {
+                    $this->setData($this->_underscore($banner->Zone), $banner->Html);
+                }
             }
         }
 	}
