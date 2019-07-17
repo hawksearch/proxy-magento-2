@@ -205,6 +205,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                 break;
             case 'catalogsearch_result':
                 if ($this->getConfigurationData('hawksearch_proxy/proxy/manage_search')) {
+                    if(isset($params['lpurl'])) {
+                        unset($params['lpurl']);
+                    }
                     $this->setUri($params);
                 }
                 break;
