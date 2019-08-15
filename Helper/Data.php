@@ -47,6 +47,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     const LP_CACHE_KEY = 'hawk_landing_pages';
     const LOCK_FILE_NAME = 'hawkcategorysync.lock';
     const CONFIG_PROXY_META_ROBOTS = 'hawksearch_proxy/proxy/meta_robots';
+    const RECS_URL_FORMAT = 'hawksearch_proxy/general/recs_url_%s';
 
     protected $_syncingExceptions = [];
 
@@ -295,7 +296,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     public function getApiUrl()
     {
-        $apiUrl = $this->getConfigurationData(sprintf('hawksearch_proxy/proxy/tracking_url_%s', $this->getMode()));
+        $apiUrl = $this->getConfigurationData(sprintf('hawksearch_proxy/general/tracking_url_%s', $this->getMode()));
         $apiUrl = preg_replace('|^http://|', 'https://', $apiUrl);
         if ('/' == substr($apiUrl, -1)) {
             return $apiUrl . 'api/v3/';
@@ -341,9 +342,14 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         return $this->hawkData->Data->Facets;
     }
 
+    public function getRecsUrl() {
+        $recsUrl = $this->getConfigurationData(sprintf(self::RECS_URL_FORMAT, $this->getMode()));
+        return rtrim($recsUrl, "/") . "/";
+    }
+
     public function getTrackingUrl()
     {
-        $trackingUrl = $this->getConfigurationData(sprintf('hawksearch_proxy/proxy/tracking_url_%s', $this->getMode()));
+        $trackingUrl = $this->getConfigurationData(sprintf('hawksearch_proxy/general/tracking_url_%s', $this->getMode()));
         if ('/' == substr($trackingUrl, -1)) {
             return $trackingUrl . 'sites/' . $this->getEngineName();
         }
@@ -352,7 +358,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     public function getTrackingPixelUrl($args)
     {
-        $trackingUrl = $this->getConfigurationData(sprintf('hawksearch_proxy/proxy/tracking_url_%s', $this->getMode()));
+        $trackingUrl = $this->getConfigurationData(sprintf('hawksearch_proxy/general/tracking_url_%s', $this->getMode()));
         if ('/' == substr($trackingUrl, -1)) {
             return $trackingUrl . 'sites/_hawk/hawkconversion.aspx?' . http_build_query($args);
         }

@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2017 Hawksearch (www.hawksearch.com) - All Rights Reserved
+ * Copyright (c) 2019 Hawksearch (www.hawksearch.com) - All Rights Reserved
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -18,41 +18,47 @@
     (function (HawkSearch) {
         HawkSearch.BaseUrl = '<?php echo $block->getBaseUrl(); ?>';
         HawkSearch.TrackingUrl = '<?php echo $block->getTrackingUrl(); ?>';
+        HawkSearch.RecommenderUrl = '<?php echo $block->getRecommenderUrl(); ?>';
+        HawkSearch.ClientGuid = '<?php echo $block->getTrackingKey(); ?>';
         if ('http:' == document.location.protocol) {
             HawkSearch.BaseUrl = HawkSearch.BaseUrl.replace('https://', 'http://');
             HawkSearch.TrackingUrl = HawkSearch.TrackingUrl.replace('https://', 'http://');
+            HawkSearch.RecommenderUrl = HawkSearch.RecommenderUrl.replace('https://', 'http://');
         }
         if ('https:' == document.location.protocol) {
             HawkSearch.BaseUrl = HawkSearch.BaseUrl.replace('http://', 'https://');
             HawkSearch.TrackingUrl = HawkSearch.TrackingUrl.replace('http://', 'https://');
+            HawkSearch.RecommenderUrl = HawkSearch.RecommenderUrl.replace('http://', 'https://');
         }
     }(window.HawkSearch = window.HawkSearch || {}));
 
     require(["jquery", "hawksearch" ], function ($) {
-        HawkSearch.initAutoSuggest = function () {
-            <?php foreach($block->getSearchBoxes() as $sbid) : ?>
+        <?php foreach($block->getSearchBoxes() as $sbid) : ?>
             HawkSearch.suggestInit('#<?php echo $sbid; ?>', {
                 lookupUrlPrefix: HawkSearch.TrackingUrl + '<?php echo $block->getAutosuggestParams() ?>',
                 hiddenDivName: '<?php echo $block->getHiddenDivName() ?>',
                 isAutoWidth: true
             });
-            <?php endforeach; ?>
+        <?php endforeach; ?>
 
-            HawkSearch.bindClickTracking = function(data) {
-                var items = $('#hawkitemlist');
-                for(var row in data) {
-                    items.find('a[href="' + data[row]["url"] + '"]').click({tid:data[row]["tid"], idx:data[row]["i"], sku:data[row]["sku"]}, function(e) {
-                        return HawkSearch.link(e, e.data.tid, e.data.idx, e.data.sku, 0);
-                    });
-                }
-            };
-            HawkSearch.origProcessFacets = HawkSearch.processFacets;
-            HawkSearch.processFacets = function(hash, json, queryGuid, backbutton) {
-                HawkSearch.origProcessFacets(hash, json, queryGuid, backbutton);
-                var data = $(json.html).find('#hawktrackingdata').data('tracking');
-                HawkSearch.bindClickTracking(data);
-            };
-            HawkSearch.bindClickTracking($(document).find('#hawktrackingdata').data('tracking'));
+        HawkSearch.bindClickTracking = function(data) {
+            var items = $('#hawkitemlist');
+            for(var row in data) {
+                    items.find('a[href="' + data[row]["url"] + '"]').click({
+                        tid: data[row]["tid"],
+                        idx: data[row]["i"],
+                        sku: data[row]["sku"]
+                    }, function (e) {
+                    return HawkSearch.link(e, e.data.tid, e.data.idx, e.data.sku, 0);
+                });
+            }
         };
+        HawkSearch.origProcessFacets = HawkSearch.processFacets;
+        HawkSearch.processFacets = function(hash, json, queryGuid, backbutton) {
+            HawkSearch.origProcessFacets(hash, json, queryGuid, backbutton);
+            var data = $(json.html).find('#hawktrackingdata').data('tracking');
+            HawkSearch.bindClickTracking(data);
+        };
+        HawkSearch.bindClickTracking($(document).find('#hawktrackingdata').data('tracking'));
     });
 </script>
