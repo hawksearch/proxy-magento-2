@@ -23,6 +23,11 @@ class Footer extends \Magento\Framework\View\Element\Template
         $this->helper = $helper;
     }
 
+    public function getHawkUrl()
+    {
+        return $this->helper->getHawkUrl();
+    }
+
     public function getBaseUrl()
     {
         return $this->helper->getBaseUrl();

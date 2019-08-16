@@ -17,16 +17,19 @@
 <script type="text/javascript">
     (function (HawkSearch) {
         HawkSearch.BaseUrl = '<?php echo $block->getBaseUrl(); ?>';
+        HawkSearch.HawkUrl = '<?php echo $block->getHawkUrl(); ?>';
         HawkSearch.TrackingUrl = '<?php echo $block->getTrackingUrl(); ?>';
         HawkSearch.RecommenderUrl = '<?php echo $block->getRecommenderUrl(); ?>';
         HawkSearch.ClientGuid = '<?php echo $block->getTrackingKey(); ?>';
         if ('http:' == document.location.protocol) {
             HawkSearch.BaseUrl = HawkSearch.BaseUrl.replace('https://', 'http://');
+            HawkSearch.HawkUrl = HawkSearch.HawkUrl.replace('https://', 'http://');
             HawkSearch.TrackingUrl = HawkSearch.TrackingUrl.replace('https://', 'http://');
             HawkSearch.RecommenderUrl = HawkSearch.RecommenderUrl.replace('https://', 'http://');
         }
         if ('https:' == document.location.protocol) {
             HawkSearch.BaseUrl = HawkSearch.BaseUrl.replace('http://', 'https://');
+            HawkSearch.HawkUrl = HawkSearch.HawkUrl.replace('http://', 'https://');
             HawkSearch.TrackingUrl = HawkSearch.TrackingUrl.replace('http://', 'https://');
             HawkSearch.RecommenderUrl = HawkSearch.RecommenderUrl.replace('http://', 'https://');
         }

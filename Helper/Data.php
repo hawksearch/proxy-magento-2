@@ -47,7 +47,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     const LP_CACHE_KEY = 'hawk_landing_pages';
     const LOCK_FILE_NAME = 'hawkcategorysync.lock';
     const CONFIG_PROXY_META_ROBOTS = 'hawksearch_proxy/proxy/meta_robots';
-    const RECS_URL_FORMAT = 'hawksearch_proxy/general/recs_url_%s';
+    const CONFIG_RECS_URL_FORMAT = 'hawksearch_proxy/general/recs_url_%s';
+    const CONFIG_HAWK_URL_FORMAT = 'hawksearch_proxy/general/hawk_url_%s';
     const CONFIG_RECS_ENABLE = 'hawksearch_proxy/recs/enabled';
 
     protected $_syncingExceptions = [];
@@ -251,7 +252,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             unset($args['lpurl']);
         }
 
-        $this->uri = $this->getTrackingUrl() . '/?' . http_build_query($args);
+        $this->uri = $this->getHawkUrlWithEngine() . '/?' . http_build_query($args);
     }
 
     private function fetchResponse()
@@ -297,7 +298,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     public function getApiUrl()
     {
-        $apiUrl = $this->getConfigurationData(sprintf('hawksearch_proxy/general/tracking_url_%s', $this->getMode()));
+        $apiUrl = $this->getConfigurationData(sprintf('hawksearch_proxy/general/hawk_url_%s', $this->getMode()));
         $apiUrl = preg_replace('|^http://|', 'https://', $apiUrl);
         if ('/' == substr($apiUrl, -1)) {
             return $apiUrl . 'api/v3/';
@@ -343,10 +344,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         return $this->hawkData->Data->Facets;
     }
 
-    public function getRecsUrl() {
-        $recsUrl = $this->getConfigurationData(sprintf(self::RECS_URL_FORMAT, $this->getMode()));
-        return rtrim($recsUrl, "/") . "/";
-    }
 
     public function getTrackingUrl()
     {
@@ -1174,6 +1171,22 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function getRecommendationsActive()
     {
         return $this->getConfigurationData(self::CONFIG_RECS_ENABLE);
+    }
+
+    public function getRecsUrl() {
+        $recsUrl = $this->getConfigurationData(sprintf(self::CONFIG_RECS_URL_FORMAT, $this->getMode()));
+        return rtrim($recsUrl, "/") . "/";
+    }
+
+    public function getHawkUrl()
+    {
+        $hawkUrl = $this->getConfigurationData(sprintf(self::CONFIG_HAWK_URL_FORMAT, $this->getMode()));
+        return rtrim($hawkUrl, "/") . "/";
+    }
+
+    public function getHawkUrlWithEngine()
+    {
+        return sprintf('%s%s%s', $this->getHawkUrl(), 'sites/', $this->getEngineName());
     }
 }
 
