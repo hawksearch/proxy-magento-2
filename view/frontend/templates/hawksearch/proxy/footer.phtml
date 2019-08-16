@@ -12,7 +12,7 @@
  */
 /** @var Magento\Catalog\Model\ResourceModel\Product\Attribute\Collection $pac */
 
-/** @var HawkSearch\Proxy\Block\Footer $block */
+/** @var $block HawkSearch\Proxy\Block\Footer */
 ?>
 <script type="text/javascript">
     (function (HawkSearch) {
@@ -61,4 +61,21 @@
         };
         HawkSearch.bindClickTracking($(document).find('#hawktrackingdata').data('tracking'));
     });
+    <?php if($block->getRecommendationsActive()) : ?>
+    require(["jquery", "hawksearch", "domReady"], function ($) {
+        let s = 'script[type="text/x-hawk-recs"]';
+        let nodes = $(s);
+        if (typeof nodes[0] === 'undefined') {
+            // the default case
+            HawkSearch.Tracking.track("pageload", {pageType: "custom"});
+        } else {
+            // only process the first node
+            let data = JSON.parse(nodes[0].textContent);
+            if(data.hasOwnProperty("pageload")) {
+                HawkSearch.Context.add("uniqueid", data.pageload.context.uniqueId);
+            }
+            HawkSearch.Tracking.track("pageload", {pageType: data.pageload.pageType});
+        }
+    });
+    <?php endif; ?>
 </script>

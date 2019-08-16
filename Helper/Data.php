@@ -48,6 +48,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     const LOCK_FILE_NAME = 'hawkcategorysync.lock';
     const CONFIG_PROXY_META_ROBOTS = 'hawksearch_proxy/proxy/meta_robots';
     const RECS_URL_FORMAT = 'hawksearch_proxy/general/recs_url_%s';
+    const CONFIG_RECS_ENABLE = 'hawksearch_proxy/recs/enabled';
 
     protected $_syncingExceptions = [];
 
@@ -1168,6 +1169,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                 return $this->isManageCategories();
         }
         return false;
+    }
+
+    public function getRecommendationsActive()
+    {
+        return $this->getConfigurationData(self::CONFIG_RECS_ENABLE);
     }
 }
 

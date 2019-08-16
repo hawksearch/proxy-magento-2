@@ -58,4 +58,9 @@ class Footer extends \Magento\Framework\View\Element\Template
     {
         return $this->helper->getConfigurationData('hawksearch_proxy/proxy/autocomplete_query_params');
     }
+
+    public function getRecommendationsActive()
+    {
+        return $this->helper->getRecommendationsActive();
+    }
 }

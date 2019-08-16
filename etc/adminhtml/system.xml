@@ -73,8 +73,7 @@
                     <label>HawkSearch Recommendations URL (Production)</label>
                 </field>
             </group>
-            <group id="proxy" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1"
-                   showInStore="1">
+            <group id="proxy" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Proxy Module Settings</label>
                 <field id="engine_name" translate="label comment" type="text" showInDefault="0" showInWebsite="0"
                        showInStore="1" sortOrder="10">
@@ -230,6 +229,13 @@
                     <depends>
                         <field id="show_type_labels">1</field>
                     </depends>
+                </field>
+            </group>
+            <group id="recs" translate="label" type="text" sortOrder="11" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Recommendations Settings</label>
+                <field id="enabled" translate="label" type="select" showInStore="1" showInWebsite="1" showInDefault="1" sortOrder="1">
+                    <label>Enabled</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
             </group>
             <group id="sync" translate="label" type="text" sortOrder="15" showInDefault="1" showInWebsite="1"

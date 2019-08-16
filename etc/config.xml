@@ -35,6 +35,9 @@
         <show_tabs>0</show_tabs>
         <meta_robots>NOINDEX,FOLLOW</meta_robots>
       </proxy>
+      <recs>
+        <enabled>1</enabled>
+      </recs>
       <sync>
         <cron_string>0 0 * * *</cron_string>
       </sync>
