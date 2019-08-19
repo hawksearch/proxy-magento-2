@@ -49,6 +49,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     const CONFIG_PROXY_META_ROBOTS = 'hawksearch_proxy/proxy/meta_robots';
     const CONFIG_RECS_URL_FORMAT = 'hawksearch_proxy/general/recs_url_%s';
     const CONFIG_HAWK_URL_FORMAT = 'hawksearch_proxy/general/hawk_url_%s';
+    const CONFIG_TRACK_URL_FORMAT = 'hawksearch_proxy/general/tracking_url_%s';
     const CONFIG_RECS_ENABLE = 'hawksearch_proxy/recs/enabled';
 
     protected $_syncingExceptions = [];
@@ -342,16 +343,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             $this->fetchResponse();
         }
         return $this->hawkData->Data->Facets;
-    }
-
-
-    public function getTrackingUrl()
-    {
-        $trackingUrl = $this->getConfigurationData(sprintf('hawksearch_proxy/general/tracking_url_%s', $this->getMode()));
-        if ('/' == substr($trackingUrl, -1)) {
-            return $trackingUrl . 'sites/' . $this->getEngineName();
-        }
-        return $trackingUrl . '/sites/' . $this->getEngineName();
     }
 
     public function getTrackingPixelUrl($args)
@@ -1188,5 +1179,15 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return sprintf('%s%s%s', $this->getHawkUrl(), 'sites/', $this->getEngineName());
     }
-}
 
+    public function getTrackingUrl()
+    {
+        $hawkUrl = $this->getConfigurationData(sprintf(self::CONFIG_TRACK_URL_FORMAT, $this->getMode()));
+        return rtrim($hawkUrl, "/") . "/";
+    }
+
+    public function getTrackingUrlWithEngine()
+    {
+        return sprintf('%s%s%s', $this->getTrackingUrl(), 'sites/', $this->getEngineName());
+    }
+}

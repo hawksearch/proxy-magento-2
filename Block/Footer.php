@@ -28,6 +28,11 @@ class Footer extends \Magento\Framework\View\Element\Template
         return $this->helper->getHawkUrl();
     }
 
+    public function getHawkUrlWithEngine()
+    {
+        return $this->helper->getHawkUrlWithEngine();
+    }
+
     public function getBaseUrl()
     {
         return $this->helper->getBaseUrl();
@@ -35,7 +40,7 @@ class Footer extends \Magento\Framework\View\Element\Template
 
     public function getTrackingUrl()
     {
-        return $this->helper->getTrackingUrl();
+        return rtrim($this->helper->getTrackingUrl(), "/");
     }
 
     public function getRecommenderUrl()

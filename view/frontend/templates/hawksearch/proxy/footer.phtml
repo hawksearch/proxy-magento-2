@@ -17,8 +17,8 @@
 <script type="text/javascript">
     (function (HawkSearch) {
         HawkSearch.BaseUrl = '<?php echo $block->getBaseUrl(); ?>';
-        HawkSearch.HawkUrl = '<?php echo $block->getHawkUrl(); ?>';
-        HawkSearch.TrackingUrl = '<?php echo $block->getTrackingUrl(); ?>';
+        HawkSearch.HawkUrl = '<?php echo $block->getHawkUrlWithEngine(); ?>'; // should be http://dev-aesearch.americaneagle.com/sites/aris
+        HawkSearch.TrackingUrl = '<?php echo $block->getTrackingUrl(); ?>'; // should be http://dev-tracking.americaneagle.com/
         HawkSearch.RecommenderUrl = '<?php echo $block->getRecommenderUrl(); ?>';
         HawkSearch.ClientGuid = '<?php echo $block->getTrackingKey(); ?>';
         if ('http:' == document.location.protocol) {
@@ -38,7 +38,7 @@
     require(["jquery", "hawksearch" ], function ($) {
         <?php foreach($block->getSearchBoxes() as $sbid) : ?>
             HawkSearch.suggestInit('#<?php echo $sbid; ?>', {
-                lookupUrlPrefix: HawkSearch.TrackingUrl + '<?php echo $block->getAutosuggestParams() ?>',
+                lookupUrlPrefix: HawkSearch.HawkUrl + '<?php echo $block->getAutosuggestParams() ?>',
                 hiddenDivName: '<?php echo $block->getHiddenDivName() ?>',
                 isAutoWidth: true
             });
