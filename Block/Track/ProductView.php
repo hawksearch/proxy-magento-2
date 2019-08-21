@@ -1,6 +1,6 @@
 <?php
 
-namespace HawkSearch\Proxy\Block\Recs;
+namespace HawkSearch\Proxy\Block\Track;
 
 
 use Magento\Framework\View\Element\Template;
@@ -26,7 +26,7 @@ class ProductView extends \Magento\Framework\View\Element\Template
         return json_encode([
             'pageload' => [
                 'context' => [
-                    'uniqueId' => $this->getCurrentProductSku()
+                    'uniqueid' => $this->getCurrentProductSku()
                 ],
                 'pageType' => 'item'
             ]

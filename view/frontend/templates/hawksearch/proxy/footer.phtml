@@ -63,21 +63,25 @@
             HawkSearch.bindClickTracking(data);
         };
         HawkSearch.bindClickTracking($(document).find('#hawktrackingdata').data('tracking'));
-    });
-    <?php if($block->getRecommendationsActive()) : ?>
-    require(["jquery", "hawksearch", "domReady"], function ($) {
-        let s = 'script[type="text/x-hawk-recs"]';
-        let nodes = $(s);
-        if (typeof nodes[0] === 'undefined') {
-            // the default case
-            HawkSearch.Tracking.track("pageload", {pageType: "custom"});
-        } else {
-            // only process the first node
-            let data = JSON.parse(nodes[0].textContent);
-            if(data.hasOwnProperty("pageload")) {
-                HawkSearch.Context.add("uniqueid", data.pageload.context.uniqueId);
+
+        <?php if($block->getRecommendationsActive()) : ?>
+        $(document).on('hawksearch:track', function(e, data) {
+            if(data.pageload.hasOwnProperty("context")) {
+                for(key in data.pageload.context) {
+                    HawkSearch.Context.add(key, data.pageload.context[key]);
+                }
             }
             HawkSearch.Tracking.track("pageload", {pageType: data.pageload.pageType});
+        });
+        <?php endif; ?>
+    });
+    <?php if($block->getRecommendationsActive()) : ?>
+    require(["jquery", "hawksearch", "domReady"], function ($){
+        let s = 'script[type="text/x-hawk-track"]';
+        let nodes = $(s);
+        if (typeof nodes[0] !== 'undefined') {
+            let data = JSON.parse(nodes[0].textContent);
+            $(document).trigger('hawksearch:track', data);
         }
     });
     <?php endif; ?>

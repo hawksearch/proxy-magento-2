@@ -16,7 +16,7 @@
       xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <body>
         <referenceContainer name="before.body.end">
-            <block class="HawkSearch\Proxy\Block\Track\ProductView" name="hawksearch_track_product_view" template="hawksearch/proxy/track/product_view.phtml"/>
+            <block class="HawkSearch\Proxy\Block\Track\CmsPageView" name="hawksearch_track_cms_page_view" template="hawksearch/proxy/track/cms_page_view.phtml"/>
         </referenceContainer>
     </body>
 </page>
