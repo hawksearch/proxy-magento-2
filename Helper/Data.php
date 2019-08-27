@@ -51,6 +51,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     const CONFIG_HAWK_URL_FORMAT = 'hawksearch_proxy/general/hawk_url_%s';
     const CONFIG_TRACK_URL_FORMAT = 'hawksearch_proxy/general/tracking_url_%s';
     const CONFIG_RECS_ENABLE = 'hawksearch_proxy/recs/enabled';
+    const CONFIG_RECS_TRACKING_VERSION = 'hawksearch_proxy/recs/tracking_version';
 
     protected $_syncingExceptions = [];
 
@@ -1189,5 +1190,10 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function getTrackingUrlWithEngine()
     {
         return sprintf('%s%s%s', $this->getTrackingUrl(), 'sites/', $this->getEngineName());
+    }
+
+    public function getTrackingVersion()
+    {
+        return $this->getConfigurationData(self::CONFIG_RECS_TRACKING_VERSION);
     }
 }

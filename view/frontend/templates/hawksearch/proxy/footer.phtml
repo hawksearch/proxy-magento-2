@@ -15,10 +15,11 @@
 /** @var $block HawkSearch\Proxy\Block\Footer */
 ?>
 <script type="text/javascript">
+    <?php if($block->isTrackingV2()): ?>
     (function (HawkSearch) {
         HawkSearch.BaseUrl = '<?php echo $block->getBaseUrl(); ?>';
-        HawkSearch.HawkUrl = '<?php echo $block->getHawkUrlWithEngine(); ?>'; // should be http://dev-aesearch.americaneagle.com/sites/aris
-        HawkSearch.TrackingUrl = '<?php echo $block->getTrackingUrl(); ?>'; // should be http://dev-tracking.americaneagle.com/
+        HawkSearch.HawkUrl = '<?php echo $block->getHawkUrlWithEngine(); ?>';
+        HawkSearch.TrackingUrl = '<?php echo $block->getTrackingUrl(); ?>';
         HawkSearch.RecommenderUrl = '<?php echo $block->getRecommenderUrl(); ?>';
         HawkSearch.ClientGuid = '<?php echo $block->getTrackingKey(); ?>';
         if ('http:' == document.location.protocol) {
@@ -34,6 +35,20 @@
             HawkSearch.RecommenderUrl = HawkSearch.RecommenderUrl.replace('http://', 'https://');
         }
     }(window.HawkSearch = window.HawkSearch || {}));
+    <?php else: ?>
+    (function (HawkSearch) {
+        HawkSearch.BaseUrl = '<?php echo $block->getBaseUrl(); ?>';
+        HawkSearch.TrackingUrl = '<?php echo $block->getHawkUrlWithEngine(); ?>';
+        if ('http:' == document.location.protocol) {
+            HawkSearch.BaseUrl = HawkSearch.BaseUrl.replace('https://', 'http://');
+            HawkSearch.TrackingUrl = HawkSearch.TrackingUrl.replace('https://', 'http://');
+        }
+        if ('https:' == document.location.protocol) {
+            HawkSearch.BaseUrl = HawkSearch.BaseUrl.replace('http://', 'https://');
+            HawkSearch.TrackingUrl = HawkSearch.TrackingUrl.replace('http://', 'https://');
+        }
+    }(window.HawkSearch = window.HawkSearch || {}));
+    <?php endif; ?>
 
     require(["jquery", "hawksearch" ], function ($) {
         <?php foreach($block->getSearchBoxes() as $sbid) : ?>

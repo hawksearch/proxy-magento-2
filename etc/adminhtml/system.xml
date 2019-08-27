@@ -248,9 +248,13 @@
             </group>
             <group id="recs" translate="label" type="text" sortOrder="11" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Recommendations Settings</label>
-                <field id="enabled" translate="label" type="select" showInStore="1" showInWebsite="1" showInDefault="1" sortOrder="1">
+                <field id="enabled" translate="label" type="select" showInStore="1" showInWebsite="1" showInDefault="1" sortOrder="10">
                     <label>Enabled</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="tracking_version" type="select" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="20">
+                    <label>Tracking Version</label>
+                    <source_model>HawkSearch\Proxy\Model\System\Config\Source\TrackingVersion</source_model>
                 </field>
             </group>
             <group id="sync" translate="label" type="text" sortOrder="15" showInDefault="1" showInWebsite="1"

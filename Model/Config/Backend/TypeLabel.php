@@ -39,7 +39,7 @@ class TypeLabel extends \Magento\Config\Model\Config\Backend\Serialized\ArraySer
             /** @var \HawkSearch\Proxy\Helper\Data $helper */
             $helper = $this->dataFactory->create();
             $client = new \Zend_Http_Client();
-            $client->setUri($helper->getTrackingUrl() . '/?' . http_build_query(['q' => '', 'hawktabs' => 'json', 'it' => 'all', 'output' => 'custom']));
+            $client->setUri($helper->getHawkUrlWithEngine() . '/?' . http_build_query(['q' => '', 'hawktabs' => 'json', 'it' => 'all', 'output' => 'custom']));
             $response = $client->request();
             if($response->getStatus() != 200) {
                 return;

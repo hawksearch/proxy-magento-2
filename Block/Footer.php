@@ -9,6 +9,7 @@
 namespace HawkSearch\Proxy\Block;
 
 
+use HawkSearch\Proxy\Model\System\Config\Source\TrackingVersion;
 use Magento\Framework\View\Element\Template;
 
 class Footer extends \Magento\Framework\View\Element\Template
@@ -72,5 +73,9 @@ class Footer extends \Magento\Framework\View\Element\Template
     public function getRecommendationsActive()
     {
         return $this->helper->getRecommendationsActive();
+    }
+
+    public function isTrackingV2() {
+        return $this->helper->getTrackingVersion() == TrackingVersion::VERSION_TWO ? true : false;
     }
 }
