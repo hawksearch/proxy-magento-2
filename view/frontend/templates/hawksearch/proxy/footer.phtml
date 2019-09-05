@@ -88,6 +88,14 @@
             }
             HawkSearch.Tracking.track("pageload", {pageType: data.pageload.pageType});
         });
+        $(document).on('ajax:addToCart', function(e, data) {
+            HawkSearch.Tracking.track("add2cart", {
+                uniqueId: data.sku,
+                price: data.form.find("#price").val(),
+                quantity: data.form.find("#qty").val(),
+                currency: data.form.find("#currency").val()
+            });
+        });
         <?php endif; ?>
     });
     <?php if($block->getRecommendationsActive()) : ?>
