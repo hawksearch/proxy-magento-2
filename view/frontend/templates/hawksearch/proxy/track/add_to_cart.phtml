@@ -10,7 +10,12 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
+
+$atcData = $block->getAddToCartJsonData();
+if(empty($atcData)) {
+   return;
+}
 ?>
 <script type="text/x-hawk-track">
-<?php /** @var $block HawkSearch\Proxy\Block\Track\ProductView */ echo $block->getRecsJsonData(); ?>
+<?php /** @var $block HawkSearch\Proxy\Block\Track\AddToCart */ echo $atcData; ?>
 </script>

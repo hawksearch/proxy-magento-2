@@ -21,21 +21,20 @@ class ProductView extends \Magento\Framework\View\Element\Template
         $this->coreRegistry = $coreRegistry;
     }
 
-    public function getRecsPageloadJsonData()
+    public function getRecsJsonData()
     {
+        $product = $this->coreRegistry->registry('current_product');
         return json_encode([
             'pageload' => [
                 'context' => [
-                    'uniqueid' => $this->getCurrentProductSku()
+                    'uniqueid' => $product->getSku()
                 ],
                 'pageType' => 'item'
+            ],
+            'addToCart' => [
+                'price' => $product->getPrice(),
+                'currency' => $product->getStore()->getCurrentCurrency()->getCurrencyCode()
             ]
         ]);
-    }
-
-    private function getCurrentProductSku()
-    {
-        $product = $this->coreRegistry->registry('current_product');
-        return $product->getSku();
     }
 }

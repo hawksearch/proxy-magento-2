@@ -23,6 +23,10 @@
         <referenceContainer name="before.body.end">
             <block class="HawkSearch\Proxy\Block\Footer" name="hawksearch_proxyfooter"
                    as="hawksearch_proxyfooter" template="HawkSearch_Proxy::hawksearch/proxy/footer.phtml"/>
+            <block class="HawkSearch\Proxy\Block\Track\AddToCart"
+                   ifconfig="hawksearch_proxy/recs/enabled"
+                   name="hawksearch_track_add_to_cart"
+                   template="hawksearch/proxy/track/add_to_cart.phtml" />
         </referenceContainer>
     </body>
 </page>

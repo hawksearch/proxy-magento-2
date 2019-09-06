@@ -80,31 +80,48 @@
         HawkSearch.bindClickTracking($(document).find('#hawktrackingdata').data('tracking'));
 
         <?php if($block->getRecommendationsActive()) : ?>
-        $(document).on('hawksearch:track', function(e, data) {
-            if(data.pageload.hasOwnProperty("context")) {
-                for(key in data.pageload.context) {
-                    HawkSearch.Context.add(key, data.pageload.context[key]);
-                }
+        HawkSearch.getMergedTrackingData = function() {
+            let nodes = $('script[type="text/x-hawk-track"]');
+            let merged = [];
+            for(let i = 0; i < nodes.length; i++) {
+                let data = JSON.parse(nodes[i].textContent);
+                merged = merged.concat(data);
             }
-            HawkSearch.Tracking.track("pageload", {pageType: data.pageload.pageType});
+            return merged;
+        };
+        $(document).on('hawksearch:track', function(e, data) {
+            if(data.hasOwnProperty("pageload") ) {
+                if(data.pageload.hasOwnProperty("context")){
+                    for(key in data.pageload.context) {
+                        HawkSearch.Context.add(key, data.pageload.context[key]);
+                    }
+                }
+                HawkSearch.Tracking.track("pageload", {pageType: data.pageload.pageType});
+            }
+
+            if(data.hasOwnProperty("add2cart")) {
+                HawkSearch.Context.clear();
+                HawkSearch.Tracking.track("add2cart", data.add2cart);
+            }
         });
         $(document).on('ajax:addToCart', function(e, data) {
-            HawkSearch.Tracking.track("add2cart", {
-                uniqueId: data.sku,
-                price: data.form.find("#price").val(),
-                quantity: data.form.find("#qty").val(),
-                currency: data.form.find("#currency").val()
-            });
+            let mergedTrackingData = HawkSearch.getMergedTrackingData();
+            if(mergedTrackingData.length > 0) {
+                HawkSearch.Tracking.track("add2cart", {
+                    uniqueId: data.sku,
+                    price: mergedTrackingData.addToCart.price,
+                    quantity: data.form.find("#qty").val(),
+                    currency: mergedTrackingData.addToCart.currency
+                });
+            }
         });
         <?php endif; ?>
     });
     <?php if($block->getRecommendationsActive()) : ?>
     require(["jquery", "hawksearch", "domReady"], function ($){
-        let s = 'script[type="text/x-hawk-track"]';
-        let nodes = $(s);
-        if (typeof nodes[0] !== 'undefined') {
-            let data = JSON.parse(nodes[0].textContent);
-            $(document).trigger('hawksearch:track', data);
+        let mergedTrackingData = HawkSearch.getMergedTrackingData();
+        if (mergedTrackingData.length > 0) {
+            $(document).trigger('hawksearch:track', mergedTrackingData);
         }
     });
     <?php endif; ?>
