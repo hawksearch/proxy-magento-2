@@ -486,10 +486,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function getHawkResponse($method, $url, $data = null)
     {
         try {
-
             $client = new \Zend_Http_Client();
             $client->setConfig(['timeout' => 60]);
-
 
             $client->setUri($this->getApiUrl() . $url);
             $client->setMethod($method);
