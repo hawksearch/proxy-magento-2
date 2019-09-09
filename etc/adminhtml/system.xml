@@ -210,6 +210,10 @@
                         <field id="show_type_labels">1</field>
                     </depends>
                 </field>
+                <field id="allow_fulltext" showInStore="1" showInWebsite="1" showInDefault="1" type="select" sortOrder="140">
+                    <label>Allow Fulltext Aggregations</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
             </group>
             <group id="sync" translate="label" type="text" sortOrder="15" showInDefault="1" showInWebsite="1"
                    showInStore="1">
