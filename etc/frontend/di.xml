@@ -55,7 +55,6 @@
     <preference for="Magento\CatalogSearch\Block\SearchResult\ListProduct" type="virtualHawkCatalogSearchListProduct" />
     <preference for="Magento\CatalogSearch\Controller\Result\Index" type="HawkSearch\Proxy\Controller\Result\Index" />
     <preference for="Magento\CatalogSearch\Block\Result" type="HawkSearch\Proxy\Block\Result" />
-    <preference for="Magento\Checkout\Block\Onepage\Success" type="HawkSearch\Proxy\Block\OnePage\Success" />
 </config>
 
 

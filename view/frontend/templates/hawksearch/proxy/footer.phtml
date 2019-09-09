@@ -103,6 +103,10 @@
                 HawkSearch.Context.clear();
                 HawkSearch.Tracking.track("add2cart", data.add2cart);
             }
+            if(data.hasOwnProperty("sale")) {
+                HawkSearch.Context.clear();
+                HawkSearch.Tracking.track("sale", data.sale);
+            }
         });
         $(document).on('ajax:addToCart', function(e, data) {
             let mergedTrackingData = HawkSearch.getMergedTrackingData();
