@@ -18,12 +18,20 @@
       <general>
         <enabled>0</enabled>
         <logging_enabled>0</logging_enabled>
+        <hawk_url_develop>http://dev.hawksearch.net/</hawk_url_develop>
+        <hawk_url_staging>http://test.hawksearch.net/</hawk_url_staging>
+        <hawk_url_production>http://manage.hawksearch.com/</hawk_url_production>
+
+        <tracking_url_develop>http://tracking-dev.hawksearch.net/</tracking_url_develop>
+        <tracking_url_staging>http://tracking-test.hawksearch.net/</tracking_url_staging>
+        <tracking_url_production>http://tracking.hawksearch.com/</tracking_url_production>
+
+        <recs_url_develop>http://recs-dev.hawksearch.net/</recs_url_develop>
+        <recs_url_staging>http://recs-test.hawksearch.net/</recs_url_staging>
+        <recs_url_production>http://recs.hawksearch.com/</recs_url_production>
       </general>
       <proxy>
         <mode>develop</mode>
-        <tracking_url_develop>https://dev.hawksearch.net/</tracking_url_develop>
-        <tracking_url_staging>https://test.hawksearch.net/</tracking_url_staging>
-        <tracking_url_production>https://manage.hawksearch.com/</tracking_url_production>
         <search_box_ids>search</search_box_ids>
         <autocomplete_query_params><![CDATA[/?fn=ajax&f=GetSuggestions]]></autocomplete_query_params>
         <hawksearch_include_css>1</hawksearch_include_css>
@@ -32,6 +40,10 @@
         <show_tabs>0</show_tabs>
         <meta_robots>NOINDEX,FOLLOW</meta_robots>
       </proxy>
+      <recs>
+        <enabled>0</enabled>
+        <tracking_version>v2</tracking_version>
+      </recs>
       <sync>
         <cron_string>0 0 * * *</cron_string>
       </sync>

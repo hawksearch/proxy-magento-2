@@ -47,6 +47,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     const LP_CACHE_KEY = 'hawk_landing_pages';
     const LOCK_FILE_NAME = 'hawkcategorysync.lock';
     const CONFIG_PROXY_META_ROBOTS = 'hawksearch_proxy/proxy/meta_robots';
+    const CONFIG_RECS_URL_FORMAT = 'hawksearch_proxy/general/recs_url_%s';
+    const CONFIG_HAWK_URL_FORMAT = 'hawksearch_proxy/general/hawk_url_%s';
+    const CONFIG_TRACK_URL_FORMAT = 'hawksearch_proxy/general/tracking_url_%s';
+    const CONFIG_RECS_ENABLE = 'hawksearch_proxy/recs/enabled';
+    const CONFIG_RECS_TRACKING_VERSION = 'hawksearch_proxy/recs/tracking_version';
 
     protected $_syncingExceptions = [];
 
@@ -249,7 +254,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             unset($args['lpurl']);
         }
 
-        $this->uri = $this->getTrackingUrl() . '/?' . http_build_query($args);
+        $this->uri = $this->getHawkUrlWithEngine() . '/?' . http_build_query($args);
     }
 
     private function fetchResponse()
@@ -295,7 +300,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     public function getApiUrl()
     {
-        $apiUrl = $this->getConfigurationData(sprintf('hawksearch_proxy/proxy/tracking_url_%s', $this->getMode()));
+        $apiUrl = $this->getConfigurationData(sprintf('hawksearch_proxy/general/hawk_url_%s', $this->getMode()));
         $apiUrl = preg_replace('|^http://|', 'https://', $apiUrl);
         if ('/' == substr($apiUrl, -1)) {
             return $apiUrl . 'api/v3/';
@@ -341,18 +346,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         return $this->hawkData->Data->Facets;
     }
 
-    public function getTrackingUrl()
-    {
-        $trackingUrl = $this->getConfigurationData(sprintf('hawksearch_proxy/proxy/tracking_url_%s', $this->getMode()));
-        if ('/' == substr($trackingUrl, -1)) {
-            return $trackingUrl . 'sites/' . $this->getEngineName();
-        }
-        return $trackingUrl . '/sites/' . $this->getEngineName();
-    }
-
     public function getTrackingPixelUrl($args)
     {
-        $trackingUrl = $this->getConfigurationData(sprintf('hawksearch_proxy/proxy/tracking_url_%s', $this->getMode()));
+        $trackingUrl = $this->getConfigurationData(sprintf('hawksearch_proxy/general/tracking_url_%s', $this->getMode()));
         if ('/' == substr($trackingUrl, -1)) {
             return $trackingUrl . 'sites/_hawk/hawkconversion.aspx?' . http_build_query($args);
         }
@@ -490,10 +486,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function getHawkResponse($method, $url, $data = null)
     {
         try {
-
             $client = new \Zend_Http_Client();
             $client->setConfig(['timeout' => 60]);
-
 
             $client->setUri($this->getApiUrl() . $url);
             $client->setMethod($method);
@@ -1163,5 +1157,41 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         }
         return false;
     }
-}
 
+    public function getRecommendationsActive()
+    {
+        return $this->getConfigurationData(self::CONFIG_RECS_ENABLE);
+    }
+
+    public function getRecsUrl() {
+        $recsUrl = $this->getConfigurationData(sprintf(self::CONFIG_RECS_URL_FORMAT, $this->getMode()));
+        return rtrim($recsUrl, "/") . "/";
+    }
+
+    public function getHawkUrl()
+    {
+        $hawkUrl = $this->getConfigurationData(sprintf(self::CONFIG_HAWK_URL_FORMAT, $this->getMode()));
+        return rtrim($hawkUrl, "/") . "/";
+    }
+
+    public function getHawkUrlWithEngine()
+    {
+        return sprintf('%s%s%s', $this->getHawkUrl(), 'sites/', $this->getEngineName());
+    }
+
+    public function getTrackingUrl()
+    {
+        $hawkUrl = $this->getConfigurationData(sprintf(self::CONFIG_TRACK_URL_FORMAT, $this->getMode()));
+        return rtrim($hawkUrl, "/") . "/";
+    }
+
+    public function getTrackingUrlWithEngine()
+    {
+        return sprintf('%s%s%s', $this->getTrackingUrl(), 'sites/', $this->getEngineName());
+    }
+
+    public function getTrackingVersion()
+    {
+        return $this->getConfigurationData(self::CONFIG_RECS_TRACKING_VERSION);
+    }
+}

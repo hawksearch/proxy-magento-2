@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2017 Hawksearch (www.hawksearch.com) - All Rights Reserved
+ * Copyright (c) 2019 Hawksearch (www.hawksearch.com) - All Rights Reserved
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -12,12 +12,33 @@
  */
 /** @var Magento\Catalog\Model\ResourceModel\Product\Attribute\Collection $pac */
 
-/** @var HawkSearch\Proxy\Block\Footer $block */
+/** @var $block HawkSearch\Proxy\Block\Footer */
 ?>
 <script type="text/javascript">
+    <?php if($block->isTrackingV2()): ?>
     (function (HawkSearch) {
         HawkSearch.BaseUrl = '<?php echo $block->getBaseUrl(); ?>';
+        HawkSearch.HawkUrl = '<?php echo $block->getHawkUrlWithEngine(); ?>';
         HawkSearch.TrackingUrl = '<?php echo $block->getTrackingUrl(); ?>';
+        HawkSearch.RecommenderUrl = '<?php echo $block->getRecommenderUrl(); ?>';
+        HawkSearch.ClientGuid = '<?php echo $block->getTrackingKey(); ?>';
+        if ('http:' == document.location.protocol) {
+            HawkSearch.BaseUrl = HawkSearch.BaseUrl.replace('https://', 'http://');
+            HawkSearch.HawkUrl = HawkSearch.HawkUrl.replace('https://', 'http://');
+            HawkSearch.TrackingUrl = HawkSearch.TrackingUrl.replace('https://', 'http://');
+            HawkSearch.RecommenderUrl = HawkSearch.RecommenderUrl.replace('https://', 'http://');
+        }
+        if ('https:' == document.location.protocol) {
+            HawkSearch.BaseUrl = HawkSearch.BaseUrl.replace('http://', 'https://');
+            HawkSearch.HawkUrl = HawkSearch.HawkUrl.replace('http://', 'https://');
+            HawkSearch.TrackingUrl = HawkSearch.TrackingUrl.replace('http://', 'https://');
+            HawkSearch.RecommenderUrl = HawkSearch.RecommenderUrl.replace('http://', 'https://');
+        }
+    }(window.HawkSearch = window.HawkSearch || {}));
+    <?php else: ?>
+    (function (HawkSearch) {
+        HawkSearch.BaseUrl = '<?php echo $block->getBaseUrl(); ?>';
+        HawkSearch.TrackingUrl = '<?php echo $block->getHawkUrlWithEngine(); ?>';
         if ('http:' == document.location.protocol) {
             HawkSearch.BaseUrl = HawkSearch.BaseUrl.replace('https://', 'http://');
             HawkSearch.TrackingUrl = HawkSearch.TrackingUrl.replace('https://', 'http://');
@@ -27,32 +48,85 @@
             HawkSearch.TrackingUrl = HawkSearch.TrackingUrl.replace('http://', 'https://');
         }
     }(window.HawkSearch = window.HawkSearch || {}));
+    <?php endif; ?>
 
     require(["jquery", "hawksearch" ], function ($) {
-        HawkSearch.initAutoSuggest = function () {
-            <?php foreach($block->getSearchBoxes() as $sbid) : ?>
+        <?php foreach($block->getSearchBoxes() as $sbid) : ?>
             HawkSearch.suggestInit('#<?php echo $sbid; ?>', {
-                lookupUrlPrefix: HawkSearch.TrackingUrl + '<?php echo $block->getAutosuggestParams() ?>',
+                lookupUrlPrefix: <?php echo $block->getRecommendationsActive() ? 'HawkSearch.HawkUrl' : 'HawkSearch.TrackingUrl'; ?> + '<?php echo $block->getAutosuggestParams() ?>',
                 hiddenDivName: '<?php echo $block->getHiddenDivName() ?>',
                 isAutoWidth: true
             });
-            <?php endforeach; ?>
+        <?php endforeach; ?>
 
-            HawkSearch.bindClickTracking = function(data) {
-                var items = $('#hawkitemlist');
-                for(var row in data) {
-                    items.find('a[href="' + data[row]["url"] + '"]').click({tid:data[row]["tid"], idx:data[row]["i"], sku:data[row]["sku"]}, function(e) {
-                        return HawkSearch.link(e, e.data.tid, e.data.idx, e.data.sku, 0);
-                    });
-                }
-            };
-            HawkSearch.origProcessFacets = HawkSearch.processFacets;
-            HawkSearch.processFacets = function(hash, json, queryGuid, backbutton) {
-                HawkSearch.origProcessFacets(hash, json, queryGuid, backbutton);
-                var data = $(json.html).find('#hawktrackingdata').data('tracking');
-                HawkSearch.bindClickTracking(data);
-            };
-            HawkSearch.bindClickTracking($(document).find('#hawktrackingdata').data('tracking'));
+        HawkSearch.bindClickTracking = function(data) {
+            var items = $('#hawkitemlist');
+            for(var row in data) {
+                    items.find('a[href="' + data[row]["url"] + '"]').click({
+                        tid: data[row]["tid"],
+                        idx: data[row]["i"],
+                        sku: data[row]["sku"]
+                    }, function (e) {
+                    return HawkSearch.link(e, e.data.tid, e.data.idx, e.data.sku, 0);
+                });
+            }
         };
+        HawkSearch.origProcessFacets = HawkSearch.processFacets;
+        HawkSearch.processFacets = function(hash, json, queryGuid, backbutton) {
+            HawkSearch.origProcessFacets(hash, json, queryGuid, backbutton);
+            var data = $(json.html).find('#hawktrackingdata').data('tracking');
+            HawkSearch.bindClickTracking(data);
+        };
+        HawkSearch.bindClickTracking($(document).find('#hawktrackingdata').data('tracking'));
+
+        <?php if($block->getRecommendationsActive()) : ?>
+        HawkSearch.getMergedTrackingData = function() {
+            let nodes = $('script[type="text/x-hawk-track"]');
+            let merged = [];
+            for(let i = 0; i < nodes.length; i++) {
+                let data = JSON.parse(nodes[i].textContent);
+                merged = merged.concat(data);
+            }
+            return merged;
+        };
+        $(document).on('hawksearch:track', function(e, data) {
+            if(data.hasOwnProperty("pageload") ) {
+                if(data.pageload.hasOwnProperty("context")){
+                    for(key in data.pageload.context) {
+                        HawkSearch.Context.add(key, data.pageload.context[key]);
+                    }
+                }
+                HawkSearch.Tracking.track("pageload", {pageType: data.pageload.pageType});
+            }
+
+            if(data.hasOwnProperty("add2cart")) {
+                HawkSearch.Context.clear();
+                HawkSearch.Tracking.track("add2cart", data.add2cart);
+            }
+            if(data.hasOwnProperty("sale")) {
+                HawkSearch.Context.clear();
+                HawkSearch.Tracking.track("sale", data.sale);
+            }
+        });
+        $(document).on('ajax:addToCart', function(e, data) {
+            let mergedTrackingData = HawkSearch.getMergedTrackingData();
+            if(mergedTrackingData.length > 0) {
+                HawkSearch.Tracking.track("add2cart", {
+                    uniqueId: data.sku,
+                    price: mergedTrackingData.addToCart.price,
+                    quantity: data.form.find("#qty").val(),
+                    currency: mergedTrackingData.addToCart.currency
+                });
+            }
+        });
+        <?php endif; ?>
     });
+    <?php if($block->getRecommendationsActive()) : ?>
+    require(["jquery", "hawksearch", "domReady"], function ($){
+        let mergedTrackingData = HawkSearch.getMergedTrackingData();
+        if (mergedTrackingData.length > 0) {
+            $(document).trigger('hawksearch:track', mergedTrackingData);
+        }
+    });
+    <?php endif; ?>
 </script>

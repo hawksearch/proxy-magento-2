@@ -24,8 +24,8 @@ class HawkSearchJs extends \Magento\Framework\View\Element\Template
         parent::__construct($context, $data);
     }
 
-    public function getTrackingUrl() {
-        return $this->dataHelper->getTrackingUrl();
+    public function getHawkUrl() {
+        return $this->dataHelper->getHawkUrlWithEngine();
     }
     public function getIncludeHawkCss(){
         return $this->dataHelper->getConfigurationData('hawksearch_proxy/proxy/hawksearch_include_css');
@@ -34,6 +34,6 @@ class HawkSearchJs extends \Magento\Framework\View\Element\Template
         if($this->dataHelper->getConfigurationData('hawksearch_proxy/proxy/local_js')){
             return 'HawkSearch_Proxy/js/hawksearch';
         }
-        return sprintf('%s/includes/hawksearch', $this->getTrackingUrl());
+        return sprintf('%s/includes/hawksearch', $this->dataHelper->getHawkUrlWithEngine());
     }
 }

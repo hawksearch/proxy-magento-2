@@ -69,6 +69,9 @@ class UpgradeData implements \Magento\Framework\Setup\UpgradeDataInterface
         if(version_compare($context->getVersion(), '2.2.23', '<')) {
             $this->upgradeTo_2223($setup);
         }
+        if(version_compare($context->getVersion(), '2.2.35.6', '<')) {
+            $this->upgradeTo_22356($setup);
+        }
         $setup->endSetup();
     }
     private function upgradeTo_212(ModuleDataSetupInterface $setup) {
@@ -160,5 +163,20 @@ class UpgradeData implements \Magento\Framework\Setup\UpgradeDataInterface
             return '#fff';
         }
         return '#000';
+    }
+
+    private function upgradeTo_22356(ModuleDataSetupInterface $setup)
+    {
+        /*
+         * configuration changes:
+         * hawksearch_proxy/proxy/tracking_url_develop -> hawksearch_proxy/general/tracking_url_develop
+         * hawksearch_proxy/proxy/tracking_url_staging -> hawksearch_proxy/general/tracking_url_staging
+         * hawksearch_proxy/proxy/tracking_url_production -> hawksearch_proxy/general/tracking_url_production
+         */
+
+        $setup->getConnection()->update('core_config_data', ['path' => 'hawksearch_proxy/general/tracking_url_develop'], ['path = ?' => 'hawksearch_proxy/proxy/tracking_url_develop']);
+        $setup->getConnection()->update('core_config_data', ['path' => 'hawksearch_proxy/general/tracking_url_staging'], ['path = ?' => 'hawksearch_proxy/proxy/tracking_url_staging']);
+        $setup->getConnection()->update('core_config_data', ['path' => 'hawksearch_proxy/general/tracking_url_production'], ['path = ?' => 'hawksearch_proxy/proxy/tracking_url_production']);
+        $setup->getConnection()->delete('core_config_data', ['path = ?' => 'hawksearch_proxy/proxy/autocomplete_div_id']);
     }
 }

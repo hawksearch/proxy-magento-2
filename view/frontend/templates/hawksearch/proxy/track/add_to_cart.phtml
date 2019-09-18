@@ -1,5 +1,4 @@
-<?xml version="1.0"?>
-<!--
+<?php
 /**
  * Copyright (c) 2019 Hawksearch (www.hawksearch.com) - All Rights Reserved
  *
@@ -11,14 +10,12 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
--->
-<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      layout="1column" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
-    <body>     
-        <referenceContainer name="before.body.end">
-            <block class="HawkSearch\Proxy\Block\Track\OrderConfirmation"
-                   name="hawksearch_track_order_confirmation"
-                   template="hawksearch/proxy/track/order_confirmation.phtml" />
-        </referenceContainer>
-    </body>
-</page>
+
+$atcData = $block->getAddToCartJsonData();
+if(empty($atcData)) {
+   return;
+}
+?>
+<script type="text/x-hawk-track">
+<?php /** @var $block HawkSearch\Proxy\Block\Track\AddToCart */ echo $atcData; ?>
+</script>
