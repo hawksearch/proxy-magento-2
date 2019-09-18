@@ -53,7 +53,7 @@
     require(["jquery", "hawksearch" ], function ($) {
         <?php foreach($block->getSearchBoxes() as $sbid) : ?>
             HawkSearch.suggestInit('#<?php echo $sbid; ?>', {
-                lookupUrlPrefix: HawkSearch.HawkUrl + '<?php echo $block->getAutosuggestParams() ?>',
+                lookupUrlPrefix: <?php echo $block->getRecommendationsActive() ? 'HawkSearch.HawkUrl' : 'HawkSearch.TrackingUrl'; ?> + '<?php echo $block->getAutosuggestParams() ?>',
                 hiddenDivName: '<?php echo $block->getHiddenDivName() ?>',
                 isAutoWidth: true
             });
