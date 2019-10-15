@@ -92,6 +92,7 @@
         $(document).on('hawksearch:track', function(e, data) {
             if(data.hasOwnProperty("pageload") ) {
                 if(data.pageload.hasOwnProperty("context")){
+                    HawkSearch.Context.clear();
                     for(key in data.pageload.context) {
                         HawkSearch.Context.add(key, data.pageload.context[key]);
                     }
