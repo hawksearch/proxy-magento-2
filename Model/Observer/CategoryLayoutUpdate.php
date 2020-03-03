@@ -15,9 +15,17 @@ use Magento\Framework\Event\ObserverInterface;
 class CategoryLayoutUpdate implements ObserverInterface
 {
     private $helper;
-    public function __construct(\HawkSearch\Datafeed\Helper\Data $helper)
+    /**
+     * @var \Magento\Framework\Registry
+     */
+    private $registry;
+
+    public function __construct(\HawkSearch\Datafeed\Helper\Data $helper,
+                                \Magento\Framework\Registry $registry
+    )
     {
         $this->helper = $helper;
+        $this->registry = $registry;
     }
 
     /**
@@ -28,6 +36,15 @@ class CategoryLayoutUpdate implements ObserverInterface
     {
         if($this->helper->getConfigurationData('hawksearch_proxy/proxy/manage_categories')){
             if($observer->getFullActionName() == 'catalog_category_view') {
+                if(!$this->helper->getConfigurationData('hawksearch_proxy/proxy/manage_all')) {
+                    $category = $this->registry->registry('current_category');
+                    if (is_object($category) && $category->getId()) {
+                        if(! $category->getHawkLandingPage()) {
+                            return;
+                        }
+                    }
+                }
+
                 /** @var \Magento\Framework\View\Layout $layout */
                 $layout = $observer->getLayout();
                 $layout->getUpdate()->addHandle('hawksearch_category_view');
