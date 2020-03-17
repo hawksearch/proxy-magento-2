@@ -49,7 +49,7 @@ class LayoutUpdate implements ObserverInterface
                 $layout->getUpdate()->addHandle('hawksearch_catalogsearch_result');
             }
         } elseif($observer->getFullActionName() == 'catalog_category_view') {
-            if($this->helper->isManageCategories()){
+            if($this->helper->isManageCategories() && $this->helper->getIsHawkManaged()){
                 $layout = $observer->getLayout();
                 $layout->getUpdate()->addHandle('hawksearch_category_view');
             }

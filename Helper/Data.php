@@ -530,7 +530,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function getIsHawkManaged($path = null)
     {
         if (empty($path)) {
-            return $this->isManaged;
+            $path = $this->_request->getRequestUri();
         }
 
         if (substr($path, 0, 1) != '/') {
@@ -1153,7 +1153,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             case 'catalogsearch':
                 return $this->isManageSearch();
             case 'category':
-                return $this->isManageCategories();
+                return $this->getIsHawkManaged();
         }
         return false;
     }

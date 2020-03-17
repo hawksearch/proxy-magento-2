@@ -7,17 +7,17 @@
             </argument>
         </arguments>
     </type>
-    <type name="Magento\CatalogSearch\Model\Layer\Category\ItemCollectionProvider">
-        <arguments>
-            <argument name="collectionFactory"
-                      xsi:type="object">HawkSearch\Proxy\Model\ResourceModel\CollectionFactory</argument>
-        </arguments>
-    </type>
-    <virtualType name="HawkSearch\Proxy\Model\ResourceModel\CollectionFactory" type="Magento\Catalog\Model\ResourceModel\Product\CollectionFactory">
-        <arguments>
-            <argument name="instanceName" xsi:type="string">HawkSearch\Proxy\Model\ResourceModel\Collection</argument>
-        </arguments>
-    </virtualType>
+<!--    <type name="Magento\CatalogSearch\Model\Layer\Category\ItemCollectionProvider">-->
+<!--        <arguments>-->
+<!--            <argument name="collectionFactory"-->
+<!--                      xsi:type="object">HawkSearch\Proxy\Model\ResourceModel\CollectionFactory</argument>-->
+<!--        </arguments>-->
+<!--    </type>-->
+<!--    <virtualType name="HawkSearch\Proxy\Model\ResourceModel\CollectionFactory" type="Magento\Catalog\Model\ResourceModel\Product\CollectionFactory">-->
+<!--        <arguments>-->
+<!--            <argument name="instanceName" xsi:type="string">HawkSearch\Proxy\Model\ResourceModel\Collection</argument>-->
+<!--        </arguments>-->
+<!--    </virtualType>-->
     <virtualType name="hawkSearchProxyVirtualLogHandler" type="Magento\Framework\Logger\Handler\Base">
         <arguments>
             <argument name="fileName" xsi:type="string">var/log/hawksearch_proxy.log</argument>

@@ -39,6 +39,9 @@
     <type name="Magento\Store\App\Response\Redirect">
         <plugin name="hawkproxy_redirect_url" type="HawkSearch\Proxy\Plugin\StoreRedirect" />
     </type>
+    <type name="Magento\CatalogSearch\Model\ResourceModel\Fulltext\Collection">
+        <plugin name="hawkproxy_get_faceted_data" type="HawkSearch\Proxy\Plugin\GetFacetedData" />
+    </type>
 
     <virtualType name="virtualHawkCatalogSearchListProduct" type="HawkSearch\Proxy\Block\Product\ListProduct">
         <arguments>
