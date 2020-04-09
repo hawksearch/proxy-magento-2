@@ -529,9 +529,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     public function getIsHawkManaged($path = null)
     {
-        if(isset($this->isManaged)){
-            return $this->isManaged;
-        }
         if (empty($path)) {
             $path = $this->_request->getRequestUri();
             $path = explode("?", $path, 2)[0];
