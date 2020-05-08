@@ -18,8 +18,7 @@ use Magento\Framework\View\Element\Template;
 /**
  *  Html block
  */
-class Html
-    extends Template
+class Html extends Template
 {
 
     private $helper;
@@ -29,8 +28,8 @@ class Html
         Template\Context $context,
         \HawkSearch\Proxy\Helper\Data $helper,
         \HawkSearch\Proxy\Block\BannerFactory $bannerFactory,
-        array $data = [])
-    {
+        array $data = []
+    ) {
         $helper->setClientIp($context->getRequest()->getClientIp());
         $helper->setClientUa($context->getRequest()->getHeader('UserAgent'));
         $helper->setIsHawkManaged(true);
@@ -64,7 +63,7 @@ class Html
     public function getMetaRobots()
     {
         $results = $this->helper->getResultData();
-        if(property_exists($results, 'MetaRobots')) {
+        if (property_exists($results, 'MetaRobots')) {
             return $results->MetaRobots;
         }
         return '';
@@ -110,14 +109,15 @@ class Html
         return $this->helper->getResultData()->Data->Title;
     }
 
-    public function getHawkTrackingData() {
+    public function getHawkTrackingData()
+    {
         return $this->helper->getTrackingDataHtml();
     }
 
     public function getItemList()
     {
         $layout = $this->getLayout();
-        if($this->getTabbedContent()) {
+        if ($this->getTabbedContent()) {
             return $layout->getBlock('hawksearch_tabbed_items')->toHtml();
         } else {
             return $layout->getBlock('hawksearch_hawkitems')->getChildHtml();
@@ -127,7 +127,7 @@ class Html
     public function getFeaturedZone($zone)
     {
         $layout = $this->getLayout();
-        $block = $layout->createBlock('HawkSearch\Proxy\Block\Product\ListFeatured');
+        $block = $layout->createBlock(HawkSearch\Proxy\Block\Product\ListFeatured::class);
         $block->setZone($zone);
         $productCollection = $block->getLoadedProductCollection();
         if ($productCollection->count() > 0) {
@@ -140,7 +140,7 @@ class Html
     public function getFeaturedLeftZone($zone)
     {
         $layout = $this->getLayout();
-        $block = $layout->createBlock('HawkSearch\Proxy\Block\Product\ListFeatured');
+        $block = $layout->createBlock(HawkSearch\Proxy\Block\Product\ListFeatured::class);
         $block->setZone($zone);
         $productCollection = $block->getLoadedProductCollection();
         if ($productCollection->count() > 0) {
@@ -157,10 +157,9 @@ class Html
     public function getTabs()
     {
         $resultData = $this->helper->getResultData()->Data;
-        if(property_exists($resultData, 'Tabs')){
+        if (property_exists($resultData, 'Tabs')) {
             return $resultData->Tabs;
         }
         return null;
     }
-
 }

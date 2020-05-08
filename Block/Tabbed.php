@@ -10,7 +10,6 @@ namespace HawkSearch\Proxy\Block;
 
 use Magento\Framework\View\Element\Template;
 
-
 class Tabbed extends Html
 {
     /**
@@ -20,11 +19,12 @@ class Tabbed extends Html
     private $labelMap;
     public static $increment = 1;
 
-    public function __construct(Template\Context $context,
-                                \HawkSearch\Proxy\Helper\Data $helper,
-                                \HawkSearch\Proxy\Block\BannerFactory $bannerFactory,
-                                array $data = [])
-    {
+    public function __construct(
+        Template\Context $context,
+        \HawkSearch\Proxy\Helper\Data $helper,
+        \HawkSearch\Proxy\Block\BannerFactory $bannerFactory,
+        array $data = []
+    ) {
         parent::__construct($context, $helper, $bannerFactory, $data);
         $this->helper = $helper;
     }
@@ -32,7 +32,7 @@ class Tabbed extends Html
     public function getTabs()
     {
         $resultData = $this->helper->getResultData()->Data;
-        if(property_exists($resultData, 'Tabs')){
+        if (property_exists($resultData, 'Tabs')) {
             return $resultData->Tabs;
         }
         return null;
@@ -44,10 +44,11 @@ class Tabbed extends Html
         return $results->Items;
     }
 
-    public function getTabbedItemHtml($item) {
+    public function getTabbedItemHtml($item)
+    {
         $rendererList = $this->getChildBlock('item.renderers');
         $type = 'default';
-        if($this->helper->getShowTypeLabels() && $this->getRequest()->getParam('it') != 'all') {
+        if ($this->helper->getShowTypeLabels() && $this->getRequest()->getParam('it') != 'all') {
             $type = strstr($item->Custom->it, '|^|', true);
         }
 
@@ -55,25 +56,26 @@ class Tabbed extends Html
         $renderer->_viewVars = ['item' => $item];
         return $renderer->toHtml();
     }
-    public function getIncrement(){
+    public function getIncrement()
+    {
         return self::$increment++;
     }
 
     public function getTypeLabel($item)
     {
-        if(!$this->helper->getShowTypeLabels() || !isset($item->Custom->it)) {
+        if (!$this->helper->getShowTypeLabels() || !isset($item->Custom->it)) {
             return '';
         }
-        if(!$this->labelMap){
+        if (!$this->labelMap) {
             $this->labelMap = $this->helper->getTypeLabelMap();
         }
         $type = strstr($item->Custom->it, '|^|', true);
 
-        if(!isset($this->labelMap[$type])) {
+        if (!isset($this->labelMap[$type])) {
             preg_match_all('/tab="(.*?)"/', $this->helper->getResultData()->Data->Tabs, $matches);
-            if(count($matches) > 0) {
-                foreach($matches[1] as $foundType) {
-                    if($foundType == 'all' || isset($this->labelMap[$foundType])){
+            if (count($matches) > 0) {
+                foreach ($matches[1] as $foundType) {
+                    if ($foundType == 'all' || isset($this->labelMap[$foundType])) {
                         continue;
                     }
                     $obj = new \stdClass();
@@ -89,6 +91,11 @@ class Tabbed extends Html
         $bg = $this->labelMap[$type]->color;
         $label = $this->labelMap[$type]->title;
         $fg = $this->labelMap[$type]->textColor;
-        return sprintf('<p style="background-color: %s; padding: 5px 10px; display:inline-block; font-weight: bold; color: %s">%s</p>', $bg, $fg, $label);
+        return sprintf(
+            '<p style="background-color: %s; padding: 5px 10px; display:inline-block; font-weight: bold; color: %s">%s</p>',
+            $bg,
+            $fg,
+            $label
+        );
     }
 }

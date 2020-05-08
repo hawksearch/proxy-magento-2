@@ -1,6 +1,7 @@
-<?php
+<?xml version="1.0"?>
+<!--
 /**
- * Copyright (c) 2019 Hawksearch (www.hawksearch.com) - All Rights Reserved
+ * Copyright (c) 2018 Hawksearch (www.hawksearch.com) - All Rights Reserved
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -10,18 +11,12 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
-
-
-namespace HawkSearch\Proxy\Plugin;
-
-class BreadcrumbPlugin
-{
-    public function aroundGetBreadcrumbPath(\Magento\Catalog\Helper\Data $subject, callable $proceed)
-    {
-        $category = $subject->getCategory();
-        if ($category && $category->getHawksearchLandingPage()) {
-            return $category->getHawkBreadcrumbPath();
-        }
-        return $proceed();
-    }
-}
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceContainer name="top.container">
+            <referenceBlock name="catalog_category_event" remove="true"/>
+        </referenceContainer>
+    </body>
+</page>

@@ -16,8 +16,8 @@
 ?>
 <script type="text/javascript">
     (function (HawkSearch) {
-        HawkSearch.BaseUrl = '<?php echo $block->getBaseUrl(); ?>';
-        HawkSearch.TrackingUrl = '<?php echo $block->getTrackingUrl(); ?>';
+        HawkSearch.BaseUrl = '<?= /* @noEscape */ $block->getBaseUrl(); ?>';
+        HawkSearch.TrackingUrl = '<?= /* @noEscape */ $block->getTrackingUrl(); ?>';
         if ('http:' == document.location.protocol) {
             HawkSearch.BaseUrl = HawkSearch.BaseUrl.replace('https://', 'http://');
             HawkSearch.TrackingUrl = HawkSearch.TrackingUrl.replace('https://', 'http://');
@@ -30,10 +30,10 @@
 
     require(["jquery", "hawksearch" ], function ($) {
         HawkSearch.initAutoSuggest = function () {
-            <?php foreach($block->getSearchBoxes() as $sbid) : ?>
-            HawkSearch.suggestInit('#<?php echo $sbid; ?>', {
-                lookupUrlPrefix: HawkSearch.TrackingUrl + '<?php echo $block->getAutosuggestParams() ?>',
-                hiddenDivName: '<?php echo $block->getHiddenDivName() ?>',
+            <?php foreach ($block->getSearchBoxes() as $sbid): ?>
+            HawkSearch.suggestInit('#<?= /* @noEscape */ $sbid; ?>', {
+                lookupUrlPrefix: HawkSearch.TrackingUrl + '<?= /* @noEscape */ $block->getAutosuggestParams() ?>',
+                hiddenDivName: '<?= /* @noEscape */ $block->getHiddenDivName() ?>',
                 isAutoWidth: true
             });
             <?php endforeach; ?>
@@ -41,7 +41,8 @@
             HawkSearch.bindClickTracking = function(data) {
                 var items = $('#hawkitemlist');
                 for(var row in data) {
-                    items.find('a[href="' + data[row]["url"] + '"]').click({tid:data[row]["tid"], idx:data[row]["i"], sku:data[row]["sku"]}, function(e) {
+                    items.find('a[href="' + data[row]["url"] + '"]').click({tid:data[row]["tid"],
+                        idx:data[row]["i"], sku:data[row]["sku"]}, function(e) {
                         return HawkSearch.link(e, e.data.tid, e.data.idx, e.data.sku, 0);
                     });
                 }

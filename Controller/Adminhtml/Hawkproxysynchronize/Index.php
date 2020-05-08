@@ -16,26 +16,26 @@ use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\ResponseInterface;
 use Magento\Framework\View\Result\PageFactory;
 
-class Index
-    extends \Magento\Backend\App\Action
+class Index extends \Magento\Backend\App\Action
 {
     /**
      * @var \Magento\Framework\Controller\Result\JsonFactory
      */
     protected $resultJsonFactory;
-    /** @var \HawkSearch\Proxy\Helper\Data $helper */
+    /**
+     * @var \HawkSearch\Proxy\Helper\Data $helper 
+     */
     protected $dataHelper;
 
     /**
-     * @param Context $context
+     * @param Context                                          $context
      * @param \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory
      */
     public function __construct(
         Context $context,
         \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory,
         \HawkSearch\Proxy\Helper\Data $dataHelper
-    )
-    {
+    ) {
         parent::__construct($context);
         $this->resultJsonFactory = $resultJsonFactory;
         $this->dataHelper = $dataHelper;
@@ -48,21 +48,25 @@ class Index
     {
         $disabledFuncs = explode(',', ini_get('disable_functions'));
         $isShellDisabled = is_array($disabledFuncs) ? in_array('shell_exec', $disabledFuncs) : true;
-        $isShellDisabled = ((stripos(PHP_OS, 'Darwin') !== false) || (stripos(PHP_OS, 'win') === false)) ? $isShellDisabled : true;
+        $isShellDisabled = ((stripos(PHP_OS, 'Darwin') !== false)
+            || (stripos(PHP_OS, 'win') === false)) ? $isShellDisabled : true;
 
         if ($isShellDisabled) {
-            return $this->resultJsonFactory->create()->setData([
-                'error' => 'This installation cannot run one-off category synchronizations because the PHP function "shell_exec" has been disabled. Please use cron.']);
+            return $this->resultJsonFactory->create()->setData(
+                [
+                'error' => 'This installation cannot run one-off category synchronizations because the PHP function "shell_exec" has been disabled. Please use cron.']
+            );
         } else {
             if (strtolower($this->getRequest()->getParam('force')) == 'true') {
                 $this->dataHelper->removeSyncLocks();
             }
-            if(strtolower($this->getRequest()->getParam('overwrite')) == 'true') {
+            if (strtolower($this->getRequest()->getParam('overwrite')) == 'true') {
                 $this->dataHelper->setOverwriteFlag(true);
             }
             $rs = $this->dataHelper->launchSyncProcess();
             if ($rs === true) {
-                return $this->resultJsonFactory->create()->setData(['message' => 'Sync started, running as background process.']);
+                return $this->resultJsonFactory->create()
+                    ->setData(['message' => 'Sync started, running as background process.']);
             } else {
                 return $this->resultJsonFactory->create()->setData(['error' => $rs]);
             }

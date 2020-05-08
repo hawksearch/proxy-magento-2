@@ -22,20 +22,22 @@ class Version extends \Magento\Config\Block\System\Config\Form\Field
 
     /**
      * Version constructor.
+     *
      * @param ModuleListInterface $moduleList
-     * @param Context $context
-     * @param array $data
+     * @param Context             $context
+     * @param array               $data
      */
-    public function __construct(ModuleListInterface $moduleList,
-                                Context $context,
-                                array $data = []) {
+    public function __construct(
+        ModuleListInterface $moduleList,
+        Context $context,
+        array $data = []
+    ) {
         $this->moduleList = $moduleList;
         parent::__construct($context, $data);
-
     }
 
     /**
-     * @param AbstractElement $element
+     * @param  AbstractElement $element
      * @return string
      */
     protected function _getElementHtml(AbstractElement $element)
@@ -43,4 +45,3 @@ class Version extends \Magento\Config\Block\System\Config\Form\Field
         return $this->moduleList->getOne('HawkSearch_Proxy')['setup_version'];
     }
 }
- 

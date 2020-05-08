@@ -20,22 +20,26 @@ $locked = $block->isSyncLocked();
 <div>
     <div id="hawk_synchrinize_result" class="message-validation hidden"></div>
     <button type="button"
-            id="<?php echo $block->getHtmlId() ?>">
-        <span><?php echo $block->escapeHtml($block->getButtonLabel()); ?></span>
+            id="<?= /* @noEscape */ $block->getHtmlId() ?>">
+        <span><?= /* @noEscape */ $block->escapeHtml($block->getButtonLabel()); ?></span>
     </button>
     <div id="forcesyncwrap" class="hidden">
-        <input type="checkbox" value="forcesync" id="<?php echo $block->getHtmlId() ?>_forcesync" name="forcesync" /> force sync
+        <input type="checkbox" value="forcesync"
+               id="<?= /* @noEscape */ $block->getHtmlId() ?>_forcesync"
+               name="forcesync" /> force sync
     </div>
-    <input type="checkbox" value="overwrite" id="<?php echo $block->getHtmlId() ?>_overwrite" name="overwrite" /> overwrite all
+    <input type="checkbox" value="overwrite"
+           id="<?= /* @noEscape */ $block->getHtmlId() ?>_overwrite"
+           name="overwrite" /> overwrite all
 </div>
 
 <script>
     require(['prototype'], function() {
-        var locked = <?php echo $locked ? 'true' : 'false'; ?>;
-        var b = $('<?php echo $block->getHtmlId() ?>');
-        var force = $('<?php echo $block->getHtmlId() ?>_forcesync');
+        var locked = <?= /* @noEscape */ $locked ? 'true' : 'false'; ?>;
+        var b = $('<?= /* @noEscape */ $block->getHtmlId() ?>');
+        var force = $('<?= /* @noEscape */ $block->getHtmlId() ?>_forcesync');
         var forcewrap = $('forcesyncwrap');
-        var overwrite = $('<?php echo $block->getHtmlId() ?>_overwrite');
+        var overwrite = $('<?= /* @noEscape */ $block->getHtmlId() ?>_overwrite');
         if(locked) {
             b.disable();
             force.enable();
@@ -54,7 +58,7 @@ $locked = $block->isSyncLocked();
         b.observe('click', function(event) {
             var isForce = force.checked;
             var isOverwrite = overwrite.checked;
-            new Ajax.Request('<?php echo $this->getInternUrl() ?>', {
+            new Ajax.Request('<?= /* @noEscape */ $block->getInternUrl() ?>', {
                 parameters: {force: isForce, overwrite: isOverwrite},
                 onSuccess: function(transport) {
                     var resp = transport.responseText.evalJSON();

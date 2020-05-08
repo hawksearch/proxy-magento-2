@@ -1,4 +1,5 @@
-define([
+define(
+    [
         'jquery',
         'matchMedia',
         'jquery/ui'
@@ -15,33 +16,45 @@ define([
                     this.searchForm = $(this.options.formSelector);
                     this.searchLabel = this.searchForm.find(this.options.searchLabel);
 
-                    mediaCheck({
-                        media: '(max-width: 768px)',
-                        entry: function () {
-                            this.isExpandable = true;
-                        }.bind(this),
-                        exit: function () {
-                            this.isExpandable = false;
-                            this.element.removeAttr('aria-expanded');
+                    mediaCheck(
+                        {
+                            media: '(max-width: 768px)',
+                            entry: function () {
+                                this.isExpandable = true;
+                            }.bind(this),
+                            exit: function () {
+                                this.isExpandable = false;
+                                this.element.removeAttr('aria-expanded');
+                            }.bind(this)
+                        }
+                    );
+
+                    this.searchLabel.on(
+                        'click', function (e) {
+                            // allow input to lose its' focus when clicking on label
+                            if (this.isExpandable && this.isActive()) {
+                                e.preventDefault();
+                            }
                         }.bind(this)
-                    });
+                    );
 
-                    this.searchLabel.on('click', function (e) {
-                        // allow input to lose its' focus when clicking on label
-                        if (this.isExpandable && this.isActive()) {
-                            e.preventDefault();
-                        }
-                    }.bind(this));
-
-                    this.element.on('blur', $.proxy(function () {
-                        if (!this.searchLabel.hasClass('active')) {
-                            return;
-                        }
-                        setTimeout($.proxy(function () {
-                            this.setActiveState(false);
-                            this._updateAriaHasPopup(false);
-                        }, this), 250);
-                    }, this));
+                    this.element.on(
+                        'blur', $.proxy(
+                            function () {
+                                if (!this.searchLabel.hasClass('active')) {
+                                    return;
+                                }
+                                setTimeout(
+                                    $.proxy(
+                                        function () {
+                                            this.setActiveState(false);
+                                            this._updateAriaHasPopup(false);
+                                        }, this
+                                    ), 250
+                                );
+                            }, this
+                        )
+                    );
 
                     this.element.on('focus', this.setActiveState.bind(this, true));
                 },
@@ -67,4 +80,5 @@ define([
         );
         return $.mage.quickSearch;
 
-    });
+    }
+);

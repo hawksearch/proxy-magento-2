@@ -12,6 +12,7 @@
  */
 
 namespace HawkSearch\Proxy\Cron;
+
 use Magento\Framework\Filesystem\DirectoryList;
 
 class SyncCategories
@@ -20,7 +21,9 @@ class SyncCategories
      * @var \HawkSearch\Proxy\Helper\Data
      */
     protected $helper;
-    /** @var \HawkSearch\Proxy\Model\ProxyEmail $email */
+    /**
+     * @var \HawkSearch\Proxy\Model\ProxyEmail $email
+     */
     private $email;
     private $dir;
 
@@ -28,18 +31,17 @@ class SyncCategories
         \HawkSearch\Proxy\Helper\Data $helper,
         \HawkSearch\Proxy\Model\ProxyEmail $email,
         DirectoryList $dir
-    )
-    {
+    ) {
         $this->helper = $helper;
         $this->email = $email;
         $this->dir = $dir;
     }
 
-    public function execute() {
-        chdir($this->dir->getRoot());
+    public function execute()
+    {
 
         $errors = [];
-        if($this->helper->isCategorySyncCronEnabled()) {
+        if ($this->helper->isCategorySyncCronEnabled()) {
             if (($timestamp = $this->helper->isSyncLocked())) {
                 $subject = "HawkSearch process is locked. Categories NOT synchronized.";
                 $errors[] = sprintf("HawkSearch Cron process locked since %s", $timestamp);

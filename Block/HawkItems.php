@@ -7,8 +7,8 @@
  */
 
 namespace HawkSearch\Proxy\Block;
-use Magento\Framework\View\Element\Template;
 
+use Magento\Framework\View\Element\Template;
 
 class HawkItems extends Template
 {
@@ -20,25 +20,28 @@ class HawkItems extends Template
 
     /**
      * HawkItems constructor.
-     * @param Banner $banner
+     *
+     * @param Banner                        $banner
      * @param \HawkSearch\Proxy\Helper\Data $helper
-     * @param Template\Context $context
-     * @param array $data
+     * @param Template\Context              $context
+     * @param array                         $data
      */
     public function __construct(
         Banner $banner,
         \HawkSearch\Proxy\Helper\Data $helper,
         Template\Context $context,
-        array $data = [])
-    {
+        array $data = []
+    ) {
         parent::__construct($context, $data);
         $this->banner = $banner;
         $this->helper = $helper;
     }
-    public function getBanner() {
+    public function getBanner()
+    {
         return $this->banner;
     }
-    public function getClickTracking() {
+    public function getClickTracking()
+    {
         return $this->helper->getTrackingDataHtml();
     }
 }

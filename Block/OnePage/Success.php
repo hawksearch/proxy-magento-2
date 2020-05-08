@@ -8,7 +8,6 @@
 
 namespace HawkSearch\Proxy\Block\OnePage;
 
-
 class Success extends \Magento\Checkout\Block\Onepage\Success
 {
     /**
@@ -27,22 +26,31 @@ class Success extends \Magento\Checkout\Block\Onepage\Success
         \Magento\Checkout\Model\Session $checkoutSession,
         \Magento\Sales\Model\Order\Config $orderConfig,
         \Magento\Framework\App\Http\Context $httpContext,
-        array $data = [])
-    {
+        array $data = []
+    ) {
         parent::__construct($context, $checkoutSession, $orderConfig, $httpContext, $data);
         $this->helper = $helper;
         $this->session = $session;
     }
 
-    public function getTrackingPixelUrl() {
+    public function getTrackingPixelUrl()
+    {
         $sid = $this->session->getHawkSessionId();
-        $this->helper->log(sprintf('using hawksessionid = %s, checkout session id = %s', $sid, $this->_checkoutSession->getSessionId()));
+        $this->helper->log(
+            sprintf(
+                'using hawksessionid = %s, checkout session id = %s',
+                $sid,
+                $this->_checkoutSession->getSessionId()
+            )
+        );
         $order = $this->_checkoutSession->getLastRealOrder();
-        return $this->helper->getTrackingPixelUrl([
+        return $this->helper->getTrackingPixelUrl(
+            [
             'd' => $this->helper->getOrderTackingKey(),
             'hawksessionid' => $sid,
             'orderno' => $order->getIncrementId(),
             'total' => $order->getGrandTotal()
-        ]);
+            ]
+        );
     }
 }

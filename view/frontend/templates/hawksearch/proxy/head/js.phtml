@@ -17,13 +17,15 @@ $includeCss = $block->getIncludeHawkCss();
 ?>
 <!-- Hawk Search Header Includes -->
 <script type="text/javascript">
-    <?php if($includeCss) :?>
-	document.write(unescape("%3Clink rel='stylesheet' type='text/css' href='<?php echo $trackingUrl; ?>/includes/hawksearch.css'%3E%3C/link%3E"));
-	<?php endif; ?>
+    <?php if ($includeCss):?>
+    document.write(unescape(
+        "%3Clink rel='stylesheet' type='text/css' href='<?= /* @noEscape */ $trackingUrl; ?>/includes/hawksearch.css'%3E%3C/link%3E")
+    );
+    <?php endif; ?>
     (function() {
         var config = {
             paths: {
-                "hawksearch": "<?php echo $block->getJsPath(); ?>"
+                "hawksearch": "<?= /* @noEscape */ $block->getJsPath(); ?>"
             }
         };
         require.config(config);

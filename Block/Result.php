@@ -11,6 +11,7 @@
  * IN THE SOFTWARE.
  */
 namespace HawkSearch\Proxy\Block;
+
 use Magento\Catalog\Model\Layer\Resolver as LayerResolver;
 use Magento\CatalogSearch\Helper\Data;
 use Magento\Framework\View\Element\Template\Context;
@@ -19,8 +20,7 @@ use Magento\Search\Model\QueryFactory;
 /**
  * Product search result block
  */
-class Result
-    extends \Magento\CatalogSearch\Block\Result
+class Result extends \Magento\CatalogSearch\Block\Result
 {
     /**
      * @var \HawkSearch\Proxy\Helper\Data
@@ -29,12 +29,13 @@ class Result
 
     /**
      * Result constructor.
-     * @param Context $context
-     * @param LayerResolver $layerResolver
-     * @param Data $catalogSearchData
-     * @param QueryFactory $queryFactory
+     *
+     * @param Context                       $context
+     * @param LayerResolver                 $layerResolver
+     * @param Data                          $catalogSearchData
+     * @param QueryFactory                  $queryFactory
      * @param \HawkSearch\Proxy\Helper\Data $helper
-     * @param array $data
+     * @param array                         $data
      */
     public function __construct(
         Context $context,
@@ -42,8 +43,8 @@ class Result
         Data $catalogSearchData,
         QueryFactory $queryFactory,
         \HawkSearch\Proxy\Helper\Data $helper,
-        array $data = [])
-    {
+        array $data = []
+    ) {
         $this->helper = $helper;
         parent::__construct($context, $layerResolver, $catalogSearchData, $queryFactory, $data);
     }
@@ -51,7 +52,7 @@ class Result
     public function getSearchQueryText()
     {
         $qt = $this->_getQuery()->getQueryText();
-        if($qt == '') {
+        if ($qt == '') {
             return 'All Items';
         }
         return parent::getSearchQueryText();
@@ -61,6 +62,5 @@ class Result
     {
         $this->setModuleName('Magento_CatalogSearch');
         return parent::getTemplateFile($template);
-        $this->setModuleName('HawkSearch_Proxy');
     }
 }

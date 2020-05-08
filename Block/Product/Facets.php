@@ -8,18 +8,18 @@
 
 namespace HawkSearch\Proxy\Block\Product;
 
-
 use Magento\Framework\View\Element\Template;
 
 class Facets extends \Magento\Framework\View\Element\Template
 {
     private $hawkHelper;
     private $banner;
-    public function __construct(Template\Context $context,
-                                \HawkSearch\Proxy\Block\Banner $banner,
-                                \HawkSearch\Proxy\Helper\Data $hawkHelper,
-                                array $data)
-    {
+    public function __construct(
+        Template\Context $context,
+        \HawkSearch\Proxy\Block\Banner $banner,
+        \HawkSearch\Proxy\Helper\Data $hawkHelper,
+        array $data
+    ) {
         $this->hawkHelper = $hawkHelper;
         $this->banner = $banner;
         parent::__construct($context, $data);
@@ -29,10 +29,12 @@ class Facets extends \Magento\Framework\View\Element\Template
     {
         return $this->getFeaturedZone("FeaturedLeftTop");
     }
-    public function getBannerLeftTop(){
+    public function getBannerLeftTop()
+    {
         return $this->banner->getBannerLeftTop();
     }
-    public function getFacets(){
+    public function getFacets()
+    {
         return $this->hawkHelper->getFacets();
     }
     public function getFeaturedLeftBottom()
@@ -47,7 +49,7 @@ class Facets extends \Magento\Framework\View\Element\Template
     protected function getFeaturedZone($zone)
     {
         $layout = $this->getLayout();
-        $block = $layout->createBlock('HawkSearch\Proxy\Block\Product\ListFeatured');
+        $block = $layout->createBlock(HawkSearch\Proxy\Block\Product\ListFeatured::class);
         $block->setZone($zone);
         $productCollection = $block->getLoadedProductCollection();
         if ($productCollection->count() > 0) {

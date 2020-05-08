@@ -8,11 +8,11 @@
 
 namespace HawkSearch\Proxy\Block\Tabbed;
 
-
 class DefaultRenderer extends \HawkSearch\Proxy\Block\Tabbed
 {
-    public function getCustomUrl($path) {
-        if(substr( $path, 0, 4 ) === "http"){
+    public function getCustomUrl($path)
+    {
+        if (substr($path, 0, 4) === "http") {
             return $path;
         }
         return  sprintf("%s%s", $this->getBaseUrl(), $path);

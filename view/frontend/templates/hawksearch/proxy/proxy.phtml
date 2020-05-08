@@ -1,4 +1,4 @@
-<?php 
+<?php
 /**
  * Copyright (c) 2017 Hawksearch (www.hawksearch.com) - All Rights Reserved
  *
@@ -10,5 +10,5 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
-
-echo $block->getJsonpCallback() ?>(<?php echo json_encode($block->getJsonpObject()) ?>)
+?>
+<?= /* @noEscape */ $block->getJsonpCallback() ?>(<?= /* @noEscape */ json_encode($block->getJsonpObject()) ?>)

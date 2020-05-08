@@ -10,56 +10,68 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
+
 namespace HawkSearch\Proxy\Setup;
 
-use Magento\Framework\Module\Setup\Migration;
+use Magento\Catalog\Model\Category;
+use Magento\Catalog\Setup\CategorySetupFactory;
+use Magento\Eav\Model\Entity\Attribute\ScopedAttributeInterface;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Setup\InstallDataInterface;
 use Magento\Framework\Setup\ModuleContextInterface;
 use Magento\Framework\Setup\ModuleDataSetupInterface;
-use Magento\Catalog\Setup\CategorySetupFactory;
 
-//use Magento\Framework\DB\Ddl\Table;
 
-class InstallData
-    implements InstallDataInterface
+/**
+ * Class InstallData
+ *
+ * @package HawkSearch\Proxy\Setup
+ */
+class InstallData implements InstallDataInterface
 {
     /**
      * Category setup factory
      *
      * @var CategorySetupFactory
      */
-    private $categorySetupFactory;
+    private $_categorySetupFactory;
+
 
     /**
-     * Init
-     *
-     * @param CategorySetupFactory $categorySetupFactory
+     * InstallData constructor.
+     * @param CategorySetupFactory $_categorySetupFactory
      */
-    public function __construct(CategorySetupFactory $categorySetupFactory) {
-        $this->categorySetupFactory = $categorySetupFactory;
+    public function __construct(CategorySetupFactory $_categorySetupFactory)
+    {
+        $this->_categorySetupFactory = $_categorySetupFactory;
     }
 
     /**
-     * {@inheritdoc}
-     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     * @param ModuleDataSetupInterface $setup
+     * @param ModuleContextInterface $context
+     * @throws LocalizedException
+     * @throws \Zend_Validate_Exception
      */
-    public function install(ModuleDataSetupInterface $setup, ModuleContextInterface $context) {
+    public function install(ModuleDataSetupInterface $setup, ModuleContextInterface $context)
+    {
         $installer = $setup;
         $installer->startSetup();
 
-        $categorySetup = $this->categorySetupFactory->create(['setup' => $setup]);
-        $entityTypeId = $categorySetup->getEntityTypeId(\Magento\Catalog\Model\Category::ENTITY);
+        $categorySetup = $this->_categorySetupFactory->create(['setup' => $setup]);
+        $entityTypeId = $categorySetup->getEntityTypeId(Category::ENTITY);
         $attributeSetId = $categorySetup->getDefaultAttributeSetId($entityTypeId);
-//        $categorySetup->removeAttribute(\Magento\Catalog\Model\Category::ENTITY, 'hawk_landing_page');
+        //        $categorySetup->removeAttribute(\Magento\Catalog\Model\Category::ENTITY, 'hawk_landing_page');
         $categorySetup->addAttribute(
-            \Magento\Catalog\Model\Category::ENTITY, 'hawk_landing_page', [
+            \Magento\Catalog\Model\Category::ENTITY,
+            'hawk_landing_page',
+            [
                 'type' => 'int',
                 'label' => 'Hawksearch Landing Page',
                 'input' => 'select',
-                'source' => 'Magento\Eav\Model\Entity\Attribute\Source\Boolean',
+                'source' => Magento\Eav\Model\Entity\Attribute\Source\Boolean::class,
                 'required' => false,
                 'sort_order' => 100,
-                'global' => \Magento\Eav\Model\Entity\Attribute\ScopedAttributeInterface::SCOPE_STORE,
+                'global' => ScopedAttributeInterface::SCOPE_STORE,
                 'group' => 'Display Settings',
             ]
         );
@@ -73,4 +85,4 @@ class InstallData
         );
         $installer->endSetup();
     }
-} 
+}

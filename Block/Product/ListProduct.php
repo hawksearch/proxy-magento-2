@@ -10,12 +10,13 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
+
 namespace HawkSearch\Proxy\Block\Product;
 
 use Magento\Catalog\Api\CategoryRepositoryInterface;
+use Magento\Catalog\Model\Product;
 
-class ListProduct
-    extends \Magento\Catalog\Block\Product\ListProduct
+class ListProduct extends \Magento\Catalog\Block\Product\ListProduct
 {
 
     private $topseen = false;
@@ -29,23 +30,23 @@ class ListProduct
      */
     private $mode;
 
-
     public function setPagers($bool)
     {
         $this->pagers = $bool;
     }
 
-    public function __construct(\Magento\Catalog\Block\Product\Context $context,
-                                \Magento\Framework\Data\Helper\PostHelper $postDataHelper,
-                                \Magento\Catalog\Model\Layer\Resolver $layerResolver,
-                                CategoryRepositoryInterface $categoryRepository,
-                                \Magento\Framework\Url\Helper\Data $urlHelper,
-                                \Magento\Framework\Pricing\Helper\Data $pricingHelper,
-                                \HawkSearch\Proxy\Helper\Data $hawkHelper,
-                                \Magento\Framework\App\Response\Http $response,
-                                string $mode = 'proxy',
-                                array $data = [])
-    {
+    public function __construct(
+        \Magento\Catalog\Block\Product\Context $context,
+        \Magento\Framework\Data\Helper\PostHelper $postDataHelper,
+        \Magento\Catalog\Model\Layer\Resolver $layerResolver,
+        CategoryRepositoryInterface $categoryRepository,
+        \Magento\Framework\Url\Helper\Data $urlHelper,
+        \Magento\Framework\Pricing\Helper\Data $pricingHelper,
+        \HawkSearch\Proxy\Helper\Data $hawkHelper,
+        \Magento\Framework\App\Response\Http $response,
+        string $mode = 'proxy',
+        array $data = []
+    ) {
         $this->pricingHelper = $pricingHelper;
         $this->hawkHelper = $hawkHelper;
         $this->response = $response;
@@ -69,7 +70,7 @@ class ListProduct
                     $this->hawkHelper->log(sprintf('Redirecting to location: %s', $this->hawkHelper->getLocation()));
                     $this->response->setRedirect($this->hawkHelper->getLocation());
                     $this->response->send();
-                    exit();
+                    return;
                 }
             } catch (\Exception $e) {
                 return parent::getToolbarHtml();
@@ -82,12 +83,20 @@ class ListProduct
             if ($this->pagers) {
                 $baseUrl = $this->_storeManager->getStore()->getBaseUrl();
                 if ($this->topseen) {
-                    return '<div id="hawkbottompager">' . str_replace($baseUrl . '/', $baseUrl, $this->hawkHelper->getResultData()->Data->BottomPager) . '</div>';
+                    return '<div id="hawkbottompager">' . str_replace(
+                        $baseUrl . '/',
+                        $baseUrl,
+                        $this->hawkHelper->getResultData()->Data->BottomPager
+                    ) . '</div>';
                 }
                 $this->topseen = true;
                 $data = $this->hawkHelper->getResultData()->Data;
-                if($this->hawkHelper->getShowTabs()) {
-                    return sprintf('<div id="hawktabs">%s</div><div id="hawktoppager">%s</div>', $data->Tabs, $data->TopPager);
+                if ($this->hawkHelper->getShowTabs()) {
+                    return sprintf(
+                        '<div id="hawktabs">%s</div><div id="hawktoppager">%s</div>',
+                        $data->Tabs,
+                        $data->TopPager
+                    );
                 }
                 return sprintf('<div id="hawktoppager">%s</div>', $data->TopPager);
             } else {
@@ -100,16 +109,14 @@ class ListProduct
     public function getIdentities()
     {
         $identities = [];
-        if(count($this->_getProductCollection()))
-        {
+        if ($this->_getProductCollection() && count($this->_getProductCollection())) {
             foreach ($this->_getProductCollection() as $item) {
                 $identities = array_merge($identities, $item->getIdentities());
             }
         }
         $category = $this->getLayer()->getCurrentCategory();
-        if ($category)
-        {
-            $identities[] = \Magento\Catalog\Model\Product::CACHE_PRODUCT_CATEGORY_TAG . '_' . $category->getId();
+        if ($category) {
+            $identities[] = Product::CACHE_PRODUCT_CATEGORY_TAG . '_' . $category->getId();
         }
         return $identities;
     }
@@ -119,11 +126,16 @@ class ListProduct
         if ($this->_productCollection === null) {
             if ($this->hawkHelper->modeActive($this->mode)) {
                 if ($this->hawkHelper->getLocation() != "") {
-                    $this->hawkHelper->log(sprintf('Redirecting to location: %s', $this->hawkHelper->getLocation()));
+                    $this->hawkHelper->log(
+                        sprintf(
+                            'Redirecting to location: %s',
+                            $this->hawkHelper->getLocation()
+                        )
+                    );
                     //return $this->helper->_redirectUrl($this->hawkHelper->getLocation());
                     $this->response->setRedirect($this->hawkHelper->getLocation());
                     $this->response->send();
-                    exit;
+                    return;
                 }
                 $this->_productCollection = $this->hawkHelper->getProductCollection();
             } else {
@@ -134,7 +146,8 @@ class ListProduct
         return $this->_productCollection;
     }
 
-    public function getTemplateFile($template = null) {
+    public function getTemplateFile($template = null)
+    {
         $this->setData('module_name', 'Magento_Catalog');
         $ret = parent::getTemplateFile($template);
         $this->setData('module_name', 'HawkSearch_Proxy');
@@ -159,16 +172,21 @@ class ListProduct
                     ]
                 );
             } else {
-                $priceamount = $this->pricingHelper->currency(number_format($product->getFinalPrice(), 2), true, false);
-                $price = '<div class="price-box price-final_price" data-role="priceBox" data-product-id="' . $product->getId() . '">
-
-
-<span class="price-container price-final_price tax weee">
-        <span id="product-price-' . $product->getId() . '" data-price-amount="' . $priceamount . '" data-price-type="finalPrice" class="price-wrapper ">
-        <span class="price">' . $priceamount . '</span>    </span>
-        </span>
-
-</div>';
+                $priceamount = $this->pricingHelper->currency(
+                    number_format(
+                        $product->getFinalPrice(),
+                        2
+                    ),
+                    true,
+                    false
+                );
+                $price = '<div class="price-box price-final_price" data-role="priceBox" data-product-id="';
+                $price .= $product->getId().'">';
+                $price .= '<span class="price-container price-final_price tax weee">';
+                $price .= '<span id="product-price-' . $product->getId();
+                $price .= '" data-price-amount="' . $priceamount;
+                $price .= '" data-price-type="finalPrice" class="price-wrapper ">';
+                $price .= '<span class="price">' . $priceamount . '</span></span></span></div>';
             }
 
             return $price;

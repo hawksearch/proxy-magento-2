@@ -11,18 +11,18 @@
  * IN THE SOFTWARE.
  */
 $opts = getopt('r:t:f:');
-chdir($opts['r']);
+
 require 'app/bootstrap.php';
 
 $bootstrap = \Magento\Framework\App\Bootstrap::create(BP, $_SERVER);
 $obj = $bootstrap->getObjectManager();
- 
+
 $state = $obj->get('Magento\Framework\App\State');
 $state->setAreaCode('frontend');
 
-$helper = $obj->get('HawkSearch\Proxy\Helper\Data');  
+$helper = $obj->get('HawkSearch\Proxy\Helper\Data');
 
-if(isset($opts['f'])){
+if (isset($opts['f'])) {
     $helper->setOverwriteFlag($opts['f']);
 }
 
@@ -30,12 +30,16 @@ if ($helper->isSyncLocked()) {
     $helper->log("-- Block: One or more HawkSearch Proxy feeds are being generated. Generation temporarily locked.");
     try {
         if ($reciever = $helper->getEmailReceiver()) {
-            /** @var \HawkSearch\Proxy\Model\ProxyEmail $mail_helper */
+            /**
+ * @var \HawkSearch\Proxy\Model\ProxyEmail $mail_helper
+*/
             $mail_helper = $obj->create('HawkSearch\Proxy\Model\ProxyEmail');
-            $mail_helper->sendEmail($reciever, [
+            $mail_helper->sendEmail(
+                $reciever, [
                 'status_text' => 'with following message:',
                 'extra_html' => "<p><strong>One or more HawkSearch Proxy feeds are being generated. Generation temporarily locked.</strong></p>"
-            ]);
+                ]
+            );
             $helper->log('email notification has been sent');
         }
     } catch (\Exception $e) {

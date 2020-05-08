@@ -12,8 +12,7 @@
  */
 namespace HawkSearch\Proxy\Controller\Index;
 
-class Index
-    extends \Magento\Framework\App\Action\Action
+class Index extends \Magento\Framework\App\Action\Action
 {
 
     protected $result;
@@ -24,34 +23,33 @@ class Index
      */
     private $data;
 
-    public function __construct(\Magento\Framework\App\Action\Context $context,
-                                \Magento\Catalog\Model\Session $session,
-                                \Magento\Framework\Controller\Result\Raw $result,
-                                \HawkSearch\Proxy\Helper\Data $data)
-    {
+    public function __construct(
+        \Magento\Framework\App\Action\Context $context,
+        \Magento\Catalog\Model\Session $session,
+        \Magento\Framework\Controller\Result\Raw $result,
+        \HawkSearch\Proxy\Helper\Data $data
+    ) {
         $this->result = $result;
         $this->session = $session;
         $this->request = $context->getRequest();
         parent::__construct($context);
         $this->data = $data;
     }
-
-
     public function execute()
     {
         $tab = $this->getRequest()->getParam('it');
         $html = '';
 
-        if(!$this->_view->isLayoutLoaded()){
+        if (!$this->_view->isLayoutLoaded()) {
             $this->_view->loadLayout();
             $block = $this->_view->getLayout()->getBlock('hawksearch_proxy_response');
-            if(!empty($tab) && $tab !== $this->data->getResultType()) {
+            if (!empty($tab) && !empty($this->data->getResultType()) && $tab !== $this->data->getResultType()) {
                 $block->setTabbedContent(true);
             }
             $html = $block->toHtml();
         }
         $params = $this->getRequest()->getParams();
-        $obj = array('Success' => 'true', 'html' => $html, 'location' => '');
+        $obj = ['Success' => 'true', 'html' => $html, 'location' => ''];
 
         $this->result->setHeader('Content-Type', 'application/javascript');
         $this->result->setContents($params['callback'] . '(' . json_encode($obj) . ')');

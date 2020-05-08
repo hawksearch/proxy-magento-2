@@ -21,7 +21,6 @@ use Magento\Framework\App\State;
 use Magento\Framework\App\Area;
 use Magento\Framework\Filesystem\DirectoryList;
 
-
 class CategorySync extends Command
 {
     private $helper;
@@ -39,8 +38,7 @@ class CategorySync extends Command
         State $state,
         DirectoryList $dir,
         $name = null
-    )
-    {
+    ) {
         $this->helper = $helper;
         parent::__construct($name);
         $this->state = $state;
@@ -55,21 +53,20 @@ class CategorySync extends Command
     }
 
     /**
-     * @param InputInterface $input
-     * @param OutputInterface $output
+     * @param  InputInterface  $input
+     * @param  OutputInterface $output
      * @return int|null|void
      * @throws \Magento\Framework\Exception\LocalizedException
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        chdir($this->dir->getRoot());
-
         $this->state->setAreaCode(Area::AREA_CRONTAB);
-        /** @var \HawkSearch\Proxy\Helper\Data $helper */
+        /**
+         * @var \HawkSearch\Proxy\Helper\Data $helper
+        */
         $helper = $this->helper->create();
         $helper->synchronizeHawkLandingPages();
 
         $output->writeln("executing");
     }
-
 }

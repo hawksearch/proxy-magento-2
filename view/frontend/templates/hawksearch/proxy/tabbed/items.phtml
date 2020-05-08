@@ -1,6 +1,5 @@
-
-        <div class="contentList">
-            <?php foreach ($block->getContent() as $item) : ?>
-            <?= $block->getTabbedItemHtml($item) ?>
-            <?php endforeach; ?>
-        </div>
+<div class="contentList">
+    <?php foreach ($block->getContent() as $item): ?>
+        <?= /* @noEscape */ $block->getTabbedItemHtml($item) ?>
+    <?php endforeach; ?>
+</div>

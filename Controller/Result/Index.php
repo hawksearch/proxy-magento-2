@@ -27,8 +27,8 @@ class Index extends \Magento\CatalogSearch\Controller\Result\Index
         \Magento\Search\Model\QueryFactory $queryFactory,
         \Magento\Catalog\Model\Layer\Resolver $layerResolver,
         \Magento\CatalogSearch\Helper\Data $helper,
-        \HawkSearch\Proxy\Helper\Data $hawkHelper)
-    {
+        \HawkSearch\Proxy\Helper\Data $hawkHelper
+    ) {
         $this->queryFactory = $queryFactory;
         $this->request = $context->getRequest();
         $this->helper = $helper;
@@ -41,7 +41,7 @@ class Index extends \Magento\CatalogSearch\Controller\Result\Index
      */
     public function execute()
     {
-        if(!$this->hawkHelper->isManageSearch()){
+        if (!$this->hawkHelper->isManageSearch()) {
             return parent::execute();
         }
         $query = $this->queryFactory->get();
@@ -73,7 +73,7 @@ class Index extends \Magento\CatalogSearch\Controller\Result\Index
     {
         $params = $this->request->getParams();
         foreach (array_keys($params) as $key) {
-            if(substr($key, 0, strlen('category')) == 'category') {
+            if (substr($key, 0, strlen('category')) == 'category') {
                 return true;
             }
         }
