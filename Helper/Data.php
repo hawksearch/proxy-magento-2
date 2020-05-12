@@ -13,6 +13,7 @@
 
 namespace HawkSearch\Proxy\Helper;
 
+use Composer\Util\Filesystem as UtilFileSystem;
 use HawkSearch\Proxy\Model\ProxyEmailFactory;
 use Magento\Catalog\Model\Category;
 use Magento\Catalog\Model\Config;
@@ -22,20 +23,19 @@ use Magento\Catalog\Model\SessionFactory;
 use Magento\CatalogUrlRewrite\Model\CategoryUrlRewriteGenerator;
 use Magento\Framework\App\CacheInterface as Cache;
 use Magento\Framework\App\Helper\Context;
-use Magento\UrlRewrite\Model\UrlFinderInterface;
 use Magento\Framework\Escaper;
 use Magento\Framework\Filesystem;
 use Magento\Framework\Filesystem\Driver\File;
 use Magento\Framework\Filesystem\Io\File as ioFile;
-use Composer\Util\Filesystem as UtilFileSystem;
 use Magento\Framework\Serialize\SerializerInterface;
+use Magento\Framework\Shell;
 use Magento\Store\Model\App\Emulation;
 use Magento\Store\Model\ResourceModel\Store\CollectionFactory as StoreCollectionFactory;
 use Magento\Store\Model\ScopeInterface;
 use Magento\Store\Model\Store;
 use Magento\Store\Model\StoreManagerInterface;
+use Magento\UrlRewrite\Model\UrlFinderInterface;
 use Magento\UrlRewrite\Service\V1\Data\UrlRewrite;
-use Magento\Framework\Shell;
 
 class Data extends \Magento\Framework\App\Helper\AbstractHelper
 {
@@ -73,7 +73,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     private $isManaged;
     private $filesystem;
     /**
-     * @var \Magento\Framework\Logger\Monolog $logger 
+     * @var \Magento\Framework\Logger\Monolog $logger
      */
     private $overwriteFlag;
     private $email_helper;
@@ -241,7 +241,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             }
             break;
         case 'hawkproxy_index':
-            if (isset($params['lpurl']) 
+            if (isset($params['lpurl'])
                 && (substr($params['lpurl'], 0, strlen('/catalogsearch/result')) === '/catalogsearch/result')
             ) {
                 unset($params['lpurl']);
@@ -292,11 +292,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             $this->setClientIp($this->_request->getClientIp());
             $this->setClientUa($this->_httpHeader->getHttpUserAgent());
         }
-        $writer = new \Zend\Log\Writer\Stream(BP . '/var/log/uri.log');
-        $logger = new \Zend\Log\Logger();
-        $logger->addWriter($writer);
-
-        $logger->info("Info: " . $this->uri);
         $client = new \Zend_Http_Client();
         $client->setConfig(['timeout' => 30]);
 
@@ -452,7 +447,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         }
 
         /**
- * @var \Magento\Catalog\Model\ResourceModel\Product\Collection $collection 
+ * @var \Magento\Catalog\Model\ResourceModel\Product\Collection $collection
 */
         $collection = $this->getResourceCollection($skus);
 
@@ -612,7 +607,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $code = $this->getConfigurationData('hawksearch_proxy/proxy/store_code');
 
         /**
- * @var Mage_Core_Model_Resource_Store_Collection $store 
+ * @var Mage_Core_Model_Resource_Store_Collection $store
 */
         $store = $this->storeCollectionFactory->create();
         return $store->addFieldToFilter('code', $code)->getFirstItem()->getId();
@@ -854,8 +849,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $errors = [];
         foreach ($stores as $store) {
             /**
- * @var Store $store 
-*/
+             * @var Store $store
+             */
             if ($store->getConfig('hawksearch_proxy/general/enabled') && $store->isActive()) {
                 try {
                     $this->syncHawkLandingByStore($store);
@@ -1165,8 +1160,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             $extra_html = $this->_getEmailExtraHtml();
 
             /**
- * @var ProxyEmail $mail_helper 
-*/
+             * @var ProxyEmail $mail_helper
+             */
             $mail_helper = $this->email_helper->create();
 
             try {
@@ -1208,8 +1203,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function getResourceCollection(array $skus)
     {
         /**
- * @var \Magento\Catalog\Model\ResourceModel\Product\Collection $collection 
-*/
+         * @var \Magento\Catalog\Model\ResourceModel\Product\Collection $collection
+         */
         $collection = $this->collectionFactory->create();
         $collection
             ->addAttributeToSelect($this->catalogConfig->getProductAttributes())
@@ -1224,8 +1219,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function getTypeLabelMap()
     {
         /**
- * @var stdClass $map 
-*/
+         * @var stdClass $map
+         */
         $obj = json_decode($this->getConfigurationData(self::CONFIG_PROXY_TYPE_LABEL));
         $map = [];
         if (is_object($obj)) {

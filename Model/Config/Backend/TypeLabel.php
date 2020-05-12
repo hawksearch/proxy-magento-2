@@ -46,8 +46,8 @@ class TypeLabel extends \Magento\Config\Model\Config\Backend\Serialized\ArraySer
         parent::_afterLoad();
         if (!$this->getValue() || count($this->getValue()) == 0) {
             /**
- * @var \HawkSearch\Proxy\Helper\Data $helper 
-*/
+             * @var \HawkSearch\Proxy\Helper\Data $helper
+             */
             $helper = $this->dataFactory->create();
             $client = new \Zend_Http_Client();
             $client->setUri(

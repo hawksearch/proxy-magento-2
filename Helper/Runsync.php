@@ -11,7 +11,7 @@
  * IN THE SOFTWARE.
  */
 $opts = getopt('r:t:f:');
-
+chdir($opts['r']);
 require 'app/bootstrap.php';
 
 $bootstrap = \Magento\Framework\App\Bootstrap::create(BP, $_SERVER);
@@ -31,8 +31,8 @@ if ($helper->isSyncLocked()) {
     try {
         if ($reciever = $helper->getEmailReceiver()) {
             /**
- * @var \HawkSearch\Proxy\Model\ProxyEmail $mail_helper
-*/
+             * @var \HawkSearch\Proxy\Model\ProxyEmail $mail_helper
+             */
             $mail_helper = $obj->create('HawkSearch\Proxy\Model\ProxyEmail');
             $mail_helper->sendEmail(
                 $reciever, [
