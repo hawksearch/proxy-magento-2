@@ -117,7 +117,8 @@ class UpgradeData implements \Magento\Framework\Setup\UpgradeDataInterface
             ->select()
             ->from($setup->getTable('core_config_data'))
             ->where(
-                'path in (?)', ['hawksearch_proxy/proxy/tracking_url_staging',
+                'path in (?)',
+                ['hawksearch_proxy/proxy/tracking_url_staging',
                 'hawksearch_proxy/proxy/tracking_url_live', 'hawksearch_proxy/proxy/mode']
             )
             ->order('path');

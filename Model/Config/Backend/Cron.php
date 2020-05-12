@@ -35,11 +35,11 @@ class Cron extends \Magento\Framework\App\Config\Value
     public function afterSave()
     {
         switch ($this->getPath()) {
-        case "hawksearch_proxy/sync/cron_string":
-            $targetPath = self::CRON_CATEGORY_SYNC_EXPR;
-            break;
-        default:
-            throw new \Exception(sprintf("Unexpected 'path': %s in %s", $this->getPath(), __FILE__));
+            case "hawksearch_proxy/sync/cron_string":
+                $targetPath = self::CRON_CATEGORY_SYNC_EXPR;
+                break;
+            default:
+                throw new \Exception(sprintf("Unexpected 'path': %s in %s", $this->getPath(), __FILE__));
         }
         $this->resourceConfig->saveConfig($targetPath, $this->getValue(), 'default', 0);
 

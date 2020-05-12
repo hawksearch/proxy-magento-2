@@ -221,35 +221,35 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             $params['lpurl'] = rtrim($params['lpurl'], "/");
         }
         switch ($controller) {
-        case 'hawkproxy_landingPage':
-            if ($this->getConfigurationData('hawksearch_proxy/proxy/enable_hawk_landing_pages')) {
-                $params['lpurl'] = $this->_request->getAlias('rewrite_request_path');
-                $this->setUri($params);
-            }
-            break;
-        case 'catalog_category':
-            if ($this->getConfigurationData('hawksearch_proxy/proxy/manage_categories')) {
-                if (empty($params['lpurl'])) {
+            case 'hawkproxy_landingPage':
+                if ($this->getConfigurationData('hawksearch_proxy/proxy/enable_hawk_landing_pages')) {
                     $params['lpurl'] = $this->_request->getAlias('rewrite_request_path');
+                    $this->setUri($params);
+                }
+                break;
+            case 'catalog_category':
+                if ($this->getConfigurationData('hawksearch_proxy/proxy/manage_categories')) {
+                    if (empty($params['lpurl'])) {
+                        $params['lpurl'] = $this->_request->getAlias('rewrite_request_path');
+                    }
+                    $this->setUri($params);
+                }
+                break;
+            case 'catalogsearch_result':
+                if ($this->getConfigurationData('hawksearch_proxy/proxy/manage_search')) {
+                    $this->setUri($params);
+                }
+                break;
+            case 'hawkproxy_index':
+                if (isset($params['lpurl'])
+                && (substr($params['lpurl'], 0, strlen('/catalogsearch/result')) === '/catalogsearch/result')
+                ) {
+                    unset($params['lpurl']);
                 }
                 $this->setUri($params);
-            }
-            break;
-        case 'catalogsearch_result':
-            if ($this->getConfigurationData('hawksearch_proxy/proxy/manage_search')) {
+                break;
+            default:
                 $this->setUri($params);
-            }
-            break;
-        case 'hawkproxy_index':
-            if (isset($params['lpurl'])
-                && (substr($params['lpurl'], 0, strlen('/catalogsearch/result')) === '/catalogsearch/result')
-            ) {
-                unset($params['lpurl']);
-            }
-            $this->setUri($params);
-            break;
-        default:
-            $this->setUri($params);
         }
     }
 
@@ -717,12 +717,14 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $this->log(sprintf('got %d magento category pages', count($mageList)));
 
         usort(
-            $hawkList, function ($a, $b) {
+            $hawkList,
+            function ($a, $b) {
                 return strcmp($a['hawkurl'], $b['hawkurl']);
             }
         );
         usort(
-            $mageList, function ($a, $b) {
+            $mageList,
+            function ($a, $b) {
                 return strcmp($a['hawkurl'], $b['hawkurl']);
             }
         );
@@ -1166,7 +1168,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
             try {
                 $mail_helper->sendEmail(
-                    $receiver, [
+                    $receiver,
+                    [
                     'status_text' => $status_text,
                     'extra_html' => $extra_html
                     ]
@@ -1260,12 +1263,12 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function modeActive(string $mode)
     {
         switch ($mode) {
-        case 'proxy':
-            return true;
-        case 'catalogsearch':
-            return $this->isManageSearch();
-        case 'category':
-            return $this->isManageCategories();
+            case 'proxy':
+                return true;
+            case 'catalogsearch':
+                return $this->isManageSearch();
+            case 'category':
+                return $this->isManageCategories();
         }
         return false;
     }

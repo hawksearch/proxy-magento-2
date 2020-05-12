@@ -23,7 +23,7 @@ class Index extends \Magento\Backend\App\Action
      */
     protected $resultJsonFactory;
     /**
-     * @var \HawkSearch\Proxy\Helper\Data $helper 
+     * @var \HawkSearch\Proxy\Helper\Data $helper
      */
     protected $dataHelper;
 
