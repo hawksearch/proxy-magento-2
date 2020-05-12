@@ -110,8 +110,8 @@ class UpgradeData implements \Magento\Framework\Setup\UpgradeDataInterface
          * hawksearch_proxy/proxy/mode -> value "0" => "develop", value "1" => "production"
          */
         /**
- * @var \Magento\Config\Model\ResourceModel\Config $config 
-*/
+         * @var \Magento\Config\Model\ResourceModel\Config $config
+         */
         $config = $this->config;
         $select = $config->getConnection()
             ->select()

@@ -54,8 +54,8 @@ class LayoutUpdate implements ObserverInterface
             }
         } elseif ($observer->getFullActionName() == 'hawkproxy_landingPage_view') {
             /**
- * @var \Magento\Framework\View\Layout $layout 
-*/
+             * @var \Magento\Framework\View\Layout $layout
+             */
             $layout = $observer->getLayout();
             $layout->getUpdate()->addHandle('catalog_category_view')
                 ->addHandle('hawksearch_category_view')

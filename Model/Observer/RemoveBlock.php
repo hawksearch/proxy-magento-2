@@ -12,9 +12,9 @@
  */
 namespace HawkSearch\Proxy\Model\Observer;
 
+use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
-use Magento\Framework\App\Config\ScopeConfigInterface;
 
 class RemoveBlock implements ObserverInterface
 {
@@ -28,12 +28,12 @@ class RemoveBlock implements ObserverInterface
     public function execute(Observer $observer)
     {
         /**
- * @var \Magento\Framework\View\Element\Template $block 
-*/
+         * @var \Magento\Framework\View\Element\Template $block
+         */
         $block = $observer->getBlock();
 
-        if ($block->getType() == Magento\Catalog\Block\Product\ListProduct::class 
-            || $block->getType() == Magento\Catalog\Block\Product\ProductList\Toolbar::class 
+        if ($block->getType() == Magento\Catalog\Block\Product\ListProduct::class
+            || $block->getType() == Magento\Catalog\Block\Product\ProductList\Toolbar::class
             || $block->getType() == Magento\Theme\Block\Html\Pager::class
         ) {
             $block->setTemplate(false);
