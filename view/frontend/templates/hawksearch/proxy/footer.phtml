@@ -30,7 +30,7 @@
 
     require(["jquery", "hawksearch" ], function ($) {
         HawkSearch.initAutoSuggest = function () {
-            <?php foreach ($block->getSearchBoxes() as $sbid): ?>
+            <?php foreach ($block->getSearchBoxes() as $sbid) : ?>
             HawkSearch.suggestInit('#<?= /* @noEscape */ $sbid; ?>', {
                 lookupUrlPrefix: HawkSearch.TrackingUrl + '<?= /* @noEscape */ $block->getAutosuggestParams() ?>',
                 hiddenDivName: '<?= /* @noEscape */ $block->getHiddenDivName() ?>',

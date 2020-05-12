@@ -1,5 +1,5 @@
 <div class="contentList">
-    <?php foreach ($block->getContent() as $item): ?>
+    <?php foreach ($block->getContent() as $item) : ?>
         <?= /* @noEscape */ $block->getTabbedItemHtml($item) ?>
     <?php endforeach; ?>
 </div>

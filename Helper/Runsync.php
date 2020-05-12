@@ -35,7 +35,8 @@ if ($helper->isSyncLocked()) {
              */
             $mail_helper = $obj->create('HawkSearch\Proxy\Model\ProxyEmail');
             $mail_helper->sendEmail(
-                $reciever, [
+                $reciever,
+                [
                 'status_text' => 'with following message:',
                 'extra_html' => "<p><strong>One or more HawkSearch Proxy feeds are being generated. Generation temporarily locked.</strong></p>"
                 ]

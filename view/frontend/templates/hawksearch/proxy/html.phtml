@@ -59,13 +59,13 @@ $tabs = $block->getTabs();
         $block->getBreadCrumb() ?></div>
     <div id="hawktitle"><?= /* @noEscape */
         $block->getTitle() ?></div>
-    <?php if ($block->getTabbedContent()): ?>
+    <?php if ($block->getTabbedContent()) : ?>
         <div id="hawktoppager"><?= /* @noEscape */
             $block->getTopPager(); ?></div>
         <div id="hawkbottompager"><?= /* @noEscape */
             $block->getBottomPager(); ?></div>
     <?php endif; ?>
-    <?php if (!empty($tabs)): ?>
+    <?php if (!empty($tabs)) : ?>
         <?= /* @noEscape */ sprintf('<div id="hawktabs">%s</div>', $tabs); ?>
     <?php endif;?>
 </div>
