@@ -328,7 +328,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     public function getApiUrl()
     {
-        $apiUrl = $this->getConfigurationData(sprintf('hawksearch_proxy/proxy/tracking_url_%s', $this->getMode()));
+        $apiUrl = $this->getConfigurationData(sprintf('hawksearch_proxy/proxy/hawk_url_settings/hawk_url_%s', $this->getMode()));
         $apiUrl = preg_replace('|^http://|', 'https://', $apiUrl);
         if ('/' == substr($apiUrl, -1)) {
             return $apiUrl . 'api/v3/';
@@ -378,18 +378,28 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         return $this->hawkData->Data->Facets;
     }
 
-    public function getTrackingUrl()
+    public function getHawkUrl()
     {
-        $trackingUrl = $this->getConfigurationData(sprintf('hawksearch_proxy/proxy/tracking_url_%s', $this->getMode()));
+        $trackingUrl = $this->getConfigurationData(sprintf('hawksearch_proxy/proxy/hawk_url_settings/hawk_url_%s', $this->getMode()));
         if ('/' == substr($trackingUrl, -1)) {
             return $trackingUrl . 'sites/' . $this->getEngineName();
         }
         return $trackingUrl . '/sites/' . $this->getEngineName();
     }
 
+    public function getTrackingUrl()
+    {
+        return $this->getConfigurationData(sprintf('hawksearch_proxy/proxy/tracking_url_settings/tracking_url_%s', $this->getMode()));
+    }
+
+    public function getRecommenderUrl()
+    {
+        return $this->getConfigurationData(sprintf('hawksearch_proxy/proxy/rec_url_settings/rec_url_%s', $this->getMode()));
+    }
+
     public function getTrackingPixelUrl($args)
     {
-        $trackingUrl = $this->getConfigurationData(sprintf('hawksearch_proxy/proxy/tracking_url_%s', $this->getMode()));
+        $trackingUrl = $this->getTrackingUrl();
         if ('/' == substr($trackingUrl, -1)) {
             return $trackingUrl . 'sites/_hawk/hawkconversion.aspx?' . http_build_query($args);
         }
