@@ -49,7 +49,7 @@ class Facets extends \Magento\Framework\View\Element\Template
     protected function getFeaturedZone($zone)
     {
         $layout = $this->getLayout();
-        $block = $layout->createBlock(HawkSearch\Proxy\Block\Product\ListFeatured::class);
+        $block = $layout->createBlock('HawkSearch\Proxy\Block\Product\ListFeatured');
         $block->setZone($zone);
         $productCollection = $block->getLoadedProductCollection();
         if ($productCollection->count() > 0) {

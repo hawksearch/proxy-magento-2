@@ -127,7 +127,7 @@ class Html extends Template
     public function getFeaturedZone($zone)
     {
         $layout = $this->getLayout();
-        $block = $layout->createBlock(HawkSearch\Proxy\Block\Product\ListFeatured::class);
+        $block = $layout->createBlock('HawkSearch\Proxy\Block\Product\ListFeatured');
         $block->setZone($zone);
         $productCollection = $block->getLoadedProductCollection();
         if ($productCollection->count() > 0) {
@@ -140,7 +140,7 @@ class Html extends Template
     public function getFeaturedLeftZone($zone)
     {
         $layout = $this->getLayout();
-        $block = $layout->createBlock(HawkSearch\Proxy\Block\Product\ListFeatured::class);
+        $block = $layout->createBlock('HawkSearch\Proxy\Block\Product\ListFeatured');
         $block->setZone($zone);
         $productCollection = $block->getLoadedProductCollection();
         if ($productCollection->count() > 0) {
