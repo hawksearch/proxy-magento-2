@@ -12,64 +12,79 @@
  */
 namespace HawkSearch\Proxy\Controller\Adminhtml\Hawkproxysynchronize;
 
+use DateTime;
+use Exception;
+use HawkSearch\Proxy\Model\Task\Exception\AlreadyScheduledException;
+use HawkSearch\Proxy\Model\Task\Exception\SchedulerException;
+use HawkSearch\Proxy\Model\Task\SyncCategories\TaskScheduler;
+use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
-use Magento\Framework\App\ResponseInterface;
-use Magento\Framework\View\Result\PageFactory;
+use Magento\Cron\Model\Schedule;
+use Magento\Framework\Controller\Result\Redirect;
+use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 
-class Index extends \Magento\Backend\App\Action
+class Index extends Action
 {
-    /**
-     * @var \Magento\Framework\Controller\Result\JsonFactory
-     */
-    protected $resultJsonFactory;
-    /**
-     * @var \HawkSearch\Proxy\Helper\Data $helper
-     */
-    protected $dataHelper;
+    private const SUCCESS_MESSAGE = 'Successfully scheduled Category Sync Task';
+
+    /** @var TaskScheduler */
+    private $taskScheduler;
+
+    /** @var TimezoneInterface */
+    private $timezone;
 
     /**
-     * @param Context                                          $context
-     * @param \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory
+     * @param Context $context
+     * @param TaskScheduler $taskScheduler
+     * @param TimezoneInterface $timezone
      */
     public function __construct(
         Context $context,
-        \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory,
-        \HawkSearch\Proxy\Helper\Data $dataHelper
-    ) {
-        parent::__construct($context);
-        $this->resultJsonFactory = $resultJsonFactory;
-        $this->dataHelper = $dataHelper;
+        TaskScheduler $taskScheduler,
+        TimezoneInterface $timezone
+    )
+    {
+        parent::__construct( $context );
+        $this->taskScheduler = $taskScheduler;
+        $this->timezone      = $timezone;
     }
 
     /**
-     * @return \Magento\Framework\Controller\Result\Json
+     * @return Redirect
      */
     public function execute()
     {
-        $disabledFuncs = explode(',', ini_get('disable_functions'));
-        $isShellDisabled = is_array($disabledFuncs) ? in_array('shell_exec', $disabledFuncs) : true;
-        $isShellDisabled = ((stripos(PHP_OS, 'Darwin') !== false)
-            || (stripos(PHP_OS, 'win') === false)) ? $isShellDisabled : true;
+        try {
+            $schedule = $this->taskScheduler->schedule();
+        }
+        catch ( AlreadyScheduledException $exception ) {
+            $this->messageManager->addWarningMessage( __( 'Category Sync is already scheduled' ) );
+        }
+        catch ( SchedulerException $exception ) {
+            $this->messageManager->addErrorMessage( __( 'Failed to schedule Category Sync' ) );
+        }
 
-        if ($isShellDisabled) {
-            return $this->resultJsonFactory->create()->setData(
-                [
-                'error' => 'This installation cannot run one-off category synchronizations because the PHP function "shell_exec" has been disabled. Please use cron.']
+        // return to previous page
+        return $this->resultRedirectFactory->create()->setUrl( $this->_redirect->getRefererUrl() );
+    }
+
+    /**
+     * @param Schedule $schedule
+     */
+    private function reportSuccess( Schedule $schedule ) : void
+    {
+        $id = $schedule->getId();
+
+        try {
+            $scheduledAt = $this->timezone
+                ->date( new DateTime( $schedule->getScheduledAt() ) )
+                ->format( DateTime::RFC850 );
+            $this->messageManager->addSuccessMessage(
+                __( self::SUCCESS_MESSAGE ) . ": $scheduledAt (ID: $id)"
             );
-        } else {
-            if (strtolower($this->getRequest()->getParam('force')) == 'true') {
-                $this->dataHelper->removeSyncLocks();
-            }
-            if (strtolower($this->getRequest()->getParam('overwrite')) == 'true') {
-                $this->dataHelper->setOverwriteFlag(true);
-            }
-            $rs = $this->dataHelper->launchSyncProcess();
-            if ($rs === true) {
-                return $this->resultJsonFactory->create()
-                    ->setData(['message' => 'Sync started, running as background process.']);
-            } else {
-                return $this->resultJsonFactory->create()->setData(['error' => $rs]);
-            }
+        }
+        catch ( Exception $exception ) {
+            $this->messageManager->addSuccessMessage( __( self::SUCCESS_MESSAGE ) );
         }
     }
 }

@@ -218,24 +218,27 @@
             <group id="sync" translate="label" type="text" sortOrder="15" showInDefault="1" showInWebsite="1"
                    showInStore="1">
                 <label>Synchronization Settings</label>
-                <field id="synchronize" translate="button_label" sortOrder="5" showInDefault="1"
+                <field id="enabled" translate="label comment" type="select" showInDefault="1" showInWebsite="1"
+                       showInStore="1" sortOrder="25">
+                    <label>Enable cron sync</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="synchronize" translate="button_label" sortOrder="26" showInDefault="1"
                        showInWebsite="0" showInStore="0">
                     <label/>
                     <button_label>
-                        <![CDATA[Synchronize]]>
+                        <![CDATA[Schedule Synchronization]]>
                     </button_label>
                     <button_url>
                         <![CDATA[hawksearchproxy/hawkproxysynchronize/index]]>
                     </button_url>
                     <frontend_model>HawkSearch\Proxy\Block\System\Config\Sync</frontend_model>
                     <comment>
-                        <![CDATA[Manually Synchronize Categories.]]>
+                        <![CDATA[Schedule Category Synchronization for next cron run]]>
                     </comment>
-                </field>
-                <field id="enabled" translate="label comment" type="select" showInDefault="1" showInWebsite="1"
-                       showInStore="1" sortOrder="25">
-                    <label>Enable cron sync</label>
-                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
                 </field>
                 <field id="cron_string" translate="label comment" type="text" showInDefault="1" showInWebsite="1"
                        showInStore="1" sortOrder="30">

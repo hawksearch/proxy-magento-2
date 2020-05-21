@@ -28,7 +28,6 @@ use Magento\Framework\Filesystem;
 use Magento\Framework\Filesystem\Driver\File;
 use Magento\Framework\Filesystem\Io\File as ioFile;
 use Magento\Framework\Serialize\SerializerInterface;
-use Magento\Framework\Shell;
 use Magento\Store\Model\App\Emulation;
 use Magento\Store\Model\ResourceModel\Store\CollectionFactory as StoreCollectionFactory;
 use Magento\Store\Model\ScopeInterface;
@@ -105,7 +104,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     protected $file;
     protected $fileDirectory;
     private $utilFileSystem;
-    protected $shell;
     /**
      * Data constructor.
      *
@@ -139,8 +137,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         SerializerInterface $serializer,
         File $file,
         ioFile $fileDirectory,
-        UtilFileSystem $utilFileSystem,
-        Shell $shell
+        UtilFileSystem $utilFileSystem
     ) {
         // parent construct first so scopeConfig gets set for use in "setUri", etc.
         parent::__construct($context);
@@ -163,7 +160,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $this->file = $file;
         $this->fileDirectory = $fileDirectory;
         $this->utilFileSystem = $utilFileSystem;
-        $this->shell = $shell;
     }
 
     public function getConfigurationData($data)
@@ -986,37 +982,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         return false;
     }
 
-    public function launchSyncProcess()
-    {
-        try {
-            $tmppath = $this->filesystem->getDirectoryWrite('tmp')->getAbsolutePath();
-            $tmpfile = tempnam($tmppath, 'hawkproxy_');
-
-            $parts = explode(DIRECTORY_SEPARATOR, __FILE__);
-            array_pop($parts);
-            $parts[] = 'Runsync.php';
-            $runfile = implode(DIRECTORY_SEPARATOR, $parts);
-            $root = BP;
-
-            $f = $this->file->fileOpen($tmpfile, 'w');
-
-            $phpbin = PHP_BINDIR . DIRECTORY_SEPARATOR . "php";
-
-            if ($this->overwriteFlag) {
-                $this->file->fileWrite($f, "$phpbin -d memory_limit=-1 $runfile -r $root -t $tmpfile -f 1\n");
-            } else {
-                $this->file->fileWrite($f, "$phpbin -d memory_limit=-1 $runfile -r $root -t $tmpfile\n");
-            }
-
-            $syncLog = implode(DIRECTORY_SEPARATOR, [BP, 'var', 'log', 'hawk_sync_exception.log']);
-            shell_exec("/bin/sh $tmpfile > $syncLog 2>&1 &");
-
-            return true;
-        } catch (\Exception $e) {
-            return $e->getMessage();
-        }
-    }
-
     private function validateHawkLandingPageResponse($response, $action, $url, $request_raw = null)
     {
         // valid action
@@ -1063,32 +1028,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         }
 
         return $fullPath;
-    }
-
-    public function createSyncLocks()
-    {
-        $this->log('going to create proxy lock file');
-        $path = $this->getSyncFilePath();
-        $filename = implode(DIRECTORY_SEPARATOR, [$path, self::LOCK_FILE_NAME]);
-        $content = date("Y-m-d H:i:s");
-
-        if ($this->file->filePutContents($filename, $content) === false) {
-            $this->log("Unable to write lock file, returning false!");
-            return false;
-        }
-        return true;
-    }
-
-    public function removeSyncLocks()
-    {
-        $path = $this->getSyncFilePath();
-        $filename = implode(DIRECTORY_SEPARATOR, [$path, self::LOCK_FILE_NAME]);
-
-        if ($this->file->isFile($filename)) {
-
-            return $this->utilFileSystem->unlink($filename);
-        }
-        return false;
     }
 
     public function getSearchBoxes()
