@@ -42,14 +42,15 @@ class Sync extends Field
      * @param TimezoneInterface $timezone
      * @param array $data
      */
-    public function __construct( Context $context,
-                                 Data $helper,
-                                 TaskScheduler $taskScheduler,
-                                 TimezoneInterface $timezone,
-                                 array $data = [] )
-    {
+    public function __construct(
+        Context $context,
+        Data $helper,
+        TaskScheduler $taskScheduler,
+        TimezoneInterface $timezone,
+        array $data = []
+    ) {
         $this->helper = $helper;
-        parent::__construct( $context, $data );
+        parent::__construct($context, $data);
         $this->taskScheduler = $taskScheduler;
         $this->timezone      = $timezone;
     }
@@ -58,7 +59,7 @@ class Sync extends Field
     {
         parent::_prepareLayout();
         if (!$this->getTemplate()) {
-              $this->setTemplate('HawkSearch_Proxy::system/config/button/sync.phtml');
+            $this->setTemplate('HawkSearch_Proxy::system/config/button/sync.phtml');
         }
         return $this;
     }
@@ -68,7 +69,7 @@ class Sync extends Field
      * @param AbstractElement $element
      * @return string
      */
-    public function render( AbstractElement $element )
+    public function render(AbstractElement $element)
     {
         // Remove scope label
         $element->unsScope()->unsCanUseWebsiteValue()->unsCanUseDefaultValue();
@@ -80,7 +81,7 @@ class Sync extends Field
      * @param AbstractElement $element
      * @return string
      */
-    protected function _getElementHtml( AbstractElement $element )
+    protected function _getElementHtml(AbstractElement $element)
     {
         $config = $element->getFieldConfig();
         $this->addData(
@@ -110,12 +111,12 @@ class Sync extends Field
      */
     public function getNextScheduledId() : ?int
     {
-        if ( is_null( $this->nextScheduled ) ) {
+        if ($this->nextScheduled === null) {
             $this->loadNextScheduled();
         }
 
         return $this->nextScheduled
-            ? intval( $this->nextScheduled->getId() )
+            ? (int)$this->nextScheduled->getId()
             : null;
     }
 
@@ -124,20 +125,19 @@ class Sync extends Field
      */
     public function getNextScheduledTimestamp() : ?string
     {
-        if ( is_null( $this->nextScheduled ) ) {
+        if ($this->nextScheduled === null) {
             $this->loadNextScheduled();
         }
 
-        if ( is_null( $this->nextScheduled ) ) {
+        if ($this->nextScheduled === null) {
             return null;
         }
 
         try {
             return $this->timezone
-                ->date( new DateTime( $this->nextScheduled->getScheduledAt() ) )
-                ->format( DateTime::RFC850 );
-        }
-        catch ( Exception $exception ) {
+                ->date(new DateTime($this->nextScheduled->getScheduledAt()))
+                ->format(DateTime::RFC850);
+        } catch (Exception $exception) {
             return null;
         }
     }

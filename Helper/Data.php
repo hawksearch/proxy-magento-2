@@ -740,7 +740,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             $customVal = null;
             if ($sc < 0) {
                 //Hawk has page Magento doesn't want managed, delete, increment left
-                if (substr($hawkList[$left]['custom'], 0, strlen('__mage_catid_'))== '__mage_catid_' || $this->overwriteFlag
+                if (substr($hawkList[$left]['custom'], 0, strlen('__mage_catid_'))== '__mage_catid_'
+                    || $this->overwriteFlag
                 ) {
                     $resp = $this->getHawkResponse(
                         \Zend_Http_Client::DELETE,
@@ -1070,7 +1071,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                     $html .= "<p>";
                     $html .= "<strong>Category Url:</strong>" . $this->_syncingExceptions[$i]['url'] . "<br/>";
                     $html .= "<strong>Action:</strong>" . $this->_syncingExceptions[$i]['action'] . "<br/>";
-                    $html .= "<strong>Request Raw Data:</strong>" . $this->_syncingExceptions[$i]['request_raw'] . "<br/>";
+                    $html .= "<strong>Request Raw Data:</strong>" .
+                        $this->_syncingExceptions[$i]['request_raw'] . "<br/>";
                     $html .= "<strong>Response Message:</strong>" . $this->_syncingExceptions[$i]['error'] . "<br/>";
                     $html .= "</p>";
                     $html .= "<hr/>";

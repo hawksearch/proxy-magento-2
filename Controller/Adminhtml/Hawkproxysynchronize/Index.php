@@ -42,9 +42,8 @@ class Index extends Action
         Context $context,
         TaskScheduler $taskScheduler,
         TimezoneInterface $timezone
-    )
-    {
-        parent::__construct( $context );
+    ) {
+        parent::__construct($context);
         $this->taskScheduler = $taskScheduler;
         $this->timezone      = $timezone;
     }
@@ -56,35 +55,32 @@ class Index extends Action
     {
         try {
             $schedule = $this->taskScheduler->schedule();
-        }
-        catch ( AlreadyScheduledException $exception ) {
-            $this->messageManager->addWarningMessage( __( 'Category Sync is already scheduled' ) );
-        }
-        catch ( SchedulerException $exception ) {
-            $this->messageManager->addErrorMessage( __( 'Failed to schedule Category Sync' ) );
+        } catch (AlreadyScheduledException $exception) {
+            $this->messageManager->addWarningMessage(__('Category Sync is already scheduled'));
+        } catch (SchedulerException $exception) {
+            $this->messageManager->addErrorMessage(__('Failed to schedule Category Sync'));
         }
 
         // return to previous page
-        return $this->resultRedirectFactory->create()->setUrl( $this->_redirect->getRefererUrl() );
+        return $this->resultRedirectFactory->create()->setUrl($this->_redirect->getRefererUrl());
     }
 
     /**
      * @param Schedule $schedule
      */
-    private function reportSuccess( Schedule $schedule ) : void
+    private function reportSuccess(Schedule $schedule) : void
     {
         $id = $schedule->getId();
 
         try {
             $scheduledAt = $this->timezone
-                ->date( new DateTime( $schedule->getScheduledAt() ) )
-                ->format( DateTime::RFC850 );
+                ->date(new DateTime($schedule->getScheduledAt()))
+                ->format(DateTime::RFC850);
             $this->messageManager->addSuccessMessage(
-                __( self::SUCCESS_MESSAGE ) . ": $scheduledAt (ID: $id)"
+                self::SUCCESS_MESSAGE . ": $scheduledAt (ID: $id)"
             );
-        }
-        catch ( Exception $exception ) {
-            $this->messageManager->addSuccessMessage( __( self::SUCCESS_MESSAGE ) );
+        } catch (Exception $exception) {
+            $this->messageManager->addSuccessMessage(self::SUCCESS_MESSAGE);
         }
     }
 }
