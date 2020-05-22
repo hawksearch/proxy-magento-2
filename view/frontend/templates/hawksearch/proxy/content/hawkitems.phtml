@@ -13,16 +13,16 @@
  /** @var $block HawkSearch\Proxy\Block\HawkItems */
 ?>
 <div id="hawkbannertop" class="bannerTop">
-    <?php echo $block->getBanner()->getFeaturedTop() ?>
-	<?php echo $block->getBanner()->getBannerTop() ?></div>
+    <?= /* @noEscape */ $block->getBanner()->getFeaturedTop() ?>
+    <?= /* @noEscape */ $block->getBanner()->getBannerTop() ?></div>
 <div id="hawkitemlist">
-	<?php echo $block->getChildHtml(); ?>
+    <?= /* @noEscape */ $block->getChildHtml(); ?>
 </div>
-<?php echo $block->getClickTracking(); ?>
+<?= /* @noEscape */ $block->getClickTracking(); ?>
 <div id="hawkbannerbottom" class="bannerBottom">
-    <?php echo $block->getBanner()->getFeaturedBottom() ?>
-	<?php echo $block->getBanner()->getBannerBottom() ?></div>
+    <?= /* @noEscape */ $block->getBanner()->getFeaturedBottom() ?>
+    <?= /* @noEscape */ $block->getBanner()->getBannerBottom() ?></div>
 <div id="hawkbannerbottom2" class="bannerBottom">
-	<?php echo $block->getBanner()->getBannerBottom2() ?>
-    <?php echo $block->getBanner()->getFeaturedBottom2() ?>
+    <?= /* @noEscape */ $block->getBanner()->getBannerBottom2() ?>
+    <?= /* @noEscape */ $block->getBanner()->getFeaturedBottom2() ?>
 </div>

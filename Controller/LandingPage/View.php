@@ -12,8 +12,7 @@
  */
 namespace HawkSearch\Proxy\Controller\LandingPage;
 
-class View
-    extends \Magento\Framework\App\Action\Action
+class View extends \Magento\Framework\App\Action\Action
 {
 
     protected $resultPageFactory;
@@ -30,15 +29,14 @@ class View
      * @var \HawkSearch\Proxy\Helper\Data
      */
     private $helper;
-
-
     /**
      * View constructor.
-     * @param \Magento\Framework\App\Action\Context $context
-     * @param \Magento\Catalog\Model\Session $session
-     * @param \Magento\Framework\Registry $coreRegistry
-     * @param \Magento\Catalog\Model\CategoryFactory $categoryFactory
-     * @param \HawkSearch\Proxy\Helper\Data $helper
+     *
+     * @param \Magento\Framework\App\Action\Context      $context
+     * @param \Magento\Catalog\Model\Session             $session
+     * @param \Magento\Framework\Registry                $coreRegistry
+     * @param \Magento\Catalog\Model\CategoryFactory     $categoryFactory
+     * @param \HawkSearch\Proxy\Helper\Data              $helper
      * @param \Magento\Framework\View\Result\PageFactory $resultPageFactory
      */
     public function __construct(
@@ -48,8 +46,7 @@ class View
         \Magento\Catalog\Model\CategoryFactory $categoryFactory,
         \HawkSearch\Proxy\Helper\Data $helper,
         \Magento\Framework\View\Result\PageFactory $resultPageFactory
-    )
-    {
+    ) {
         parent::__construct($context);
         $this->resultPageFactory = $resultPageFactory;
         $this->session = $session;
@@ -57,24 +54,24 @@ class View
         $this->categoryFactory = $categoryFactory;
         $this->helper = $helper;
     }
-
-
     public function execute()
     {
         $category = $this->categoryFactory->create();
         $category->setHawksearchLandingPage(true);
         $data = $this->helper->getResultData();
-        if(property_exists($data, 'Name')) {
+        if (property_exists($data, 'Name')) {
             $category->setName($data->Name);
         } elseif (property_exists($data, 'HeaderTitle')) {
             $category->setName(strip_tags($data->HeaderTitle));
         } else {
             $category->setName('-');
         }
-        $category->setHawkBreadcrumbPath([ 0 => [
+        $category->setHawkBreadcrumbPath(
+            [ 0 => [
             'label' => $category->getName(),
             'link' => ''
-        ]]);
+            ]]
+        );
 
         $this->coreRegistry->register('current_category', $category);
 

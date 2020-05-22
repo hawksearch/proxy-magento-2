@@ -13,8 +13,9 @@
 
 namespace HawkSearch\Proxy\Controller;
 
-class LandingPageRouter
-    implements \Magento\Framework\App\RouterInterface
+use Magento\Framework\App\Action\Forward;
+
+class LandingPageRouter implements \Magento\Framework\App\RouterInterface
 {
     /**
      * @var \Magento\Framework\App\ActionFactory
@@ -27,20 +28,19 @@ class LandingPageRouter
 
     /**
      * @param \Magento\Framework\App\ActionFactory $actionFactory
-     * @param \HawkSearch\Proxy\Helper\Data $helper
+     * @param \HawkSearch\Proxy\Helper\Data        $helper
      */
     public function __construct(
         \Magento\Framework\App\ActionFactory $actionFactory,
         \HawkSearch\Proxy\Helper\Data $helper
-    )
-    {
+    ) {
         $this->actionFactory = $actionFactory;
         $this->helper = $helper;
     }
 
     public function match(\Magento\Framework\App\RequestInterface $request)
     {
-        if(!$this->helper->getEnabled()) {
+        if (!$this->helper->getEnabled()) {
             return false;
         }
         if (!$this->helper->getEnableLandingPageRoute()) {
@@ -54,7 +54,6 @@ class LandingPageRouter
         /*
          * We have match and now we will forward action
          */
-        return $this->actionFactory->create('Magento\Framework\App\Action\Forward');
+        return $this->actionFactory->create(Forward::class);
     }
-
 }

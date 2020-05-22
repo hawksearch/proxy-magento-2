@@ -12,8 +12,7 @@
  */
 namespace HawkSearch\Proxy\Controller;
 
-class SearchRouter
-    implements \Magento\Framework\App\RouterInterface
+class SearchRouter implements \Magento\Framework\App\RouterInterface
 {
     /**
      * @var \Magento\Framework\App\ActionFactory
@@ -26,13 +25,12 @@ class SearchRouter
 
     /**
      * @param \Magento\Framework\App\ActionFactory $actionFactory
-     * @param \HawkSearch\Proxy\Helper\Data $helper
+     * @param \HawkSearch\Proxy\Helper\Data        $helper
      */
     public function __construct(
         \Magento\Framework\App\ActionFactory $actionFactory,
         \HawkSearch\Proxy\Helper\Data $helper
-    )
-    {
+    ) {
         $this->actionFactory = $actionFactory;
         $this->helper = $helper;
     }
@@ -40,12 +38,12 @@ class SearchRouter
     /**
      * Validate and Match Cms Page and modify request
      *
-     * @param \Magento\Framework\App\RequestInterface $request
+     * @param  \Magento\Framework\App\RequestInterface $request
      * @return bool
      */
     public function match(\Magento\Framework\App\RequestInterface $request)
     {
-        if(!$this->helper->getEnableCustomSearchRoute()) {
+        if (!$this->helper->getEnableCustomSearchRoute()) {
             return false;
         }
         $stem = $this->helper->getConfigurationData('hawksearch_proxy/proxy/custom_search_route');
@@ -53,7 +51,10 @@ class SearchRouter
         $identifier = array_shift($parts);
 
         if (strpos($identifier, $stem) !== false) {
-            $request->setModuleName('catalogsearch')->setControllerName('result')->setActionName('index')->setParam('q', implode(' ', $parts));
+            $request->setModuleName('catalogsearch')
+                ->setControllerName('result')
+                ->setActionName('index')
+                ->setParam('q', implode(' ', $parts));
         } else {
             return false;
         }
@@ -62,9 +63,8 @@ class SearchRouter
          * We have match and now we will forward action
          */
         return $this->actionFactory->create(
-            'Magento\Framework\App\Action\Forward',
+            Magento\Framework\App\Action\Forward::class,
             ['request' => $request]
         );
     }
-
 }

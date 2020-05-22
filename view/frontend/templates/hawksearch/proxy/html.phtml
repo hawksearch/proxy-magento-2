@@ -16,32 +16,56 @@ $tabs = $block->getTabs();
 ?>
 
 <div>
-    <div id="hawkmetarobots"><?php echo $block->getMetaRobots() ?></div>
-    <div id="hawkheadertitle"><?php echo $block->getHeaderTitle() ?></div>
-    <div id="hawkmetadescription"><?php echo $block->getMetaDescription() ?></div>
-    <div id="hawkmetakeywords"><?php echo $block->getMetaKeywords() ?></div>
-    <div id="hawkrelcanonical"><?php echo $block->getRelCanonical() ?></div>
-    <div id="hawktoptext"><?php echo $block->getTopText() ?></div>
-    <div id="hawkitemlist"><?php echo $block->getItemList() ?></div>
-    <?php echo $block->getHawkTrackingData(); ?>
+    <div id="hawkmetarobots"><?= /* @noEscape */
+        $block->getMetaRobots() ?></div>
+    <div id="hawkheadertitle"><?= /* @noEscape */
+        $block->getHeaderTitle() ?></div>
+    <div id="hawkmetadescription"><?= /* @noEscape */
+        $block->getMetaDescription() ?></div>
+    <div id="hawkmetakeywords"><?= /* @noEscape */
+        $block->getMetaKeywords() ?></div>
+    <div id="hawkrelcanonical"><?= /* @noEscape */
+        $block->getRelCanonical() ?></div>
+    <div id="hawktoptext"><?= /* @noEscape */
+        $block->getTopText() ?></div>
+    <div id="hawkitemlist"><?= /* @noEscape */
+        $block->getItemList() ?></div>
+    <?= /* @noEscape */
+    $block->getHawkTrackingData(); ?>
     <div id="hawkexplain"></div>
     <div id="hawksmartbug"></div>
-    <div id="hawkrelated"><?php echo $block->getRelated() ?></div>
-    <div id="hawkfacets"><?php echo $block->getFacets() ?></div>
+    <div id="hawkrelated"><?= /* @noEscape */
+        $block->getRelated() ?></div>
+    <div id="hawkfacets"><?= /* @noEscape */
+        $block->getFacets() ?></div>
     <div id="hawkbannertop"
-         class="bannerTop"> <?php echo $block->getBanner()->getFeaturedTop() ?><?php echo $block->getBanner()->getBannerTop() ?></div>
-    <div id="hawkbannerlefttop" class="bannerLeftTop"><?php echo $block->getBanner()->getBannerLeftTop() ?></div>
+         class="bannerTop"> <?= /* @noEscape */
+            $block->getBanner()->getFeaturedTop() ?><?= /* @noEscape */
+        $block->getBanner()->getBannerTop() ?></div>
+    <div id="hawkbannerlefttop" class="bannerLeftTop"><?= /* @noEscape */
+        $block->getBanner()->getBannerLeftTop() ?></div>
     <div id="hawkbannerleftbottom"
-         class="bannerLeftBottom"><?php echo $block->getBanner()->getBannerLeftBottom() ?></div>
+         class="bannerLeftBottom"><?= /* @noEscape */
+            $block->getBanner()->getBannerLeftBottom() ?></div>
     <div id="hawkbannerbottom"
-         class="bannerBottom"> <?php echo $block->getBanner()->getFeaturedBottom() ?><?php echo $block->getBanner()->getBannerBottom() ?></div>
+         class="bannerBottom"> <?= /* @noEscape */
+            $block->getBanner()->getFeaturedBottom() ?><?= /* @noEscape */
+        $block->getBanner()->getBannerBottom() ?></div>
     <div id="hawkbannerbottom2"
-         class="bannerBottom"> <?php echo $block->getBanner()->getBannerBottom2() ?><?php echo $block->getBanner()->getFeaturedBottom2() ?></div>
-    <div id="hawkbreadcrumb"><?php echo $block->getBreadCrumb() ?></div>
-    <div id="hawktitle"><?php echo $block->getTitle() ?></div>
-    <?php if($block->getTabbedContent()) :?>
-    <div id="hawktoppager"><?php echo $block->getTopPager(); ?></div>
-    <div id="hawkbottompager"><?php echo $block->getBottomPager(); ?></div>
+         class="bannerBottom"> <?= /* @noEscape */
+            $block->getBanner()->getBannerBottom2() ?><?= /* @noEscape */
+        $block->getBanner()->getFeaturedBottom2() ?></div>
+    <div id="hawkbreadcrumb"><?= /* @noEscape */
+        $block->getBreadCrumb() ?></div>
+    <div id="hawktitle"><?= /* @noEscape */
+        $block->getTitle() ?></div>
+    <?php if ($block->getTabbedContent()) : ?>
+        <div id="hawktoppager"><?= /* @noEscape */
+            $block->getTopPager(); ?></div>
+        <div id="hawkbottompager"><?= /* @noEscape */
+            $block->getBottomPager(); ?></div>
     <?php endif; ?>
-    <?php if(!empty($tabs)) { echo sprintf('<div id="hawktabs">%s</div>', $tabs); } ?>
+    <?php if (!empty($tabs)) : ?>
+        <?= /* @noEscape */ sprintf('<div id="hawktabs">%s</div>', $tabs); ?>
+    <?php endif;?>
 </div>

@@ -8,7 +8,6 @@
 
 namespace HawkSearch\Proxy\Block\Head;
 
-
 use Magento\Framework\View\Element\Template;
 
 class HawkSearchJs extends \Magento\Framework\View\Element\Template
@@ -18,20 +17,23 @@ class HawkSearchJs extends \Magento\Framework\View\Element\Template
     public function __construct(
         Template\Context $context,
         \HawkSearch\Proxy\Helper\Data $dataHelper,
-        array $data)
-    {
+        array $data
+    ) {
         $this->dataHelper = $dataHelper;
         parent::__construct($context, $data);
     }
 
-    public function getTrackingUrl() {
+    public function getTrackingUrl()
+    {
         return $this->dataHelper->getTrackingUrl();
     }
-    public function getIncludeHawkCss(){
+    public function getIncludeHawkCss()
+    {
         return $this->dataHelper->getConfigurationData('hawksearch_proxy/proxy/hawksearch_include_css');
     }
-    public function getJsPath() {
-        if($this->dataHelper->getConfigurationData('hawksearch_proxy/proxy/local_js')){
+    public function getJsPath()
+    {
+        if ($this->dataHelper->getConfigurationData('hawksearch_proxy/proxy/local_js')) {
             return 'HawkSearch_Proxy/js/hawksearch';
         }
         return sprintf('%s/includes/hawksearch', $this->getTrackingUrl());

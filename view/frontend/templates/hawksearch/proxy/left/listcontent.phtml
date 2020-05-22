@@ -11,26 +11,18 @@
  * IN THE SOFTWARE.
  */
 
-$om=\Magento\Framework\App\ObjectManager::getInstance();
+$om = \Magento\Framework\App\ObjectManager::getInstance();
 
-$hawkBanner=$om->get('HawkSearch\Proxy\Block\Banner');
- 
-$helper=$om->create('HawkSearch\Proxy\Helper\Data');
-$request=$om->create('Magento\Framework\App\Request\Http');
+$hawkBanner = $om->get(\HawkSearch\Proxy\Block\Banner::class);
+$helper = $om->create(\HawkSearch\Proxy\Helper\Data::class);
+$request = $om->create(\Magento\Framework\App\Request\Http::class);
 
-$args = array_merge($request->getParams(), array('output' => 'custom', 'hawkitemlist'=>'json'));
-			$helper->setUri($args);
-			$helper->setClientIp($request->getClientIp());
-			$helper->setClientUa($om->create('\Magento\Framework\HTTP\Header')->getHttpUserAgent());
-
-			
-
-			$helper->setIsHawkManaged(true);
-
-
-
-
-
-
+$args = array_merge($request->getParams(), ['output' => 'custom', 'hawkitemlist' => 'json']);
+$helper->setUri($args);
+$helper->setClientIp($request->getClientIp());
+$helper->setClientUa($om->create(\Magento\Framework\HTTP\Header::class)->getHttpUserAgent());
+$helper->setIsHawkManaged(true);
 ?>
-<div id="hawkbannertop" class="bannerTop"><?php echo $hawkBanner->getBannerTop()?></div><div id="hawkitemlist"><?php echo $this->getChildHtml('product_list')?></div><div id="hawkbannerbottom" class="bannerBottom"><?php echo $hawkBanner->getBannerBottom() ?></div>';
+<div id="hawkbannertop" class="bannerTop"><?= /* @noEscape */ $hawkBanner->getBannerTop() ?></div>
+<div id="hawkitemlist"><?= /* @noEscape */ $block->getChildHtml('product_list') ?></div>
+<div id="hawkbannerbottom" class="bannerBottom"><?= /* @noEscape */ $hawkBanner->getBannerBottom() ?></div>';

@@ -16,9 +16,10 @@ namespace HawkSearch\Proxy\Plugin;
 
 class BreadcrumbPlugin
 {
-    public function aroundGetBreadcrumbPath(\Magento\Catalog\Helper\Data $subject, callable $proceed) {
+    public function aroundGetBreadcrumbPath(\Magento\Catalog\Helper\Data $subject, callable $proceed)
+    {
         $category = $subject->getCategory();
-        if($category && $category->getHawksearchLandingPage()){
+        if ($category && $category->getHawksearchLandingPage()) {
             return $category->getHawkBreadcrumbPath();
         }
         return $proceed();

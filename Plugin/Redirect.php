@@ -19,6 +19,7 @@ use Magento\Framework\App\Request\Http;
 use Magento\Framework\UrlInterface;
 use Magento\Framework\App\Response\RedirectInterface;
 use Magento\Store\Model\StoreManagerInterface;
+use Magento\Framework\Controller\Result\Redirect as ControllerRedirect;
 
 class Redirect extends \Magento\Framework\Controller\Result\Redirect
 {
@@ -31,20 +32,22 @@ class Redirect extends \Magento\Framework\Controller\Result\Redirect
      */
     private $storeManager;
 
-    public function __construct(Http $request,
-                                StoreManagerInterface $storeManager,
-                                RedirectInterface $redirect,
-                                UrlInterface $urlBuilder)
-    {
+    public function __construct(
+        Http $request,
+        StoreManagerInterface $storeManager,
+        RedirectInterface $redirect,
+        UrlInterface $urlBuilder
+    ) {
         parent::__construct($redirect, $urlBuilder);
         $this->request = $request;
         $this->storeManager = $storeManager;
     }
 
-    public function afterSetRefererOrBaseUrl(\Magento\Framework\Controller\Result\Redirect $subject, \Magento\Framework\Controller\Result\Redirect $result) {
+    public function afterSetRefererOrBaseUrl(ControllerRedirect $subject, ControllerRedirect $result)
+    {
 
         $baseurl = $this->storeManager->getStore()->getBaseUrl();
-        if(substr($result->url, strlen($baseurl), 9) == 'hawkproxy'){
+        if (substr($result->url, strlen($baseurl), 9) == 'hawkproxy') {
             $result->setUrl($this->request->getServer('HTTP_REFERER'));
         }
         return $result;

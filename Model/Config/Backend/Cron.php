@@ -12,7 +12,6 @@
  */
 namespace HawkSearch\Proxy\Model\Config\Backend;
 
-
 class Cron extends \Magento\Framework\App\Config\Value
 {
     const CRON_CATEGORY_SYNC_EXPR = 'crontab/default/jobs/hawksearch_category_sync/schedule';
@@ -27,8 +26,8 @@ class Cron extends \Magento\Framework\App\Config\Value
         \Magento\Config\Model\ResourceModel\Config $resourceConfig,
         \Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
         \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
-        array $data = [])
-    {
+        array $data = []
+    ) {
         $this->resourceConfig = $resourceConfig;
         parent::__construct($context, $registry, $config, $cacheTypeList, $resource, $resourceCollection, $data);
     }

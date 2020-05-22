@@ -8,7 +8,6 @@
 
 namespace HawkSearch\Proxy\Block\System\Config;
 
-
 class TypeLabel extends \Magento\Config\Block\System\Config\Form\Field\FieldArray\AbstractFieldArray
 {
     protected function _prepareToRender()

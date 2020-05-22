@@ -7,15 +7,20 @@
  */
 /** @var \HawkSearch\Proxy\Block\Tabbed\DefaultRenderer $block */
 ?>
-                <div class="item hawk-contentItem">
-                    <div class="content hawk-contentWrapper">
-                        <?php echo $block->getTypeLabel($item); ?>
-                        <h3 class="title hawk-contentTitle">
-                            <a href="<?php echo $block->getCustomUrl($item->CustomURL); ?>"
-                               onclick="<?php echo sprintf("return HawkSearch.link(this,'%s',%d,'%d',0);", $block->getHawksearchTrackingId(), $block->getIncrement(), $item->Id); ?>"><?php echo $item->ItemName; ?>
-                            </a>
-                        </h3>
-                        <p class="hawk-contentCaption"><?php echo $item->BestFragment; ?></p>
-                    </div>
-                </div>
-                <div class="clear">&nbsp;</div>
+<div class="item hawk-contentItem">
+    <div class="content hawk-contentWrapper">
+        <?= /* @noEscape */
+        $block->getTypeLabel($item); ?>
+        <h3 class="title hawk-contentTitle">
+            <a href="<?= /* @noEscape */
+            $block->getCustomUrl($item->CustomURL); ?>"
+               onclick="<?= /* @noEscape */
+                sprintf("return HawkSearch.link(this,'%s',%d,'%d',0);", $block->getHawksearchTrackingId(), $block->getIncrement(), $item->Id); ?>"><?= /* @noEscape */
+                $item->ItemName; ?>
+            </a>
+        </h3>
+        <p class="hawk-contentCaption"><?= /* @noEscape */
+            $item->BestFragment; ?></p>
+    </div>
+</div>
+<div class="clear">&nbsp;</div>

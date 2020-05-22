@@ -12,21 +12,47 @@
  */
 namespace HawkSearch\Proxy\Block\System\Config;
 
-class Sync extends \Magento\Config\Block\System\Config\Form\Field
+use DateTime;
+use Exception;
+use HawkSearch\Proxy\Helper\Data;
+use HawkSearch\Proxy\Model\Task\SyncCategories\TaskScheduler;
+use Magento\Backend\Block\Template\Context;
+use Magento\Config\Block\System\Config\Form\Field;
+use Magento\Cron\Model\Schedule;
+use Magento\Framework\Data\Form\Element\AbstractElement;
+use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
+
+class Sync extends Field
 {
     private $helper;
+
+    /** @var TaskScheduler */
+    private $taskScheduler;
+
+    /** @var Schedule */
+    private $nextScheduled = null;
+
+    /** @var TimezoneInterface */
+    private $timezone;
+
     /**
-     * @param \Magento\Backend\Block\Template\Context $context
+     * @param Context $context
+     * @param Data $helper
+     * @param TaskScheduler $taskScheduler
+     * @param TimezoneInterface $timezone
      * @param array $data
      */
-    public function __construct(\Magento\Backend\Block\Template\Context $context,
-                                \HawkSearch\Proxy\Helper\Data $helper,
-                                array $data = [])
+    public function __construct( Context $context,
+                                 Data $helper,
+                                 TaskScheduler $taskScheduler,
+                                 TimezoneInterface $timezone,
+                                 array $data = [] )
     {
         $this->helper = $helper;
-        parent::__construct($context, $data);
+        parent::__construct( $context, $data );
+        $this->taskScheduler = $taskScheduler;
+        $this->timezone      = $timezone;
     }
-
 
     protected function _prepareLayout()
     {
@@ -36,13 +62,13 @@ class Sync extends \Magento\Config\Block\System\Config\Form\Field
         }
         return $this;
     }
-   /**
+    /**
      * Render button
      *
-     * @param  \Magento\Framework\Data\Form\Element\AbstractElement $element
+     * @param AbstractElement $element
      * @return string
      */
-    public function render(\Magento\Framework\Data\Form\Element\AbstractElement $element)
+    public function render( AbstractElement $element )
     {
         // Remove scope label
         $element->unsScope()->unsCanUseWebsiteValue()->unsCanUseDefaultValue();
@@ -51,24 +77,68 @@ class Sync extends \Magento\Config\Block\System\Config\Form\Field
     /**
      * Get the button and scripts contents
      *
-     * @param \Magento\Framework\Data\Form\Element\AbstractElement $element
+     * @param AbstractElement $element
      * @return string
      */
-    protected function _getElementHtml(\Magento\Framework\Data\Form\Element\AbstractElement $element)
+    protected function _getElementHtml( AbstractElement $element )
     {
         $config = $element->getFieldConfig();
         $this->addData(
             [
-				'button_label' =>$config['button_label'],
+                'button_label' =>$config['button_label'],
                 'intern_url' => $this->getUrl($config['button_url']),
                 'html_id' => $element->getHtmlId(),
             ]
         );
         return $this->_toHtml();
     }
-    public function isSyncLocked() {
+    public function isSyncLocked()
+    {
         return $this->helper->isSyncLocked();
     }
 
+    /**
+     * Loads and stores the next task cron schedule.
+     */
+    private function loadNextScheduled() : void
+    {
+        $this->nextScheduled = $this->taskScheduler->getNextScheduled();
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getNextScheduledId() : ?int
+    {
+        if ( is_null( $this->nextScheduled ) ) {
+            $this->loadNextScheduled();
+        }
+
+        return $this->nextScheduled
+            ? intval( $this->nextScheduled->getId() )
+            : null;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getNextScheduledTimestamp() : ?string
+    {
+        if ( is_null( $this->nextScheduled ) ) {
+            $this->loadNextScheduled();
+        }
+
+        if ( is_null( $this->nextScheduled ) ) {
+            return null;
+        }
+
+        try {
+            return $this->timezone
+                ->date( new DateTime( $this->nextScheduled->getScheduledAt() ) )
+                ->format( DateTime::RFC850 );
+        }
+        catch ( Exception $exception ) {
+            return null;
+        }
+    }
 }
- 

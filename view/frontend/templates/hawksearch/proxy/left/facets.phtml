@@ -15,10 +15,10 @@
  /** @var $block \HawkSearch\Proxy\Block\Html */
 ?>
 <div id="hawkbannerlefttop" class="bannerLeftTop">
-    <?php echo $block->getFeaturedLeftTop() ?>
-	<?php echo $block->getBannerLeftTop() ?></div>
+    <?= /* @noEscape */ $block->getFeaturedLeftTop() ?>
+    <?= /* @noEscape */ $block->getBannerLeftTop() ?></div>
 <div id="hawkfacets">
-	<?php echo $block->getFacets(); ?></div>
+    <?= /* @noEscape */ $block->getFacets(); ?></div>
 <div id="hawkbannerleftbottom" class="bannerLeftBottom">
-    <?php echo $block->getFeaturedLeftBottom() ?>
-	<?php echo $block->getBannerLeftBottom() ?></div>
+    <?= /* @noEscape */ $block->getFeaturedLeftBottom() ?>
+    <?= /* @noEscape */ $block->getBannerLeftBottom() ?></div>

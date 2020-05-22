@@ -2,13 +2,12 @@
 
 namespace HawkSearch\Proxy\Setup;
 
+use Magento\Catalog\Setup\CategorySetupFactory;
 use Magento\Framework\App\Cache\Type\Config;
 use Magento\Framework\App\Config\ConfigResource\ConfigInterface;
+use Magento\Framework\Serialize\Serializer\Json;
 use Magento\Framework\Setup\ModuleContextInterface;
 use Magento\Framework\Setup\ModuleDataSetupInterface;
-use Magento\Catalog\Setup\CategorySetupFactory;
-use Magento\Framework\Serialize\Serializer\Json;
-
 
 class UpgradeData implements \Magento\Framework\Setup\UpgradeDataInterface
 {
@@ -34,16 +33,17 @@ class UpgradeData implements \Magento\Framework\Setup\UpgradeDataInterface
     /**
      * Init
      *
-     * @param Json $serializer
+     * @param Json                 $serializer
      * @param CategorySetupFactory $categorySetupFactory
-     * @param ConfigInterface $config
-     * @param Config $cache
+     * @param ConfigInterface      $config
+     * @param Config               $cache
      */
-    public function __construct(Json $serializer,
-                                CategorySetupFactory $categorySetupFactory,
-                                ConfigInterface $config,
-                                Config $cache)
-    {
+    public function __construct(
+        Json $serializer,
+        CategorySetupFactory $categorySetupFactory,
+        ConfigInterface $config,
+        Config $cache
+    ) {
         $this->categorySetupFactory = $categorySetupFactory;
         $this->config = $config;
         $this->cache = $cache;
@@ -52,6 +52,7 @@ class UpgradeData implements \Magento\Framework\Setup\UpgradeDataInterface
 
     /**
      * {@inheritdoc}
+     *
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
 
@@ -59,17 +60,22 @@ class UpgradeData implements \Magento\Framework\Setup\UpgradeDataInterface
     {
         $setup->startSetup();
         if (version_compare($context->getVersion(), '2.1.2', '<')) {
-            $this->upgradeTo_212($setup);
+            $this->upgradeToLdgPage($setup);
         }
-        if(version_compare($context->getVersion(), '2.2.0', '<')) {
-            $this->upgradeTo_220($setup);
+        if (version_compare($context->getVersion(), '2.2.0', '<')) {
+            $this->upgradeConfigData($setup);
         }
-        if(version_compare($context->getVersion(), '2.2.23', '<')) {
-            $this->upgradeTo_2223($setup);
+        if (version_compare($context->getVersion(), '2.2.23', '<')) {
+            $this->upgradeTextColor($setup);
         }
         $setup->endSetup();
     }
-    private function upgradeTo_212(ModuleDataSetupInterface $setup) {
+
+    /*
+     * upgrade to 212
+     */
+    private function upgradeToLdgPage(ModuleDataSetupInterface $setup)
+    {
         $categorySetup = $this->categorySetupFactory->create(['setup' => $setup]);
         $entityTypeId = $categorySetup->getEntityTypeId(\Magento\Catalog\Model\Category::ENTITY);
         $attributeSetId = $categorySetup->getDefaultAttributeSetId($entityTypeId);
@@ -92,7 +98,10 @@ class UpgradeData implements \Magento\Framework\Setup\UpgradeDataInterface
         }
     }
 
-    private function upgradeTo_220(ModuleDataSetupInterface $setup)
+    /*
+     * upgrade to 220
+     */
+    private function upgradeConfigData(ModuleDataSetupInterface $setup)
     {
         /*
          * configuration changes
@@ -100,28 +109,34 @@ class UpgradeData implements \Magento\Framework\Setup\UpgradeDataInterface
          * hawksearch_proxy/proxy/tracking_url_live -> hawksearch_proxy/proxy/tracking_url_production
          * hawksearch_proxy/proxy/mode -> value "0" => "develop", value "1" => "production"
          */
-        /** @var \Magento\Config\Model\ResourceModel\Config $config */
+        /**
+         * @var \Magento\Config\Model\ResourceModel\Config $config
+         */
         $config = $this->config;
         $select = $config->getConnection()
             ->select()
             ->from($setup->getTable('core_config_data'))
-            ->where('path in (?)', ['hawksearch_proxy/proxy/tracking_url_staging', 'hawksearch_proxy/proxy/tracking_url_live', 'hawksearch_proxy/proxy/mode'])
+            ->where(
+                'path in (?)',
+                ['hawksearch_proxy/proxy/tracking_url_staging',
+                'hawksearch_proxy/proxy/tracking_url_live', 'hawksearch_proxy/proxy/mode']
+            )
             ->order('path');
         foreach ($config->getConnection()->fetchAll($select) as $item) {
-            if($item['path'] == 'hawksearch_proxy/proxy/mode')  {
-                if($item['value'] == "0") {
+            if ($item['path'] == 'hawksearch_proxy/proxy/mode') {
+                if ($item['value'] == "0") {
                     $item['value'] = 'develop';
                 } else {
                     $item['value'] = 'production';
                 }
-            } elseif($item['path'] == 'hawksearch_proxy/proxy/tracking_url_live') {
+            } elseif ($item['path'] == 'hawksearch_proxy/proxy/tracking_url_live') {
                 $item['path'] = 'hawksearch_proxy/proxy/tracking_url_production';
-            } elseif($item['path'] == 'hawksearch_proxy/proxy/tracking_url_staging') {
+            } elseif ($item['path'] == 'hawksearch_proxy/proxy/tracking_url_staging') {
                 $item['path'] = 'hawksearch_proxy/proxy/tracking_url_develop';
             } else {
                 continue;
             }
-            $config->saveConfig($item['path'], $item['value'] , $item['scope'], $item['scope_id']);
+            $config->saveConfig($item['path'], $item['value'], $item['scope'], $item['scope_id']);
         }
         // delete old values:
         $config->deleteConfig('hawksearch_proxy/proxy/tracking_url_staging', 'default', 0);
@@ -129,7 +144,10 @@ class UpgradeData implements \Magento\Framework\Setup\UpgradeDataInterface
         $this->cache->clean();
     }
 
-    private function upgradeTo_2223($setup)
+    /*
+     * upgrade to 2223
+     */
+    private function upgradeTextColor($setup)
     {
         /*
          * adding column 'textColor' to object
@@ -144,7 +162,12 @@ class UpgradeData implements \Magento\Framework\Setup\UpgradeDataInterface
             foreach (array_keys($tabs) as $tab) {
                 $tabs[$tab]['textColor'] = $this->generateTextColor($tabs[$tab]['color']);
             }
-            $this->config->saveConfig($item['path'], $this->serializer->serialize($tabs) , $item['scope'], $item['scope_id']);
+            $this->config->saveConfig(
+                $item['path'],
+                $this->serializer->serialize($tabs),
+                $item['scope'],
+                $item['scope_id']
+            );
         }
         $this->cache->clean();
     }
@@ -152,9 +175,9 @@ class UpgradeData implements \Magento\Framework\Setup\UpgradeDataInterface
     private function generateTextColor($rgb)
     {
         $r = hexdec(substr($rgb, 1, 2));
-        $g = hexdec(substr($rgb, 3,2));
+        $g = hexdec(substr($rgb, 3, 2));
         $b = hexdec(substr($rgb, 5, 2));
-        if(($r * 299 + $g * 587 + $b * 114) / 1000 < 123) {
+        if (($r * 299 + $g * 587 + $b * 114) / 1000 < 123) {
             return '#fff';
         }
         return '#000';

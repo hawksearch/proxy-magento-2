@@ -14,7 +14,8 @@ namespace HawkSearch\Proxy\Block;
 
 use Magento\Framework\View\Element\Template;
 
-class Banner extends Template {
+class Banner extends Template
+{
     /**
      * @var \HawkSearch\Proxy\Helper\Data
      */
@@ -24,23 +25,23 @@ class Banner extends Template {
         \HawkSearch\Proxy\Helper\Data $helper,
         Template\Context $context,
         array $data = []
-    )
-    {
+    ) {
         $this->helper = $helper;
         parent::__construct($context, $data);
     }
 
-    protected function _construct() {
+    protected function _construct()
+    {
         $resultData = $this->helper->getResultData()->Data;
-        if(isset($resultData->Merchandising) && isset($resultData->Merchandising->Items)) {
-            foreach($resultData->Merchandising->Items as $banner) {
+        if (isset($resultData->Merchandising) && isset($resultData->Merchandising->Items)) {
+            foreach ($resultData->Merchandising->Items as $banner) {
                 $this->setData($this->_underscore($banner->Zone), $banner->Html);
             }
         }
-        if(isset($resultData->FeaturedItems) && isset($resultData->FeaturedItems->Items)) {
-            foreach($this->helper->getResultData()->Data->FeaturedItems->Items->Items as $banner) {
+        if (isset($resultData->FeaturedItems) && isset($resultData->FeaturedItems->Items)) {
+            foreach ($this->helper->getResultData()->Data->FeaturedItems->Items->Items as $banner) {
                 $this->setData($this->_underscore($banner->Zone), $banner->Html);
             }
         }
-	}
+    }
 }

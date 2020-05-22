@@ -12,80 +12,21 @@
  */
 /**
  * Cache template
- *
- * @var $block \HawkSearch\Proxy\Block\System\Config\Sync
+ * @var $block Sync
  */
-$locked = $block->isSyncLocked();
+
+$nextScheduledId        = $block->getNextScheduledId();
+$nextScheduledTimestamp = $block->getNextScheduledTimestamp();
 ?>
 <div>
-    <div id="hawk_synchrinize_result" class="message-validation hidden"></div>
-    <button type="button"
-            id="<?php echo $block->getHtmlId() ?>">
-        <span><?php echo $block->escapeHtml($block->getButtonLabel()); ?></span>
-    </button>
-    <div id="forcesyncwrap" class="hidden">
-        <input type="checkbox" value="forcesync" id="<?php echo $block->getHtmlId() ?>_forcesync" name="forcesync" /> force sync
-    </div>
-    <input type="checkbox" value="overwrite" id="<?php echo $block->getHtmlId() ?>_overwrite" name="overwrite" /> overwrite all
+    <a href="<?= $block->escapeHtml( $block->getInternUrl() ) ?>">
+        <button type="button" id="<?php echo $block->getHtmlId() ?>">
+            <span><?php echo $block->escapeHtml( $block->getButtonLabel() ); ?></span>
+        </button>
+    </a>
+    <?php if ( $nextScheduledId ): ?>
+        <div id="hawk_datagenerate_next_scheduled" style="margin-top: 8px">
+            <p>Next feed generation at <?= $nextScheduledTimestamp ?> (CRON ID: <?= $nextScheduledId ?>)</p>
+        </div>
+    <?php endif; ?>
 </div>
-
-<script>
-    require(['prototype'], function() {
-        var locked = <?php echo $locked ? 'true' : 'false'; ?>;
-        var b = $('<?php echo $block->getHtmlId() ?>');
-        var force = $('<?php echo $block->getHtmlId() ?>_forcesync');
-        var forcewrap = $('forcesyncwrap');
-        var overwrite = $('<?php echo $block->getHtmlId() ?>_overwrite');
-        if(locked) {
-            b.disable();
-            force.enable();
-            forcewrap.removeClassName('hidden');
-            force.observe('click', function(event) {
-                if(this.checked) {
-                    b.enable();
-                } else {
-                    b.disable();
-                }
-            });
-        } else {
-            b.enable();
-            force.disable();
-        }
-        b.observe('click', function(event) {
-            var isForce = force.checked;
-            var isOverwrite = overwrite.checked;
-            new Ajax.Request('<?php echo $this->getInternUrl() ?>', {
-                parameters: {force: isForce, overwrite: isOverwrite},
-                onSuccess: function(transport) {
-                    var resp = transport.responseText.evalJSON();
-                    var respEl = $('hawk_synchrinize_result');
-                    if(resp.error) {
-                        respEl.innerHTML = resp.error;
-                    } else if(resp.message) {
-                        respEl.innerHTML = resp.message;
-                    } else {
-                        respEl.innerHTML = 'Unexpected response';
-                    }
-                    respEl.removeClassName('hidden');
-                    b.disabled = true;
-                    b.addClassName('disabled');
-                    b.stopObserving('click');
-                },
-                onFailure: function(response, rHeader) {
-                    alert('There has been an error. Please contact your developer');
-                    b.disabled = true;
-                    b.addClassName('disabled');
-                    b.stopObserving('click');
-                },
-                onException: function(request, exception) {
-                    alert('There has been an error. Please contact your developer');
-                    b.disabled = true;
-                    b.addClassName('disabled');
-                    b.stopObserving('click');
-                }
-            })
-        });
-
-    });
-
-</script>

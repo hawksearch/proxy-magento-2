@@ -12,43 +12,91 @@
  */
 
 namespace HawkSearch\Proxy\Cron;
-use Magento\Framework\Filesystem\DirectoryList;
+
+use HawkSearch\Proxy\Helper\Data;
+use HawkSearch\Proxy\Model\ProxyEmail;
+use HawkSearch\Proxy\Model\Task\Exception\TaskException;
+use HawkSearch\Proxy\Model\Task\Exception\TaskLockException;
+use HawkSearch\Proxy\Model\Task\Exception\TaskUnlockException;
+use HawkSearch\Proxy\Model\Task\SyncCategories\Task;
+use HawkSearch\Proxy\Model\Task\SyncCategories\TaskOptions;
+use HawkSearch\Proxy\Model\Task\SyncCategories\TaskOptionsFactory;
 
 class SyncCategories
 {
-    /**
-     * @var \HawkSearch\Proxy\Helper\Data
-     */
-    protected $helper;
-    /** @var \HawkSearch\Proxy\Model\ProxyEmail $email */
-    private $email;
-    private $dir;
+    /** @var Data */
+    private $helper;
 
+    /** @var ProxyEmail $email */
+    private $email;
+
+    /** @var Task */
+    private $task;
+
+    /** @var TaskOptionsFactory */
+    private $taskOptionsFactory;
+
+    /**
+     * @param Data $helper
+     * @param ProxyEmail $email
+     * @param Task $task
+     * @param TaskOptionsFactory $taskOptionsFactory
+     */
     public function __construct(
-        \HawkSearch\Proxy\Helper\Data $helper,
-        \HawkSearch\Proxy\Model\ProxyEmail $email,
-        DirectoryList $dir
+        Data $helper,
+        ProxyEmail $email,
+        Task $task,
+        TaskOptionsFactory $taskOptionsFactory
     )
     {
-        $this->helper = $helper;
-        $this->email = $email;
-        $this->dir = $dir;
+        $this->helper             = $helper;
+        $this->email              = $email;
+        $this->task               = $task;
+        $this->taskOptionsFactory = $taskOptionsFactory;
     }
 
-    public function execute() {
-        chdir($this->dir->getRoot());
-
-        $errors = [];
-        if($this->helper->isCategorySyncCronEnabled()) {
-            if (($timestamp = $this->helper->isSyncLocked())) {
-                $subject = "HawkSearch process is locked. Categories NOT synchronized.";
-                $errors[] = sprintf("HawkSearch Cron process locked since %s", $timestamp);
-            } else {
-                $errors = $this->helper->synchronizeHawkLandingPages();
-                $subject = sprintf("HawkSearch Category Sync Completed %s errors", empty($errors) ? "without" : "WITH");
-            }
-            $errors = implode("\n", $errors);
-            $this->email->sendEmail(['errors' => $errors, 'subject' => $subject]);
+    /**
+     * Cron entry point.
+     */
+    public function execute()
+    {
+        if ( ! $this->helper->isCategorySyncCronEnabled() ) {
+            return;
         }
+
+        /** @var TaskOptions $options */
+        $options = $this->taskOptionsFactory->create();
+
+        try {
+            $results = $this->task->execute( $options );
+            $errors  = $results->getErrors();
+
+            $subject = sprintf( 'HawkSearch Category Sync Completed %s errors', empty( $errors ) ? 'without' : 'WITH' );
+            $this->sendEmail( $subject, $errors );
+        }
+        catch ( TaskException $exception ) {
+            $this->sendEmail( 'HawkSearch Category Sync Failed' );
+        }
+        catch ( TaskLockException $exception ) {
+            $this->sendEmail( 'HawkSearch Proxy process is locked, Categories NOT synchronized' );
+        }
+        catch ( TaskUnlockException $exception ) {
+            $this->sendEmail( 'HawkSearch Proxy process failed to release lock, please verify status Category Sync' );
+        }
+    }
+
+    /**
+     * Utility function to send emails.
+     * @param string $subject
+     * @param array $errors
+     */
+    private function sendEmail( string $subject, array $errors = [] ) : void
+    {
+        $errors = implode( "\n", $errors );
+
+        $this->email->sendEmail( [
+            'errors'  => $errors,
+            'subject' => $subject
+        ] );
     }
 }
