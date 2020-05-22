@@ -3,7 +3,8 @@
     <type name="Magento\Framework\Console\CommandList">
         <arguments>
             <argument name="commands" xsi:type="array">
-                <item name="run_category_sync" xsi:type="object">HawkSearch\Proxy\Console\Command\CategorySync</item>
+                <item name="run_category_sync" xsi:type="object">HawkSearch\Proxy\Console\Command\SyncCategories</item>
+                <item name="schedule_category_sync" xsi:type="object">HawkSearch\Proxy\Console\Command\ScheduleSyncCategories</item>
             </argument>
         </arguments>
     </type>
