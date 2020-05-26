@@ -14,6 +14,7 @@
 namespace HawkSearch\Proxy\Helper;
 
 use Composer\Util\Filesystem as UtilFileSystem;
+use HawkSearch\Proxy\Exception\ApiException;
 use HawkSearch\Proxy\Model\ProxyEmailFactory;
 use Magento\Catalog\Model\Category;
 use Magento\Catalog\Model\Config;
@@ -296,7 +297,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $client->setHeaders('HTTP-TRUE-CLIENT-IP', $this->clientIP);
         $response = $client->request();
         if ($response->getStatus() == '500') {
-            throw new \Exception($response->getMessage());
+            throw new ApiException($response->getMessage());
         }
         $this->log(sprintf('requesting url %s', $client->getUri()));
         $this->rawResponse = $response->getBody();
@@ -631,7 +632,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     private function getHawkNarrowXml($id)
     {
         $xml = simplexml_load_string(
-            '<?xml version="1.0" encoding="UTF-8"?><Rule xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" RuleType="Group" Operator="All" />'
+            '<?xml version="1.0" encoding="UTF-8"?>
+<Rule xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+RuleType="Group" Operator="All" />'
         );
         $rules = $xml->addChild('Rules');
         $rule = $rules->addChild('Rule');
@@ -985,20 +988,24 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     private function validateHawkLandingPageResponse($response, $action, $url, $request_raw = null)
     {
-        // valid action
-        if ($action == \Zend_Http_Client::PUT) {
-            $act = 'Update Landing page';
-        } elseif ($action == \Zend_Http_Client::POST) {
-            $act = 'Create new Landing page';
-        } elseif ($action == \Zend_Http_Client::DELETE) {
-            $act = 'Delete Landing page';
-        } else {
-            $act = "Unknown action ({$action})";
-        }
-
         // valid response
         $res = json_decode($response, true);
         if (isset($res['Message'])) {
+            // valid action
+            switch ($action) {
+                case \Zend_Http_Client::PUT:
+                    $act = 'Landing page: Update';
+                    break;
+                case \Zend_Http_Client::POST:
+                    $act = 'Landing page: Create New';
+                    break;
+                case \Zend_Http_Client::DELETE:
+                    $act = 'Landing page: Delete';
+                    break;
+                default:
+                    $act = "Unknown action ({$action})";
+            }
+
             $this->_syncingExceptions[] = [
                 'action' => $act,
                 'url' => $url,
@@ -1079,7 +1086,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                 }
             }
 
-            $html .= "<br/><br/><p><strong>Note*:</strong> Other synchronizing requests to HawkSearch were sent as successfully.</p>";
+            $html .= "<br/><br/>
+<p><strong>Note*:</strong> Other synchronizing requests to HawkSearch were sent as successfully.</p>";
 
             return $html;
         }
@@ -1182,7 +1190,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     public function generateColor($value)
     {
-        return sprintf('#%s', substr(md5($value), 0, 6));
+        return sprintf('#%s', substr(sha1($value), 0, 6));
     }
 
     public function generateTextColor($rgb)

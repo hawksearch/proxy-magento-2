@@ -139,9 +139,10 @@ class ListFeatured extends \Magento\Catalog\Block\Product\ListProduct
         $identities = [];
         if (count($this->_getProductCollection())) {
             foreach ($this->_getProductCollection() as $item) {
-                $identities = array_merge($identities, $item->getIdentities());
+                $identities[] = $item->getIdentities();
             }
         }
+        $identities = array_merge([], ...$identities);
         $category = $this->getLayer()->getCurrentCategory();
         if ($category) {
             $identities[] = \Magento\Catalog\Model\Product::CACHE_PRODUCT_CATEGORY_TAG . '_' . $category->getId();
