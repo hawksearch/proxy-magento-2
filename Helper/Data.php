@@ -278,7 +278,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             unset($args['lpurl']);
         }
 
-        $this->uri = $this->getTrackingUrl() . '/?' . http_build_query($args);
+        $this->uri = $this->getHawkUrl() . '/?' . http_build_query($args);
     }
 
     private function fetchResponse()
@@ -395,7 +395,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     public function getTrackingPixelUrl($args)
     {
-        $trackingUrl = $this->getTrackingUrl();
+        $trackingUrl = $this->getHawkUrl();
         if ('/' == substr($trackingUrl, -1)) {
             return $trackingUrl . 'sites/_hawk/hawkconversion.aspx?' . http_build_query($args);
         }

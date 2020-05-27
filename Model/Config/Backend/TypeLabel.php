@@ -51,7 +51,7 @@ class TypeLabel extends \Magento\Config\Model\Config\Backend\Serialized\ArraySer
             $helper = $this->dataFactory->create();
             $client = new \Zend_Http_Client();
             $client->setUri(
-                $helper->getTrackingUrl() . '/?'
+                $helper->getHawkUrl() . '/?'
                 . http_build_query(['q' => '', 'hawktabs' => 'json', 'it' => 'all', 'output' => 'custom'])
             );
             $response = $client->request();
