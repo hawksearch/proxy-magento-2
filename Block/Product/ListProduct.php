@@ -143,7 +143,7 @@ class ListProduct extends \Magento\Catalog\Block\Product\ListProduct
                 return parent::_getProductCollection();
             }
         }
-        return $this->_productCollection;
+        return $this->_productCollection !== null ? $this->_productCollection : parent::_getProductCollection();
     }
 
     public function getTemplateFile($template = null)
