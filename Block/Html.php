@@ -117,7 +117,8 @@ class Html extends Template
     public function getItemList()
     {
         $layout = $this->getLayout();
-        if ($this->getTabbedContent()) {
+        $lpurl = $this->_request->getParam('lpurl');
+        if ($this->getTabbedContent() && $lpurl == '/catalogsearch/result') {
             return $layout->getBlock('hawksearch_tabbed_items')->toHtml();
         } else {
             return $layout->getBlock('hawksearch_hawkitems')->getChildHtml();
