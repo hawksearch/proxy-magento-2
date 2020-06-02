@@ -17,14 +17,21 @@
 <script type="text/javascript">
     (function (HawkSearch) {
         HawkSearch.BaseUrl = '<?= /* @noEscape */ $block->getBaseUrl(); ?>';
+        HawkSearch.HawkUrl = '<?= /* @noEscape */ $block->getHawkUrl(); ?>';
         HawkSearch.TrackingUrl = '<?= /* @noEscape */ $block->getTrackingUrl(); ?>';
+        HawkSearch.RecommenderUrl = '<?= /* @noEscape */ $block->getRecommenderUrl(); ?>';
+        HawkSearch.ClientGuid = '<?= /* @noEscape */ $block->getTrackingKey(); ?>';
         if ('http:' == document.location.protocol) {
             HawkSearch.BaseUrl = HawkSearch.BaseUrl.replace('https://', 'http://');
+            HawkSearch.HawkUrl = HawkSearch.HawkUrl.replace('https://', 'http://');
             HawkSearch.TrackingUrl = HawkSearch.TrackingUrl.replace('https://', 'http://');
+            HawkSearch.RecommenderUrl = HawkSearch.RecommenderUrl.replace('https://', 'http://');
         }
         if ('https:' == document.location.protocol) {
             HawkSearch.BaseUrl = HawkSearch.BaseUrl.replace('http://', 'https://');
+            HawkSearch.HawkUrl = HawkSearch.HawkUrl.replace('http://', 'https://');
             HawkSearch.TrackingUrl = HawkSearch.TrackingUrl.replace('http://', 'https://');
+            HawkSearch.RecommenderUrl = HawkSearch.RecommenderUrl.replace('http://', 'https://');
         }
     }(window.HawkSearch = window.HawkSearch || {}));
 
