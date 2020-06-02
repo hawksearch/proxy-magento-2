@@ -12,6 +12,8 @@
  */
 namespace HawkSearch\Proxy\Model\Config\Backend;
 
+use Magento\Framework\Exception\FileSystemException;
+
 class Cron extends \Magento\Framework\App\Config\Value
 {
     const CRON_CATEGORY_SYNC_EXPR = 'crontab/default/jobs/hawksearch_category_sync/schedule';
@@ -39,7 +41,9 @@ class Cron extends \Magento\Framework\App\Config\Value
                 $targetPath = self::CRON_CATEGORY_SYNC_EXPR;
                 break;
             default:
-                throw new \Exception(sprintf("Unexpected 'path': %s in %s", $this->getPath(), __FILE__));
+                throw new FileSystemException(
+                    __("Unexpected 'path': %1 in %2", $this->getPath(), __FILE__)
+                );
         }
         $this->resourceConfig->saveConfig($targetPath, $this->getValue(), 'default', 0);
 

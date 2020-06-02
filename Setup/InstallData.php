@@ -23,8 +23,7 @@ use Magento\Framework\Setup\ModuleDataSetupInterface;
 
 /**
  * Class InstallData
- *
- * @package HawkSearch\Proxy\Setup
+ * adding hawk_landing_page attribute to the Category entity
  */
 class InstallData implements InstallDataInterface
 {
@@ -34,7 +33,6 @@ class InstallData implements InstallDataInterface
      * @var CategorySetupFactory
      */
     private $_categorySetupFactory;
-
 
     /**
      * InstallData constructor.

@@ -47,8 +47,7 @@ class SyncCategories
         ProxyEmail $email,
         Task $task,
         TaskOptionsFactory $taskOptionsFactory
-    )
-    {
+    ) {
         $this->helper             = $helper;
         $this->email              = $email;
         $this->task               = $task;
@@ -60,7 +59,7 @@ class SyncCategories
      */
     public function execute()
     {
-        if ( ! $this->helper->isCategorySyncCronEnabled() ) {
+        if (! $this->helper->isCategorySyncCronEnabled()) {
             return;
         }
 
@@ -68,20 +67,17 @@ class SyncCategories
         $options = $this->taskOptionsFactory->create();
 
         try {
-            $results = $this->task->execute( $options );
+            $results = $this->task->execute($options);
             $errors  = $results->getErrors();
 
-            $subject = sprintf( 'HawkSearch Category Sync Completed %s errors', empty( $errors ) ? 'without' : 'WITH' );
-            $this->sendEmail( $subject, $errors );
-        }
-        catch ( TaskException $exception ) {
-            $this->sendEmail( 'HawkSearch Category Sync Failed' );
-        }
-        catch ( TaskLockException $exception ) {
-            $this->sendEmail( 'HawkSearch Proxy process is locked, Categories NOT synchronized' );
-        }
-        catch ( TaskUnlockException $exception ) {
-            $this->sendEmail( 'HawkSearch Proxy process failed to release lock, please verify status Category Sync' );
+            $subject = sprintf('HawkSearch Category Sync Completed %s errors', empty($errors) ? 'without' : 'WITH');
+            $this->sendEmail($subject, $errors);
+        } catch (TaskException $exception) {
+            $this->sendEmail('HawkSearch Category Sync Failed');
+        } catch (TaskLockException $exception) {
+            $this->sendEmail('HawkSearch Proxy process is locked, Categories NOT synchronized');
+        } catch (TaskUnlockException $exception) {
+            $this->sendEmail('HawkSearch Proxy process failed to release lock, please verify status Category Sync');
         }
     }
 
@@ -90,13 +86,13 @@ class SyncCategories
      * @param string $subject
      * @param array $errors
      */
-    private function sendEmail( string $subject, array $errors = [] ) : void
+    private function sendEmail(string $subject, array $errors = []) : void
     {
-        $errors = implode( "\n", $errors );
+        $errors = implode("\n", $errors);
 
-        $this->email->sendEmail( [
+        $this->email->sendEmail([
             'errors'  => $errors,
             'subject' => $subject
-        ] );
+        ]);
     }
 }

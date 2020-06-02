@@ -3,7 +3,6 @@
 
 namespace HawkSearch\Proxy\Model\Task\SyncCategories;
 
-
 use Exception;
 use HawkSearch\Proxy\Helper\Data;
 use HawkSearch\Proxy\Model\Task\Exception\TaskException;
@@ -30,8 +29,7 @@ class Task
         Data $helper,
         TaskLock $taskLock,
         TaskResultsFactory $taskResultsFactory
-    )
-    {
+    ) {
         $this->helper             = $helper;
         $this->taskLock           = $taskLock;
         $this->taskResultsFactory = $taskResultsFactory;
@@ -45,11 +43,11 @@ class Task
      * @throws TaskUnlockException
      * @throws TaskException
      */
-    public function execute( TaskOptions $options ) : TaskResults
+    public function execute(TaskOptions $options) : TaskResults
     {
-        $this->lock( $options );
+        $this->lock($options);
         $results = $this->syncCategories();
-        $this->unlock( $options );
+        $this->unlock($options);
 
         return $results;
     }
@@ -64,12 +62,10 @@ class Task
             $errors = $this->helper->synchronizeHawkLandingPages();
 
             $results = $this->taskResultsFactory->create();
-            $results->setErrors( $errors );
+            $results->setErrors($errors);
             return $results;
-
-        }
-        catch ( Exception $exception ) {
-            throw new TaskException( 'An error occurred during Hawksearch Category Sync' . $exception->getMessage() );
+        } catch (Exception $exception) {
+            throw new TaskException('An error occurred during Hawksearch Category Sync' . $exception->getMessage());
         }
     }
 
@@ -77,9 +73,9 @@ class Task
      * @param TaskOptions $options
      * @throws TaskLockException
      */
-    private function lock( TaskOptions $options ) : void
+    private function lock(TaskOptions $options) : void
     {
-        if ( $options->isForceMode() ) {
+        if ($options->isForceMode()) {
             return;
         }
 
@@ -90,9 +86,9 @@ class Task
      * @param TaskOptions $options
      * @throws TaskUnlockException
      */
-    private function unlock( TaskOptions $options ) : void
+    private function unlock(TaskOptions $options) : void
     {
-        if ( $options->isForceMode() ) {
+        if ($options->isForceMode()) {
             return;
         }
 

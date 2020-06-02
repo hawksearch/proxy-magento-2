@@ -3,7 +3,6 @@
 
 namespace HawkSearch\Proxy\Model\Task\SyncCategories;
 
-
 class TaskOptions
 {
     /** @var bool */
@@ -20,7 +19,7 @@ class TaskOptions
     /**
      * @param bool $forceMode
      */
-    public function setForceMode( bool $forceMode ) : void
+    public function setForceMode(bool $forceMode) : void
     {
         $this->forceMode = $forceMode;
     }

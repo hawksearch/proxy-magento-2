@@ -18,7 +18,6 @@ use Magento\Catalog\Model\Product;
 
 class ListProduct extends \Magento\Catalog\Block\Product\ListProduct
 {
-
     private $topseen = false;
     private $hawkHelper;
     private $pagers = true;
@@ -111,9 +110,10 @@ class ListProduct extends \Magento\Catalog\Block\Product\ListProduct
         $identities = [];
         if ($this->_getProductCollection() && count($this->_getProductCollection())) {
             foreach ($this->_getProductCollection() as $item) {
-                $identities = array_merge($identities, $item->getIdentities());
+                $identities[] = $item->getIdentities();
             }
         }
+        $identities = array_merge([], ...$identities);
         $category = $this->getLayer()->getCurrentCategory();
         if ($category) {
             $identities[] = Product::CACHE_PRODUCT_CATEGORY_TAG . '_' . $category->getId();
@@ -181,7 +181,7 @@ class ListProduct extends \Magento\Catalog\Block\Product\ListProduct
                     false
                 );
                 $price = '<div class="price-box price-final_price" data-role="priceBox" data-product-id="';
-                $price .= $product->getId().'">';
+                $price .= $product->getId() . '">';
                 $price .= '<span class="price-container price-final_price tax weee">';
                 $price .= '<span id="product-price-' . $product->getId();
                 $price .= '" data-price-amount="' . $priceamount;

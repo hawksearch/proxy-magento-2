@@ -3,7 +3,6 @@
 
 namespace HawkSearch\Proxy\Model\Task;
 
-
 use Exception;
 use HawkSearch\Proxy\Model\Task\Exception\AlreadyScheduledException;
 use HawkSearch\Proxy\Model\Task\Exception\SchedulerException;
@@ -43,8 +42,7 @@ abstract class AbstractTaskScheduler
         ScheduleCollectionFactory $scheduleCollectionFactory,
         ScheduleFactory $scheduleFactory,
         ScheduleResourceModel $scheduleResourceModel
-    )
-    {
+    ) {
         $this->dateTime                  = $dateTime;
         $this->scheduleCollectionFactory = $scheduleCollectionFactory;
         $this->scheduleFactory           = $scheduleFactory;
@@ -63,12 +61,12 @@ abstract class AbstractTaskScheduler
 
         /** @var ScheduleCollection $collection */
         $collection = $this->scheduleCollectionFactory->create();
-        $collection->addFieldToFilter( 'job_code', [ 'eq' => $this->jobCode ] );
-        $collection->addFieldToFilter( 'status', [ 'eq' => Schedule::STATUS_PENDING ] );
-        $collection->addFieldToFilter( 'scheduled_at', [ 'lt' => $this->dateTime->gmtDate( null, $nextMinute ) ] );
-        $collection->addOrder( 'scheduled_at', 'asc' );
+        $collection->addFieldToFilter('job_code', [ 'eq' => $this->jobCode ]);
+        $collection->addFieldToFilter('status', [ 'eq' => Schedule::STATUS_PENDING ]);
+        $collection->addFieldToFilter('scheduled_at', [ 'lt' => $this->dateTime->gmtDate(null, $nextMinute) ]);
+        $collection->addOrder('scheduled_at', 'asc');
 
-        return boolval( $collection->getSize() );
+        return boolval($collection->getSize());
     }
 
     /**
@@ -80,9 +78,9 @@ abstract class AbstractTaskScheduler
 
         /** @var ScheduleCollection $collection */
         $collection = $this->scheduleCollectionFactory->create();
-        $collection->addFieldToFilter( 'job_code', [ 'eq' => $this->jobCode ] );
-        $collection->addFieldToFilter( 'status', [ 'eq' => Schedule::STATUS_PENDING ] );
-        $collection->addOrder( 'scheduled_at', 'asc' );
+        $collection->addFieldToFilter('job_code', [ 'eq' => $this->jobCode ]);
+        $collection->addFieldToFilter('status', [ 'eq' => Schedule::STATUS_PENDING ]);
+        $collection->addOrder('scheduled_at', 'asc');
 
         /** @var Schedule $schedule */
         $schedule = $collection->getFirstItem();
@@ -101,18 +99,17 @@ abstract class AbstractTaskScheduler
     {
         $this->requireJobCode();
 
-        if ( $this->isScheduledForNextRun() ) {
-            throw new AlreadyScheduledException( sprintf( 'job_code %s is already scheduled', $this->jobCode ) );
+        if ($this->isScheduledForNextRun()) {
+            throw new AlreadyScheduledException(sprintf('job_code %s is already scheduled', $this->jobCode));
         }
 
         $schedule = $this->createScheduleEntry();
 
         try {
-            $this->scheduleResourceModel->save( $schedule );
+            $this->scheduleResourceModel->save($schedule);
             return $schedule;
-        }
-        catch ( Exception $exception ) {
-            throw new SchedulerException( sprintf( 'failed to save schedule for job_code %s', $this->jobCode ) );
+        } catch (Exception $exception) {
+            throw new SchedulerException(sprintf('failed to save schedule for job_code %s', $this->jobCode));
         }
     }
 
@@ -127,10 +124,10 @@ abstract class AbstractTaskScheduler
 
         /** @var Schedule $schedule */
         $schedule = $this->scheduleFactory->create()
-            ->setJobCode( $this->jobCode )
-            ->setStatus( Schedule::STATUS_PENDING )
-            ->setCreatedAt( strftime( '%Y-%m-%d %H:%M:%S', $createdAt ) )
-            ->setScheduledAt( strftime( '%Y-%m-%d %H:%M', $scheduledAt ) );
+            ->setJobCode($this->jobCode)
+            ->setStatus(Schedule::STATUS_PENDING)
+            ->setCreatedAt(strftime('%Y-%m-%d %H:%M:%S', $createdAt))
+            ->setScheduledAt(strftime('%Y-%m-%d %H:%M', $scheduledAt));
 
         return $schedule;
     }
@@ -140,8 +137,8 @@ abstract class AbstractTaskScheduler
      */
     private function requireJobCode() : void
     {
-        if ( $this->jobCode === '' ) {
-            throw new InvalidArgumentException( 'jobCode is a required field' );
+        if ($this->jobCode === '') {
+            throw new InvalidArgumentException('jobCode is a required field');
         }
     }
 }
