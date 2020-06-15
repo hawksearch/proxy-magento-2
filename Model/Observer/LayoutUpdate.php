@@ -64,8 +64,7 @@ class LayoutUpdate implements ObserverInterface
         } elseif ($observer->getFullActionName() == 'hawkproxy_index_index') {
             $layout = $observer->getLayout();
             $layout->getUpdate()
-                ->addHandle('catalogsearch_result_index')
-                ->addHandle('hawksearch_catalogsearch_result');
+                ->addHandle('catalogsearch_result_index');
         }
     }
 }

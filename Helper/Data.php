@@ -14,6 +14,7 @@
 namespace HawkSearch\Proxy\Helper;
 
 use Composer\Util\Filesystem as UtilFileSystem;
+use Exception;
 use HawkSearch\Proxy\Model\ProxyEmailFactory;
 use Magento\Catalog\Model\Category;
 use Magento\Catalog\Model\Config;
@@ -104,21 +105,27 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     protected $file;
     protected $fileDirectory;
     private $utilFileSystem;
+
     /**
      * Data constructor.
      *
-     * @param Context                                      $context
-     * @param StoreManagerInterface                        $storeManager
-     * @param Filesystem                                   $filesystem
-     * @param ProxyEmailFactory                            $email_helper
-     * @param CollectionFactory                            $collectionFactory
-     * @param CategoryCollectionFactory                    $categoryCollectionFactory
-     * @param Config                                       $catalogConfig
-     * @param Emulation                                    $emulation
-     * @param StoreCollectionFactory                       $storeCollectionFactory
-     * @param Cache                                        $cache
-     * @param SessionFactory                               $session
-     * @param \Magento\UrlRewrite\Model\UrlFinderInterface $urlFinder
+     * @param Context $context
+     * @param StoreManagerInterface $storeManager
+     * @param Filesystem $filesystem
+     * @param ProxyEmailFactory $email_helper
+     * @param CollectionFactory $collectionFactory
+     * @param CategoryCollectionFactory $categoryCollectionFactory
+     * @param Config $catalogConfig
+     * @param Emulation $emulation
+     * @param StoreCollectionFactory $storeCollectionFactory
+     * @param Cache $cache
+     * @param SessionFactory $session
+     * @param UrlFinderInterface $urlFinder
+     * @param Escaper $escaper
+     * @param SerializerInterface $serializer
+     * @param File $file
+     * @param ioFile $fileDirectory
+     * @param UtilFileSystem $utilFileSystem
      */
     public function __construct(
         Context $context,
@@ -296,7 +303,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $client->setHeaders('HTTP-TRUE-CLIENT-IP', $this->clientIP);
         $response = $client->request();
         if ($response->getStatus() == '500') {
-            throw new \Exception($response->getMessage());
+            throw new Exception($response->getMessage());
         }
         $this->log(sprintf('requesting url %s', $client->getUri()));
         $this->rawResponse = $response->getBody();
@@ -410,6 +417,35 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function getApiKey()
     {
         return $this->getConfigurationData('hawksearch_proxy/proxy/hawksearch_api_key');
+    }
+
+    /**
+     * @return bool
+     * @throws Exception
+     */
+    public function productsOnly()
+    {
+        if (empty($this->hawkData)) {
+            $this->fetchResponse();
+        }
+
+        if (isset($this->hawkData->Data->Results)) {
+            $results = json_decode($this->hawkData->Data->Results);
+
+            if (!property_exists($results, 'Items') || count($results->Items) == 0) {
+                return false;
+            }
+
+            foreach ($results->Items as $item) {
+                if (!isset($item->Custom->sku)) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -536,7 +572,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             $this->log(sprintf('fetching request. URL: %s, Method: %s', $client->getUri(), $method));
             $response = $client->request();
             return $response->getBody();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->log($e);
             return json_encode(['Message' => "Internal Error - " . $e->getMessage()]);
         }
@@ -852,7 +888,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             if ($store->getConfig('hawksearch_proxy/general/enabled') && $store->isActive()) {
                 try {
                     $this->syncHawkLandingByStore($store);
-                } catch (\Exception $e) {
+                } catch (Exception $e) {
                     $errors[] = sprintf("Error syncing category pages for store '%s'", $store->getCode());
                     $errors[] = sprintf("Exception message: %s", $e->getMessage());
                     continue;
@@ -1114,7 +1150,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                     ]
                 );
                 return true;
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 $this->log('-- Error: ' . $e->getMessage() . ' - File: ' . $e->getFile() . ' on line ' . $e->getLine());
                 return false;
             }
