@@ -118,7 +118,8 @@ class Html extends Template
     {
         $layout = $this->getLayout();
         $lpurl = $this->_request->getParam('lpurl');
-        if ($this->getTabbedContent() && $lpurl == '/catalogsearch/result') {
+        if ($this->getTabbedContent() && in_array($lpurl, ['/catalogsearch/result/', '/catalogsearch/result'])
+            && !$this->helper->productsOnly()) {
             return $layout->getBlock('hawksearch_tabbed_items')->toHtml();
         } else {
             return $layout->getBlock('hawksearch_hawkitems')->getChildHtml();
