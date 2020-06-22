@@ -8,13 +8,14 @@
 
 namespace HawkSearch\Proxy\Block;
 
+use HawkSearch\Proxy\Helper\Data;
 use Magento\Framework\View\Element\Template;
 
 class HawkItems extends Template
 {
     private $banner;
     /**
-     * @var \HawkSearch\Proxy\Helper\Data
+     * @var Data
      */
     private $helper;
 
@@ -22,13 +23,13 @@ class HawkItems extends Template
      * HawkItems constructor.
      *
      * @param Banner                        $banner
-     * @param \HawkSearch\Proxy\Helper\Data $helper
+     * @param Data                          $helper
      * @param Template\Context              $context
      * @param array                         $data
      */
     public function __construct(
         Banner $banner,
-        \HawkSearch\Proxy\Helper\Data $helper,
+        Data $helper,
         Template\Context $context,
         array $data = []
     ) {
@@ -43,5 +44,14 @@ class HawkItems extends Template
     public function getClickTracking()
     {
         return $this->helper->getTrackingDataHtml();
+    }
+
+    /**
+     * @return string
+     */
+    public function getTopText()
+    {
+        $result = $this->helper->getResultData();
+        return $result->Data->TopText ?? '';
     }
 }

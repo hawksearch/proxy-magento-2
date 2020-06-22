@@ -30,17 +30,12 @@ $tabs = $block->getTabs();
         $block->getTopText(); ?></div>
     <div id="hawkrelated"><?= /* @noEscape */
         $block->getRelated() ?></div>
-    <?php if (!empty($tabs)) :?>
-        <?= /* @noEscape */ sprintf('<div id="hawktabs">%s</div>', $tabs); ?>
-    <?php endif;?>
-    <div id="hawktoppager"><?= /* @noEscape */
-        $block->getTopPager(); ?></div>
+
     <div id="hawkitemlist">
         <?= /* @noEscape */
         $block->getChildHtml('hawksearch_tabbed_items'); ?>
     </div>
-    <div id="hawkbottompager"><?= /* @noEscape */
-        $block->getBottomPager(); ?></div>
+
     <div id="hawkbannerbottom"
          class="bannerBottom"> <?= /* @noEscape */
             $block->getBanner()->getFeaturedBottom() ?>
