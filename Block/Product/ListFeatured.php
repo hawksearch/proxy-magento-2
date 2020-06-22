@@ -137,8 +137,8 @@ class ListFeatured extends \Magento\Catalog\Block\Product\ListProduct
     public function getIdentities()
     {
         $identities = [];
-        if (count($this->_getProductCollection())) {
-            foreach ($this->_getProductCollection() as $item) {
+        if ($this->_getProductCollection()) {
+            foreach ($this->_getProductCollection()->getItems() as $item) {
                 $identities[] = $item->getIdentities();
             }
         }
