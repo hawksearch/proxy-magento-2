@@ -51,7 +51,6 @@ class HawkItems extends Template
      */
     public function getTopText()
     {
-        $result = $this->helper->getResultData();
-        return $result->Data->TopText ?? '';
+        return $this->helper->getResultData()->getResponseData()->getTopText() ?? '';
     }
 }

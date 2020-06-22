@@ -32,15 +32,15 @@ class Banner extends Template
 
     protected function _construct()
     {
-        $resultData = $this->helper->getResultData()->Data;
-        if (isset($resultData->Merchandising) && isset($resultData->Merchandising->Items)) {
-            foreach ($resultData->Merchandising->Items as $banner) {
-                $this->setData($this->_underscore($banner->Zone), $banner->Html);
+        $resultData = $this->helper->getResultData()->getResponseData();
+        if ($resultData->getMerchandising()) {
+            foreach ($resultData->getMerchandising()->getItems() as $banner) {
+                $this->setData($this->_underscore($banner->getZone()), $banner->getHtml());
             }
         }
-        if (isset($resultData->FeaturedItems) && isset($resultData->FeaturedItems->Items)) {
-            foreach ($this->helper->getResultData()->Data->FeaturedItems->Items->Items as $banner) {
-                $this->setData($this->_underscore($banner->Zone), $banner->Html);
+        if ($resultData->getFeaturedItems()->getItems()->getItems()) {
+            foreach ($resultData->getFeaturedItems()->getItems()->getItems() as $banner) {
+                $this->setData($this->_underscore($banner->getZone()), $banner->getHtml());
             }
         }
     }

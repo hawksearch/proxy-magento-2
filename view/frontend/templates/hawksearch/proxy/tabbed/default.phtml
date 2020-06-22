@@ -13,14 +13,14 @@
         $block->getTypeLabel($item); ?>
         <h3 class="title hawk-contentTitle">
             <a href="<?= /* @noEscape */
-            $block->getCustomUrl($item->CustomURL); ?>"
+            $block->getCustomUrl($item['CustomURL'] ?? ''); ?>"
                onclick="<?= /* @noEscape */
-                sprintf("return HawkSearch.link(this,'%s',%d,'%d',0);", $block->getHawksearchTrackingId(), $block->getIncrement(), $item->Id); ?>"><?= /* @noEscape */
-                $item->ItemName; ?>
+                sprintf("return HawkSearch.link(this,'%s',%d,'%d',0);", $block->getHawksearchTrackingId(), $block->getIncrement(), $item['Id'] ?? ''); ?>"><?= /* @noEscape */
+                $item['ItemName'] ?? ''; ?>
             </a>
         </h3>
         <p class="hawk-contentCaption"><?= /* @noEscape */
-            $item->BestFragment; ?></p>
+            $item['BestFragment'] ?? ''; ?></p>
     </div>
 </div>
 <div class="clear">&nbsp;</div>

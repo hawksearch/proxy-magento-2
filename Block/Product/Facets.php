@@ -52,7 +52,7 @@ class Facets extends \Magento\Framework\View\Element\Template
         $block = $layout->createBlock('HawkSearch\Proxy\Block\Product\ListFeatured');
         $block->setZone($zone);
         $productCollection = $block->getLoadedProductCollection();
-        if ($productCollection->count() > 0) {
+        if ($productCollection && $productCollection->count() > 0) {
             $block->setTemplate('HawkSearch_Proxy::hawksearch/proxy/left/featured.phtml');
             return $block->toHtml(false);
         }

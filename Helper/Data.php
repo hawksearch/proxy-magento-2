@@ -15,7 +15,23 @@ namespace HawkSearch\Proxy\Helper;
 
 use Composer\Util\Filesystem as UtilFileSystem;
 use Exception;
+use HawkSearch\Proxy\Api\Data\SearchResultContentInterface;
+use HawkSearch\Proxy\Api\Data\SearchResultContentInterfaceFactory;
+use HawkSearch\Proxy\Api\Data\SearchResultContentItemInterfaceFactory;
+use HawkSearch\Proxy\Api\Data\SearchResultDataInterface;
+use HawkSearch\Proxy\Api\Data\SearchResultDataInterfaceFactory;
+use HawkSearch\Proxy\Api\Data\SearchResultFeaturedInterface;
+use HawkSearch\Proxy\Api\Data\SearchResultFeaturedInterfaceFactory;
+use HawkSearch\Proxy\Api\Data\SearchResultFeaturedMainInterface;
+use HawkSearch\Proxy\Api\Data\SearchResultFeaturedMainInterfaceFactory;
+use HawkSearch\Proxy\Api\Data\SearchResultMerchandisingInterface;
+use HawkSearch\Proxy\Api\Data\SearchResultMerchandisingInterfaceFactory;
+use HawkSearch\Proxy\Api\Data\SearchResultResponseInterface;
+use HawkSearch\Proxy\Api\Data\SearchResultResponseInterfaceFactory;
+use HawkSearch\Proxy\Api\Data\SearchResultTemplateItemInterface;
+use HawkSearch\Proxy\Api\Data\SearchResultTemplateItemInterfaceFactory;
 use HawkSearch\Proxy\Model\ProxyEmailFactory;
+use HawkSearch\Proxy\Model\SearchResultTemplateItem;
 use Magento\Catalog\Model\Category;
 use Magento\Catalog\Model\Config;
 use Magento\Catalog\Model\ResourceModel\Category\CollectionFactory as CategoryCollectionFactory;
@@ -28,6 +44,7 @@ use Magento\Framework\Escaper;
 use Magento\Framework\Filesystem;
 use Magento\Framework\Filesystem\Driver\File;
 use Magento\Framework\Filesystem\Io\File as ioFile;
+use Magento\Framework\Serialize\Serializer\Json;
 use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Store\Model\App\Emulation;
 use Magento\Store\Model\ResourceModel\Store\CollectionFactory as StoreCollectionFactory;
@@ -60,7 +77,12 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     protected $_syncingExceptions = [];
 
     protected $storeManager;
+
+    /**
+     * @var SearchResultResponseInterface
+     */
     private $hawkData;
+
     private $rawResponse;
     private $store = null;
     private $landingPages;
@@ -107,6 +129,51 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     private $utilFileSystem;
 
     /**
+     * @var Json
+     */
+    private $jsonSerializer;
+
+    /**
+     * @var SearchResultResponseInterfaceFactory
+     */
+    private $resultResponseFactory;
+
+    /**
+     * @var SearchResultDataInterfaceFactory
+     */
+    private $resultDataFactory;
+
+    /**
+     * @var SearchResultMerchandisingInterfaceFactory
+     */
+    private $resultMerchandisingFactory;
+
+    /**
+     * @var SearchResultTemplateItemInterfaceFactory
+     */
+    private $resultTemplateItemFactory;
+
+    /**
+     * @var SearchResultFeaturedMainInterfaceFactory
+     */
+    private $resultFeaturedMainFactory;
+
+    /**
+     * @var SearchResultFeaturedInterfaceFactory
+     */
+    private $resultFeaturedFactory;
+
+    /**
+     * @var SearchResultContentItemInterfaceFactory
+     */
+    private $resultContentItemFactory;
+
+    /**
+     * @var SearchResultContentInterfaceFactory
+     */
+    private $resultContentFactory;
+
+    /**
      * Data constructor.
      *
      * @param Context $context
@@ -126,6 +193,15 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @param File $file
      * @param ioFile $fileDirectory
      * @param UtilFileSystem $utilFileSystem
+     * @param Json $jsonSerializer
+     * @param SearchResultResponseInterfaceFactory $resultResponseFactory
+     * @param SearchResultDataInterfaceFactory $resultDataFactory
+     * @param SearchResultMerchandisingInterfaceFactory $resultMerchandisingFactory
+     * @param SearchResultTemplateItemInterfaceFactory $resultTemplateItemFactory
+     * @param SearchResultFeaturedMainInterfaceFactory $resultFeaturedMainFactory
+     * @param SearchResultFeaturedInterfaceFactory $resultFeaturedFactory
+     * @param SearchResultContentItemInterfaceFactory $resultContentItemFactory
+     * @param SearchResultContentInterfaceFactory $resultContentFactory
      */
     public function __construct(
         Context $context,
@@ -144,7 +220,16 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         SerializerInterface $serializer,
         File $file,
         ioFile $fileDirectory,
-        UtilFileSystem $utilFileSystem
+        UtilFileSystem $utilFileSystem,
+        Json $jsonSerializer,
+        SearchResultResponseInterfaceFactory $resultResponseFactory,
+        SearchResultDataInterfaceFactory $resultDataFactory,
+        SearchResultMerchandisingInterfaceFactory $resultMerchandisingFactory,
+        SearchResultTemplateItemInterfaceFactory $resultTemplateItemFactory,
+        SearchResultFeaturedMainInterfaceFactory $resultFeaturedMainFactory,
+        SearchResultFeaturedInterfaceFactory $resultFeaturedFactory,
+        SearchResultContentItemInterfaceFactory $resultContentItemFactory,
+        SearchResultContentInterfaceFactory $resultContentFactory
     ) {
         // parent construct first so scopeConfig gets set for use in "setUri", etc.
         parent::__construct($context);
@@ -167,6 +252,15 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $this->file = $file;
         $this->fileDirectory = $fileDirectory;
         $this->utilFileSystem = $utilFileSystem;
+        $this->jsonSerializer = $jsonSerializer;
+        $this->resultResponseFactory = $resultResponseFactory;
+        $this->resultDataFactory = $resultDataFactory;
+        $this->resultMerchandisingFactory = $resultMerchandisingFactory;
+        $this->resultTemplateItemFactory = $resultTemplateItemFactory;
+        $this->resultFeaturedMainFactory = $resultFeaturedMainFactory;
+        $this->resultFeaturedFactory = $resultFeaturedFactory;
+        $this->resultContentItemFactory = $resultContentItemFactory;
+        $this->resultContentFactory = $resultContentFactory;
     }
 
     public function getConfigurationData($data)
@@ -306,11 +400,134 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             throw new Exception($response->getMessage());
         }
         $this->log(sprintf('requesting url %s', $client->getUri()));
-        $this->rawResponse = $response->getBody();
 
-        $this->hawkData = json_decode($this->rawResponse);
+        $this->hawkData = $this->processApiResponse($response->getBody());
     }
 
+    /**
+     * @param string $rawResponse
+     * @return SearchResultResponseInterface
+     */
+    private function processApiResponse(string $rawResponse) : SearchResultResponseInterface
+    {
+        $response = $this->jsonSerializer->unserialize($rawResponse);
+        $response[SearchResultResponseInterface::RESPONSE_DATA] = $response['Data'];
+        unset($response['Data']);
+
+        //unserialize Response Data
+        $response[SearchResultResponseInterface::RESPONSE_DATA]
+        [SearchResultDataInterface::RESULTS] = isset($response[SearchResultResponseInterface::RESPONSE_DATA]
+        [SearchResultDataInterface::RESULTS]) ? $this->jsonSerializer
+            ->unserialize($response[SearchResultResponseInterface::RESPONSE_DATA][SearchResultDataInterface::RESULTS])
+            : [];
+
+        $response[SearchResultResponseInterface::RESPONSE_DATA]
+        [SearchResultDataInterface::FEATURED_ITEMS] = isset($response[SearchResultResponseInterface::RESPONSE_DATA]
+            [SearchResultDataInterface::FEATURED_ITEMS]) ? $this->jsonSerializer
+            ->unserialize($response[SearchResultResponseInterface::RESPONSE_DATA]
+            [SearchResultDataInterface::FEATURED_ITEMS])
+            : [];
+
+        //prepare Content items
+        $contentItems = [];
+        if (!empty($response[SearchResultResponseInterface::RESPONSE_DATA]
+        [SearchResultDataInterface::RESULTS][SearchResultContentInterface::ITEMS])) {
+            foreach ($response[SearchResultResponseInterface::RESPONSE_DATA]
+                     [SearchResultDataInterface::RESULTS][SearchResultContentInterface::ITEMS] as $item) {
+                $contentItems[] = $this->resultContentItemFactory->create(
+                    [
+                        'data' => $item
+                    ]
+                );
+            }
+        }
+
+        $response[SearchResultResponseInterface::RESPONSE_DATA]
+        [SearchResultDataInterface::RESULTS] = $this->resultContentFactory->create(
+            [
+                'data' => [
+                    SearchResultContentInterface::ITEMS => $contentItems
+                ]
+            ]
+        );
+
+        //prepare Merchandising Data
+        $merchandisingItems = [];
+        if (!empty($response[SearchResultResponseInterface::RESPONSE_DATA]
+        [SearchResultDataInterface::MERCHANDISING][SearchResultMerchandisingInterface::ITEMS])) {
+            foreach ($response[SearchResultResponseInterface::RESPONSE_DATA]
+                     [SearchResultDataInterface::MERCHANDISING][SearchResultMerchandisingInterface::ITEMS] as $item) {
+                if (isset(
+                    $item[SearchResultTemplateItemInterface::ZONE],
+                    $item[SearchResultTemplateItemInterface::HTML]
+                )) {
+                    $merchandisingItems[] = $this->resultTemplateItemFactory->create(
+                        [
+                            'data' => $item
+                        ]
+                    );
+                }
+            }
+        }
+
+        $response[SearchResultResponseInterface::RESPONSE_DATA]
+        [SearchResultDataInterface::MERCHANDISING] = $this->resultMerchandisingFactory->create(
+            [
+                'data' => [
+                    SearchResultMerchandisingInterface::ITEMS => $merchandisingItems
+                ]
+            ]
+        );
+
+        //prepare Featured Data
+        $featuredItems = [];
+        if (!empty($response[SearchResultResponseInterface::RESPONSE_DATA]
+        [SearchResultDataInterface::FEATURED_ITEMS][SearchResultFeaturedMainInterface::ITEMS]
+        [SearchResultFeaturedInterface::ITEMS])) {
+            foreach ($response[SearchResultResponseInterface::RESPONSE_DATA]
+                     [SearchResultDataInterface::FEATURED_ITEMS][SearchResultFeaturedMainInterface::ITEMS]
+                     [SearchResultFeaturedInterface::ITEMS] as $item) {
+                if (isset(
+                    $item[SearchResultTemplateItemInterface::ZONE],
+                    $item[SearchResultTemplateItemInterface::HTML]
+                )) {
+                    $featuredItems[] = $this->resultTemplateItemFactory->create(
+                        [
+                            'data' => $item
+                        ]
+                    );
+                }
+            }
+        }
+
+        $response[SearchResultResponseInterface::RESPONSE_DATA]
+        [SearchResultDataInterface::FEATURED_ITEMS] = $this->resultFeaturedMainFactory->create(
+            [
+                'data' => [
+                    SearchResultFeaturedMainInterface::ITEMS => $this->resultFeaturedFactory->create(
+                        [
+                            'data' => [
+                                SearchResultFeaturedInterface::ITEMS => $featuredItems
+                            ]
+                        ]
+                    )
+                ]
+            ]
+        );
+
+        //set Response Data
+        $response[SearchResultResponseInterface::RESPONSE_DATA] = $this->resultDataFactory->create(
+            [
+                'data' => $response[SearchResultResponseInterface::RESPONSE_DATA]
+            ]
+        );
+
+        return $this->resultResponseFactory->create(['data' => $response]);
+    }
+
+    /**
+     * @return SearchResultResponseInterface
+     */
     public function getResultData()
     {
         if (empty($this->hawkData)) {
@@ -349,7 +566,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         if (empty($this->hawkData)) {
             $this->fetchResponse();
         }
-        return $this->hawkData->Location;
+        return $this->hawkData->getLocation();
     }
 
     public function getTrackingDataHtml()
@@ -363,7 +580,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         if ($productCollection instanceof \Magento\Catalog\Model\ResourceModel\Product\Collection) {
             foreach ($productCollection as $item) {
                 $obj[] = ['url' => $item->getProductUrl(),
-                    'tid' => $this->hawkData->TrackingId, 'sku' => $item->getSku(), 'i' => $counter++];
+                    'tid' => $this->hawkData->getTrackingId(), 'sku' => $item->getSku(), 'i' => $counter++];
             }
             return sprintf(
                 '<div id="hawktrackingdata" style="display:none;" data-tracking="%s"></div>',
@@ -378,7 +595,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         if (empty($this->hawkData)) {
             $this->fetchResponse();
         }
-        return $this->hawkData->Data->Facets;
+        return $this->hawkData->getResponseData()->getFacets();
     }
 
     public function getTrackingUrl()
@@ -429,23 +646,16 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             $this->fetchResponse();
         }
 
-        if (isset($this->hawkData->Data->Results)) {
-            $results = json_decode($this->hawkData->Data->Results);
-
-            if (!property_exists($results, 'Items') || count($results->Items) == 0) {
-                return false;
-            }
-
-            foreach ($results->Items as $item) {
-                if (!isset($item->Custom->sku)) {
+        if ($this->hawkData->getResponseData()->getResults()->getItems()) {
+            foreach ($this->hawkData->getResponseData()->getResults()->getItems() as $item) {
+                if (!isset($item['Custom']['sku'])) {
                     return false;
                 }
             }
-
             return true;
+        } else {
+            return false;
         }
-
-        return false;
     }
 
     /**
@@ -462,15 +672,14 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $map = [];
         $bySku = [];
         $i = 0;
-        $results = json_decode($this->hawkData->Data->Results);
-        if (!property_exists($results, 'Items') || count($results->Items) == 0) {
+        if (!$this->hawkData->getResponseData()->getResults()->getItems()) {
             return $this->getResourceCollection([]);
         }
-        foreach ($results->Items as $item) {
-            if (isset($item->Custom->sku)) {
-                $skus[] = $item->Custom->sku;
-                $map[$item->Custom->sku] = $i;
-                $bySku[$item->Custom->sku] = $item;
+        foreach ($this->hawkData->getResponseData()->getResults()->getItems() as $item) {
+            if (isset($item['Custom']['sku'])) {
+                $skus[] = $item['Custom']['sku'];
+                $map[$item['Custom']['sku']] = $i;
+                $bySku[$item['Custom']['sku']] = $item;
                 $i++;
             }
         }
@@ -511,18 +720,16 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $map = [];
         $i = 0;
 
-        if (!$this->hawkData->Data->FeaturedItems instanceof \stdClass) {
-            $this->hawkData->Data->FeaturedItems = json_decode($this->hawkData->Data->FeaturedItems);
-        }
-        if (count($this->hawkData->Data->FeaturedItems->Items->Items) == 0) {
+        if (!$this->hawkData->getResponseData()->getFeaturedItems()->getItems()->getItems()) {
             return null;
         } else {
-            foreach ($this->hawkData->Data->FeaturedItems->Items->Items as $banner) {
-                if ($banner->Zone == $zone && isset($banner->Items)) {
-                    foreach ($banner->Items as $item) {
-                        if (isset($item->Custom->sku)) {
-                            $skus[] = $item->Custom->sku;
-                            $map[$item->Custom->sku] = $i;
+            foreach ($this->hawkData->getResponseData()->getFeaturedItems()->getItems()->getItems() as $banner) {
+                /** @var SearchResultTemplateItem $banner */
+                if ($banner->getZone() == $zone && $banner->getData['Items']) {
+                    foreach ($banner->getData['Items'] as $item) {
+                        if (isset($item['Custom']['sku'])) {
+                            $skus[] = $item['Custom']['sku'];
+                            $map[$item['Custom']['sku']] = $i;
                             $i++;
                         }
                     }
