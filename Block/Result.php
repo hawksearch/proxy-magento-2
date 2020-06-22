@@ -62,6 +62,5 @@ class Result extends \Magento\CatalogSearch\Block\Result
     {
         $this->setModuleName('Magento_CatalogSearch');
         return parent::getTemplateFile($template);
-        $this->setModuleName('HawkSearch_Proxy');
     }
 }

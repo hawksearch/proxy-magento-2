@@ -88,7 +88,8 @@ class Tabbed extends Html
         $label = $this->labelMap[$type]->title;
         $fg = $this->labelMap[$type]->textColor;
         return sprintf(
-            '<p style="background-color: %s; padding: 5px 10px; display:inline-block; font-weight: bold; color: %s">%s</p>',
+            '<p style="background-color: %s;
+padding: 5px 10px; display:inline-block; font-weight: bold; color: %s">%s</p>',
             $bg,
             $fg,
             $label

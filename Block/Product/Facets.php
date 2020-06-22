@@ -9,6 +9,7 @@
 namespace HawkSearch\Proxy\Block\Product;
 
 use Magento\Framework\View\Element\Template;
+use HawkSearch\Proxy\Block\Product\ListFeatured;
 
 class Facets extends \Magento\Framework\View\Element\Template
 {
@@ -49,7 +50,7 @@ class Facets extends \Magento\Framework\View\Element\Template
     protected function getFeaturedZone($zone)
     {
         $layout = $this->getLayout();
-        $block = $layout->createBlock('HawkSearch\Proxy\Block\Product\ListFeatured');
+        $block = $layout->createBlock(ListFeatured::class);
         $block->setZone($zone);
         $productCollection = $block->getLoadedProductCollection();
         if ($productCollection && $productCollection->count() > 0) {

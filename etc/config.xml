@@ -13,29 +13,44 @@
  */
 -->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
-  <default>
-    <hawksearch_proxy>
-      <general>
-        <enabled>0</enabled>
-        <logging_enabled>0</logging_enabled>
-      </general>
-      <proxy>
-        <mode>develop</mode>
-        <tracking_url_develop>https://dev.hawksearch.net/</tracking_url_develop>
-        <tracking_url_staging>https://test.hawksearch.net/</tracking_url_staging>
-        <tracking_url_production>https://manage.hawksearch.com/</tracking_url_production>
-        <search_box_ids>search</search_box_ids>
-        <autocomplete_query_params><![CDATA[/?fn=ajax&f=GetSuggestions]]></autocomplete_query_params>
-        <hawksearch_include_css>1</hawksearch_include_css>
-        <enable_hawk_landing_pages>1</enable_hawk_landing_pages>
-        <result_type>item</result_type>
-        <show_tabs>0</show_tabs>
-        <meta_robots>NOINDEX,FOLLOW</meta_robots>
-        <allow_fulltext>0</allow_fulltext>
-      </proxy>
-      <sync>
-        <cron_string>0 0 * * *</cron_string>
-      </sync>
-    </hawksearch_proxy>
-  </default>
+    <default>
+        <hawksearch_proxy>
+            <general>
+                <enabled>0</enabled>
+                <logging_enabled>0</logging_enabled>
+            </general>
+            <proxy>
+                <mode>develop</mode>
+                <hawk_url_settings>
+                    <hawk_url_develop>https://dev.hawksearch.net/</hawk_url_develop>
+                    <hawk_url_staging>https://test.hawksearch.net/</hawk_url_staging>
+                    <hawk_url_production>https://manage.hawksearch.com/</hawk_url_production>
+                </hawk_url_settings>
+
+                <tracking_url_settings>
+                    <tracking_url_develop>https://tracking-dev.hawksearch.net/</tracking_url_develop>
+                    <tracking_url_staging>https://tracking-test.hawksearch.net/</tracking_url_staging>
+                    <tracking_url_production>https://tracking.hawksearch.com/</tracking_url_production>
+                </tracking_url_settings>
+
+                <rec_url_settings>
+                    <rec_url_develop>https://recs-dev.hawksearch.net/</rec_url_develop>
+                    <rec_url_staging>https://recs-test.hawksearch.net/</rec_url_staging>
+                    <rec_url_production>https://recs.hawksearch.com/</rec_url_production>
+                </rec_url_settings>
+
+                <search_box_ids>search</search_box_ids>
+                <autocomplete_query_params><![CDATA[/?fn=ajax&f=GetSuggestions]]></autocomplete_query_params>
+                <hawksearch_include_css>1</hawksearch_include_css>
+                <enable_hawk_landing_pages>1</enable_hawk_landing_pages>
+                <result_type>item</result_type>
+                <show_tabs>0</show_tabs>
+                <meta_robots>NOINDEX,FOLLOW</meta_robots>
+                <allow_fulltext>0</allow_fulltext>
+            </proxy>
+            <sync>
+                <cron_string>0 0 * * *</cron_string>
+            </sync>
+        </hawksearch_proxy>
+    </default>
 </config>

@@ -30,6 +30,7 @@ use HawkSearch\Proxy\Api\Data\SearchResultResponseInterface;
 use HawkSearch\Proxy\Api\Data\SearchResultResponseInterfaceFactory;
 use HawkSearch\Proxy\Api\Data\SearchResultTemplateItemInterface;
 use HawkSearch\Proxy\Api\Data\SearchResultTemplateItemInterfaceFactory;
+use HawkSearch\Proxy\Exception\ApiException;
 use HawkSearch\Proxy\Model\ProxyEmailFactory;
 use HawkSearch\Proxy\Model\SearchResultTemplateItem;
 use Magento\Catalog\Model\Category;
@@ -379,7 +380,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             unset($args['lpurl']);
         }
 
-        $this->uri = $this->getTrackingUrl() . '/?' . http_build_query($args);
+        $this->uri = $this->getHawkUrl() . '/?' . http_build_query($args);
     }
 
     private function fetchResponse()
@@ -397,7 +398,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $client->setHeaders('HTTP-TRUE-CLIENT-IP', $this->clientIP);
         $response = $client->request();
         if ($response->getStatus() == '500') {
-            throw new Exception($response->getMessage());
+            throw new ApiException($response->getMessage());
         }
         $this->log(sprintf('requesting url %s', $client->getUri()));
 
@@ -548,7 +549,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     public function getApiUrl()
     {
-        $apiUrl = $this->getConfigurationData(sprintf('hawksearch_proxy/proxy/tracking_url_%s', $this->getMode()));
+        $apiUrl = $this->getConfigurationData(sprintf('hawksearch_proxy/proxy/hawk_url_settings/hawk_url_%s', $this->getMode()));
         $apiUrl = preg_replace('|^http://|', 'https://', $apiUrl);
         if ('/' == substr($apiUrl, -1)) {
             return $apiUrl . 'api/v3/';
@@ -598,18 +599,34 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         return $this->hawkData->getResponseData()->getFacets();
     }
 
-    public function getTrackingUrl()
+    public function getHawkUrl()
     {
-        $trackingUrl = $this->getConfigurationData(sprintf('hawksearch_proxy/proxy/tracking_url_%s', $this->getMode()));
+        $trackingUrl = $this->getConfigurationData(
+            sprintf('hawksearch_proxy/proxy/hawk_url_settings/hawk_url_%s', $this->getMode())
+        );
         if ('/' == substr($trackingUrl, -1)) {
             return $trackingUrl . 'sites/' . $this->getEngineName();
         }
         return $trackingUrl . '/sites/' . $this->getEngineName();
     }
 
+    public function getTrackingUrl()
+    {
+        return $this->getConfigurationData(
+            sprintf('hawksearch_proxy/proxy/tracking_url_settings/tracking_url_%s', $this->getMode())
+        );
+    }
+
+    public function getRecommenderUrl()
+    {
+        return $this->getConfigurationData(
+            sprintf('hawksearch_proxy/proxy/rec_url_settings/rec_url_%s', $this->getMode())
+        );
+    }
+
     public function getTrackingPixelUrl($args)
     {
-        $trackingUrl = $this->getConfigurationData(sprintf('hawksearch_proxy/proxy/tracking_url_%s', $this->getMode()));
+        $trackingUrl = $this->getHawkUrl();
         if ('/' == substr($trackingUrl, -1)) {
             return $trackingUrl . 'sites/_hawk/hawkconversion.aspx?' . http_build_query($args);
         }
@@ -874,7 +891,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     private function getHawkNarrowXml($id)
     {
         $xml = simplexml_load_string(
-            '<?xml version="1.0" encoding="UTF-8"?><Rule xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" RuleType="Group" Operator="All" />'
+            '<?xml version="1.0" encoding="UTF-8"?>
+<Rule xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+RuleType="Group" Operator="All" />'
         );
         $rules = $xml->addChild('Rules');
         $rule = $rules->addChild('Rule');
@@ -983,7 +1002,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             $customVal = null;
             if ($sc < 0) {
                 //Hawk has page Magento doesn't want managed, delete, increment left
-                if (substr($hawkList[$left]['custom'], 0, strlen('__mage_catid_'))== '__mage_catid_' || $this->overwriteFlag
+                if (substr($hawkList[$left]['custom'], 0, strlen('__mage_catid_'))== '__mage_catid_'
+                    || $this->overwriteFlag
                 ) {
                     $resp = $this->getHawkResponse(
                         \Zend_Http_Client::DELETE,
@@ -1095,7 +1115,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             if ($store->getConfig('hawksearch_proxy/general/enabled') && $store->isActive()) {
                 try {
                     $this->syncHawkLandingByStore($store);
-                } catch (Exception $e) {
+                } catch (\Exception $e) {
                     $errors[] = sprintf("Error syncing category pages for store '%s'", $store->getCode());
                     $errors[] = sprintf("Exception message: %s", $e->getMessage());
                     continue;
@@ -1227,20 +1247,24 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     private function validateHawkLandingPageResponse($response, $action, $url, $request_raw = null)
     {
-        // valid action
-        if ($action == \Zend_Http_Client::PUT) {
-            $act = 'Update Landing page';
-        } elseif ($action == \Zend_Http_Client::POST) {
-            $act = 'Create new Landing page';
-        } elseif ($action == \Zend_Http_Client::DELETE) {
-            $act = 'Delete Landing page';
-        } else {
-            $act = "Unknown action ({$action})";
-        }
-
         // valid response
         $res = json_decode($response, true);
         if (isset($res['Message'])) {
+            // valid action
+            switch ($action) {
+                case \Zend_Http_Client::PUT:
+                    $act = 'Landing page: Update';
+                    break;
+                case \Zend_Http_Client::POST:
+                    $act = 'Landing page: Create New';
+                    break;
+                case \Zend_Http_Client::DELETE:
+                    $act = 'Landing page: Delete';
+                    break;
+                default:
+                    $act = "Unknown action ({$action})";
+            }
+
             $this->_syncingExceptions[] = [
                 'action' => $act,
                 'url' => $url,
@@ -1313,14 +1337,16 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                     $html .= "<p>";
                     $html .= "<strong>Category Url:</strong>" . $this->_syncingExceptions[$i]['url'] . "<br/>";
                     $html .= "<strong>Action:</strong>" . $this->_syncingExceptions[$i]['action'] . "<br/>";
-                    $html .= "<strong>Request Raw Data:</strong>" . $this->_syncingExceptions[$i]['request_raw'] . "<br/>";
+                    $html .= "<strong>Request Raw Data:</strong>" .
+                        $this->_syncingExceptions[$i]['request_raw'] . "<br/>";
                     $html .= "<strong>Response Message:</strong>" . $this->_syncingExceptions[$i]['error'] . "<br/>";
                     $html .= "</p>";
                     $html .= "<hr/>";
                 }
             }
 
-            $html .= "<br/><br/><p><strong>Note*:</strong> Other synchronizing requests to HawkSearch were sent as successfully.</p>";
+            $html .= "<br/><br/>
+<p><strong>Note*:</strong> Other synchronizing requests to HawkSearch were sent as successfully.</p>";
 
             return $html;
         }
@@ -1357,7 +1383,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                     ]
                 );
                 return true;
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 $this->log('-- Error: ' . $e->getMessage() . ' - File: ' . $e->getFile() . ' on line ' . $e->getLine());
                 return false;
             }
@@ -1423,7 +1449,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     public function generateColor($value)
     {
-        return sprintf('#%s', substr(md5($value), 0, 6));
+        return sprintf('#%s', substr(sha1($value), 0, 6));
     }
 
     public function generateTextColor($rgb)
