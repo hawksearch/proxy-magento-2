@@ -39,7 +39,7 @@
         HawkSearch.initAutoSuggest = function () {
             <?php foreach ($block->getSearchBoxes() as $sbid) : ?>
             HawkSearch.suggestInit('#<?= /* @noEscape */ $sbid; ?>', {
-                lookupUrlPrefix: HawkSearch.TrackingUrl + '<?= /* @noEscape */ $block->getAutosuggestParams() ?>',
+                lookupUrlPrefix: HawkSearch.HawkUrl + '<?= /* @noEscape */ $block->getAutosuggestParams() ?>',
                 hiddenDivName: '<?= /* @noEscape */ $block->getHiddenDivName() ?>',
                 isAutoWidth: true
             });
