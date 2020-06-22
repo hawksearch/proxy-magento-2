@@ -65,7 +65,7 @@ $tabs = $block->getTabs();
         <div id="hawkbottompager"><?= /* @noEscape */
             $block->getBottomPager(); ?></div>
     <?php endif; ?>
-    <?php if (!empty($tabs)) : ?>
+    <?php if ($tabs) : ?>
         <?= /* @noEscape */ sprintf('<div id="hawktabs">%s</div>', $tabs); ?>
     <?php endif;?>
 </div>

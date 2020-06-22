@@ -48,66 +48,62 @@ class Html extends Template
     public function getFacets()
     {
 
-        return $this->helper->getResultData()->Data->Facets;
+        return $this->helper->getResultData()->getResponseData()->getFacets();
     }
 
     public function getTopPager()
     {
-        return $this->helper->getResultData()->Data->TopPager;
+        return $this->helper->getResultData()->getResponseData()->getTopPager();
     }
 
     public function getBottomPager()
     {
-        return $this->helper->getResultData()->Data->BottomPager;
+        return $this->helper->getResultData()->getResponseData()->getBottomPager();
     }
 
     public function getMetaRobots()
     {
-        $results = $this->helper->getResultData();
-        if (property_exists($results, 'MetaRobots')) {
-            return $results->MetaRobots;
-        }
-        return '';
+        return $this->helper->getResultData()->getMetaRobots() ?? '';
     }
 
     public function getHeaderTitle()
     {
-        return $this->helper->getResultData()->HeaderTitle;
+        return $this->helper->getResultData()->getHeaderTitle();
     }
 
     public function getMetaDescription()
     {
-        return $this->helper->getResultData()->MetaDescription;
+        return $this->helper->getResultData()->getMetaDescription();
     }
 
     public function getMetaKeywords()
     {
-        return $this->helper->getResultData()->MetaKeywords;
+        return $this->helper->getResultData()->getMetaKeywords();
     }
 
     public function getRelCanonical()
     {
-        return $this->helper->getResultData()->RelCanonical;
+        return $this->helper->getResultData()->getRelCanonical();
     }
 
     public function getTopText()
     {
-        return $this->helper->getResultData()->Data->TopText;
+        return $this->helper->getResultData()->getResponseData()->getTopText();
     }
 
     public function getRelated()
     {
-        return $this->helper->getResultData()->Data->Related;
+        return $this->helper->getResultData()->getResponseData()->getRelated();
     }
 
     public function getBreadCrumb()
     {
-        return $this->helper->getResultData()->Data->BreadCrumb;
+        return $this->helper->getResultData()->getResponseData()->getBreadCrumb();
     }
 
     public function getTitle()
     {
-        return $this->helper->getResultData()->Data->Title;
+        return $this->helper->getResultData()->getResponseData()->getTitle();
     }
 
     public function getHawkTrackingData()
@@ -119,7 +115,8 @@ class Html extends Template
     {
         $layout = $this->getLayout();
         $lpurl = $this->_request->getParam('lpurl');
-        if ($this->getTabbedContent() && $lpurl == '/catalogsearch/result') {
+        if ($this->getTabbedContent() && in_array($lpurl, ['/catalogsearch/result/', '/catalogsearch/result'])
+            && !$this->helper->productsOnly()) {
             return $layout->getBlock('hawksearch_tabbed_items')->toHtml();
         } else {
             return $layout->getBlock('hawksearch_hawkitems')->getChildHtml();
@@ -154,14 +151,10 @@ class Html extends Template
 
     public function getHawksearchTrackingId()
     {
-        return $this->helper->getResultData()->TrackingId;
+        return $this->helper->getResultData()->getTrackingId();
     }
     public function getTabs()
     {
-        $resultData = $this->helper->getResultData()->Data;
-        if (property_exists($resultData, 'Tabs')) {
-            return $resultData->Tabs;
-        }
-        return null;
+        return $this->helper->getResultData()->getResponseData()->getTabs() ?? '';
     }
 }

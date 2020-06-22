@@ -85,19 +85,21 @@ class ListProduct extends \Magento\Catalog\Block\Product\ListProduct
                     return '<div id="hawkbottompager">' . str_replace(
                         $baseUrl . '/',
                         $baseUrl,
-                        $this->hawkHelper->getResultData()->Data->BottomPager
+                        $this->hawkHelper->getResultData()->getResponseData()->getBottomPager()
                     ) . '</div>';
                 }
                 $this->topseen = true;
-                $data = $this->hawkHelper->getResultData()->Data;
                 if ($this->hawkHelper->getShowTabs()) {
                     return sprintf(
                         '<div id="hawktabs">%s</div><div id="hawktoppager">%s</div>',
-                        $data->Tabs,
-                        $data->TopPager
+                        $this->hawkHelper->getResultData()->getResponseData()->getTabs(),
+                        $this->hawkHelper->getResultData()->getResponseData()->getTopPager()
                     );
                 }
-                return sprintf('<div id="hawktoppager">%s</div>', $data->TopPager);
+                return sprintf(
+                    '<div id="hawktoppager">%s</div>',
+                    $this->hawkHelper->getResultData()->getResponseData()->getTopPager()
+                );
             } else {
                 return '';
             }

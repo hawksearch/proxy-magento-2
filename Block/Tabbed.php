@@ -31,25 +31,21 @@ class Tabbed extends Html
 
     public function getTabs()
     {
-        $resultData = $this->helper->getResultData()->Data;
-        if (property_exists($resultData, 'Tabs')) {
-            return $resultData->Tabs;
-        }
-        return null;
+        return $this->helper->getResultData()->getResponseData()->getTabs() ?? null;
     }
+
     public function getContent()
     {
-        $data = $this->helper->getResultData()->Data;
-        $results = json_decode($data->Results);
-        return $results->Items;
+        return $this->helper->getResultData()->getResponseData()->getResults()->getItems();
     }
 
     public function getTabbedItemHtml($item)
     {
         $rendererList = $this->getChildBlock('item.renderers');
         $type = 'default';
-        if ($this->helper->getShowTypeLabels() && $this->getRequest()->getParam('it') != 'all') {
-            $type = strstr($item->Custom->it, '|^|', true);
+        if ($this->helper->getShowTypeLabels()
+            && $this->getRequest()->getParam('it') != 'all' && isset($item['Custom']['it'])) {
+            $type = strstr($item['Custom']['it'], '|^|', true);
         }
 
         $renderer = $rendererList->getRenderer($type, 'default');
@@ -63,16 +59,16 @@ class Tabbed extends Html
 
     public function getTypeLabel($item)
     {
-        if (!$this->helper->getShowTypeLabels() || !isset($item->Custom->it)) {
+        if (!$this->helper->getShowTypeLabels() || !isset($item['Custom']['it'])) {
             return '';
         }
         if (!$this->labelMap) {
             $this->labelMap = $this->helper->getTypeLabelMap();
         }
-        $type = strstr($item->Custom->it, '|^|', true);
+        $type = strstr($item['Custom']['it'], '|^|', true);
 
         if (!isset($this->labelMap[$type])) {
-            preg_match_all('/tab="(.*?)"/', $this->helper->getResultData()->Data->Tabs, $matches);
+            preg_match_all('/tab="(.*?)"/', $this->helper->getResultData()->getResponseData()->getTabs(), $matches);
             if (count($matches) > 0) {
                 foreach ($matches[1] as $foundType) {
                     if ($foundType == 'all' || isset($this->labelMap[$foundType])) {

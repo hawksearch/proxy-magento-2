@@ -1,5 +1,15 @@
+<?php
+$tabs = $block->getTabs();
+?>
+<?php if (!empty($tabs)) :?>
+    <?= /* @noEscape */ sprintf('<div id="hawktabs">%s</div>', $tabs); ?>
+<?php endif;?>
+<div id="hawktoppager"><?= /* @noEscape */
+    $block->getTopPager(); ?></div>
 <div class="contentList">
     <?php foreach ($block->getContent() as $item) : ?>
         <?= /* @noEscape */ $block->getTabbedItemHtml($item) ?>
     <?php endforeach; ?>
 </div>
+<div id="hawkbottompager"><?= /* @noEscape */
+    $block->getBottomPager(); ?></div>
