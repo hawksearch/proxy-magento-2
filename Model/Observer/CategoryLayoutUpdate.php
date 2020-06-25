@@ -14,7 +14,7 @@ use Magento\Framework\Event\ObserverInterface;
 class CategoryLayoutUpdate implements ObserverInterface
 {
     private $helper;
-    public function __construct(\HawkSearch\Datafeed\Helper\Data $helper)
+    public function __construct(\HawkSearch\Proxy\Helper\Data $helper)
     {
         $this->helper = $helper;
     }

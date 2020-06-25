@@ -1277,11 +1277,8 @@ RuleType="Group" Operator="All" />'
     public function getSyncFilePath()
     {
         $this->log('getting sync lock file path');
-        $relPath = $this->scopeConfig->getValue(\HawkSearch\Datafeed\Helper\Data::CONFIG_FEED_PATH);
+        $relPath = \HawkSearch\Datafeed\Model\ConfigProvider::DEFAULT_FEED_PATH;
 
-        if (!$relPath) {
-            $relPath = \HawkSearch\Datafeed\Helper\Data::DEFAULT_FEED_PATH;
-        }
         $mediaRoot = $this->filesystem->getDirectoryWrite('media')->getAbsolutePath();
 
         if (strpos(strrev($mediaRoot), '/') !== 0) {
