@@ -19,6 +19,15 @@
             <argument name="instanceName" xsi:type="string">HawkSearch\Proxy\Model\ResourceModel\Collection</argument>
         </arguments>
     </virtualType>
+
+    <type name="HawkSearch\Proxy\Logger\ProxyLogger">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="debug" xsi:type="object">HawkSearch\Proxy\Logger\Handler\DebugHandler</item>
+            </argument>
+        </arguments>
+    </type>
+
     <virtualType name="hawkSearchProxyVirtualLogHandler" type="Magento\Framework\Logger\Handler\Base">
         <arguments>
             <argument name="fileName" xsi:type="string">var/log/hawksearch_proxy.log</argument>

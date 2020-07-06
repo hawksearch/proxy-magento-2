@@ -12,12 +12,12 @@
  */
 declare(strict_types=1);
 
-namespace HawkSearch\Proxy\Block\Head;
+namespace HawkSearch\Proxy\Logger;
 
-use Magento\Framework\View\Element\Template;
+use Magento\Framework\Logger\Monolog;
 use HawkSearch\Proxy\Model\ConfigProvider;
 
-class HawkSearchJs extends Template
+class ProxyLogger extends Monolog
 {
     /**
      * @var ConfigProvider
@@ -25,33 +25,37 @@ class HawkSearchJs extends Template
     private $configProvider;
 
     /**
-     * HawkSearchJs constructor.
-     * @param Template\Context $context
+     * ProxyLogger constructor.
      * @param ConfigProvider $configProvider
-     * @param array $data
+     * @param $name
+     * @param array $handlers
+     * @param array $processors
      */
     public function __construct(
-        Template\Context $context,
         ConfigProvider $configProvider,
-        array $data
+        $name,
+        array $handlers = [],
+        array $processors = []
     ) {
         $this->configProvider = $configProvider;
-        parent::__construct($context, $data);
+        parent::__construct(
+            $name,
+            $handlers,
+            $processors
+        );
     }
 
     /**
-     * @return string|null
+     * @param string $message
+     * @param array $context
+     * @return bool
      */
-    public function getHawkUrl() : ?string
+    public function debug($message, array $context = []) : bool
     {
-        return $this->configProvider->getHawkUrl();
-    }
-
-    /**
-     * @return bool|null
-     */
-    public function isHawkCssIncluded() : ?bool
-    {
-        return $this->configProvider->isHawkCssIncluded();
+        if ($this->configProvider->isLoggingEnabled()) {
+            return parent::debug($message, $context);
+        } else {
+            return false;
+        }
     }
 }

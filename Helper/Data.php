@@ -624,15 +624,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         );
     }
 
-    public function getTrackingPixelUrl($args)
-    {
-        $trackingUrl = $this->getHawkUrl();
-        if ('/' == substr($trackingUrl, -1)) {
-            return $trackingUrl . 'sites/_hawk/hawkconversion.aspx?' . http_build_query($args);
-        }
-        return $trackingUrl . '/sites/_hawk/hawkconversion.aspx?' . http_build_query($args);
-    }
-
     public function getOrderTackingKey()
     {
         return $this->getConfigurationData('hawksearch_proxy/proxy/order_tracking_key');

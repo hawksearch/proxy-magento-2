@@ -1,3 +1,4 @@
+<?php
 /**
  *  Copyright (c) 2020 Hawksearch (www.hawksearch.com) - All Rights Reserved
  *
@@ -9,16 +10,26 @@
  *  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  *  IN THE SOFTWARE.
  */
-var config = {
-    "map": {
-        "*": {
-            "quickSearch": "HawkSearch_Proxy/js/autosuggest",
-            "hawksearch": "HawkSearch_Proxy/js/hawksearch"
-        }
-    },
-    "shim": {
-        "hawksearch": {
-            "deps": ["jquery"]
-        }
-    }
-};
+declare(strict_types=1);
+
+namespace HawkSearch\Proxy\Logger\Handler;
+
+use Magento\Framework\Logger\Handler\Base as BaseHandler;
+use Monolog\Logger as MonologLogger;
+
+class DebugHandler extends BaseHandler
+{
+    /**
+     * Logging level
+     *
+     * @var int
+     */
+    protected $loggerType = MonologLogger::DEBUG;
+
+    /**
+     * File name
+     *
+     * @var string
+     */
+    protected $fileName = '/var/log/hawksearch_proxy.log';
+}

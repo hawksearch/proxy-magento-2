@@ -1,2 +1,9 @@
-<img src="<?= /* @noEscape */ $block->getTrackingPixelUrl(); ?>" style="width:0px; height:0px" />
+<?php
+use Magento\Framework\View\Element\Template;
+use HawkSearch\Proxy\ViewModel\OnePage\Tracking;
 
+/** @var Template $block */
+/** @var Tracking $hawkTracking */
+$hawkTracking = $block->getData('hawkTracking');
+?>
+<img src="<?= /* @noEscape */ $hawkTracking->getTrackingPixelUrl(); ?>" style="width:0px; height:0px" />

@@ -47,12 +47,9 @@ class Index extends \Magento\CatalogSearch\Controller\Result\Index
         $query = $this->queryFactory->get();
         $tab = $this->getRequest()->getParam('it');
         $this->helper->checkNotes();
-        $robots = $this->hawkHelper->getSearchRobots();
         if ($query->getQueryText() == '' && $this->isTopCategoryRequest()) {
             $this->_view->loadLayout();
             $this->_view->getLayout()->unsetElement('page.main.title');
-            $this->_view->getPage()->getConfig()->setRobots($robots);
-            $this->_view->renderLayout();
         } else {
 
             if ($this->hawkHelper->productsOnly()) {
@@ -60,10 +57,9 @@ class Index extends \Magento\CatalogSearch\Controller\Result\Index
             } else {
                 $this->_view->loadLayout('hawksearch_proxy_tabbed');
             }
-
-            $this->_view->getPage()->getConfig()->setRobots($robots);
-            $this->_view->renderLayout();
         }
+        $this->_view->getPage()->getConfig()->setRobots($this->hawkHelper->getSearchRobots());
+        $this->_view->renderLayout();
     }
 
     private function isTopCategoryRequest()
