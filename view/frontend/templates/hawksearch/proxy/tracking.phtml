@@ -5,5 +5,8 @@ use HawkSearch\Proxy\ViewModel\OnePage\Tracking;
 /** @var Template $block */
 /** @var Tracking $hawkTracking */
 $hawkTracking = $block->getData('hawkTracking');
+if (!$hawkTracking) {
+    return;
+}
 ?>
 <img src="<?= /* @noEscape */ $hawkTracking->getTrackingPixelUrl(); ?>" style="width:0px; height:0px" />

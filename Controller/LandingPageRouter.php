@@ -13,6 +13,7 @@
 
 namespace HawkSearch\Proxy\Controller;
 
+use HawkSearch\Proxy\Model\ConfigProvider;
 use Magento\Framework\App\Action\Forward;
 
 class LandingPageRouter implements \Magento\Framework\App\RouterInterface
@@ -27,23 +28,28 @@ class LandingPageRouter implements \Magento\Framework\App\RouterInterface
     private $helper;
 
     /**
+     * @var ConfigProvider
+     */
+    private $proxyConfigProvider;
+
+    /**
      * @param \Magento\Framework\App\ActionFactory $actionFactory
-     * @param \HawkSearch\Proxy\Helper\Data        $helper
+     * @param \HawkSearch\Proxy\Helper\Data $helper
+     * @param ConfigProvider $proxyConfigProvider
      */
     public function __construct(
         \Magento\Framework\App\ActionFactory $actionFactory,
-        \HawkSearch\Proxy\Helper\Data $helper
+        \HawkSearch\Proxy\Helper\Data $helper,
+        ConfigProvider $proxyConfigProvider
     ) {
         $this->actionFactory = $actionFactory;
         $this->helper = $helper;
+        $this->proxyConfigProvider = $proxyConfigProvider;
     }
 
     public function match(\Magento\Framework\App\RequestInterface $request)
     {
-        if (!$this->helper->getEnabled()) {
-            return false;
-        }
-        if (!$this->helper->getEnableLandingPageRoute()) {
+        if (!$this->proxyConfigProvider->isLandingPageRouteEnabled()) {
             return false;
         }
         if (!$this->helper->getIsHawkManaged(trim($request->getPathInfo(), '/'))) {

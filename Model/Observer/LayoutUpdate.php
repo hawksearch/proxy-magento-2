@@ -8,15 +8,25 @@
 
 namespace HawkSearch\Proxy\Model\Observer;
 
+use HawkSearch\Proxy\Model\ConfigProvider;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 
 class LayoutUpdate implements ObserverInterface
 {
-    private $helper;
-    public function __construct(\HawkSearch\Proxy\Helper\Data $helper)
-    {
-        $this->helper = $helper;
+    /**
+     * @var ConfigProvider
+     */
+    private $proxyConfigProvider;
+
+    /**
+     * LayoutUpdate constructor.
+     * @param ConfigProvider $proxyConfigProvider
+     */
+    public function __construct(
+        ConfigProvider $proxyConfigProvider
+    ) {
+        $this->proxyConfigProvider = $proxyConfigProvider;
     }
 
     /**
@@ -26,12 +36,12 @@ class LayoutUpdate implements ObserverInterface
     public function execute(\Magento\Framework\Event\Observer $observer)
     {
         if ($observer->getFullActionName() == 'catalogsearch_result_index') {
-            if ($this->helper->isManageSearch()) {
+            if ($this->proxyConfigProvider->isSearchManagementEnabled()) {
                 $layout = $observer->getLayout();
                 $layout->getUpdate()->addHandle('hawksearch_catalogsearch_result');
             }
         } elseif ($observer->getFullActionName() == 'catalog_category_view') {
-            if ($this->helper->isManageCategories()) {
+            if ($this->proxyConfigProvider->isCategoriesManagementEnabled()) {
                 $layout = $observer->getLayout();
                 $layout->getUpdate()->addHandle('hawksearch_category_view');
             }

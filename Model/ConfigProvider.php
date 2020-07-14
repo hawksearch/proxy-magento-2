@@ -34,6 +34,7 @@ class ConfigProvider
     /**#@+
      * Configuration paths
      */
+    const CONFIG_PROXY_ENABLED = 'hawksearch_proxy/general/enabled';
     const CONFIG_PROXY_MODE = 'hawksearch_proxy/proxy/mode';
     const CONFIG_ENGINE_NAME = 'hawksearch_proxy/proxy/engine_name';
     const CONFIG_HAWK_URL = 'hawksearch_proxy/proxy/hawk_url_settings/hawk_url_%s';
@@ -43,6 +44,16 @@ class ConfigProvider
     const CONFIG_PROXY_SHOWTABS = 'hawksearch_proxy/proxy/show_tabs';
     const CONFIG_PROXY_RESULT_TYPE = 'hawksearch_proxy/proxy/result_type';
     const CONFIG_PROXY_MANAGE_SEARCH = 'hawksearch_proxy/proxy/manage_search';
+    const CONFIG_PROXY_ENABLE_LANDING_PAGE_ROUTE = 'hawksearch_proxy/proxy/enable_hawk_landing_pages';
+    const CONFIG_PROXY_MANAGE_CATEGORIES = 'hawksearch_proxy/proxy/manage_categories';
+    const CONFIG_PROXY_ENABLE_CUSTOM_SEARCH_ROUTE = 'hawksearch_proxy/proxy/enable_custom_search_route';
+    const CONFIG_PROXY_CUSTOM_SEARCH_ROUTE = 'hawksearch_proxy/proxy/custom_search_route';
+    const CONFIG_PROXY_META_ROBOTS = 'hawksearch_proxy/proxy/meta_robots';
+    const CONFIG_PROXY_SEARCH_BOX_IDS = 'hawksearch_proxy/proxy/search_box_ids';
+    const CONFIG_PROXY_AUTOCOMPLETE_DIV_ID = 'hawksearch_proxy/proxy/autocomplete_div_id';
+    const CONFIG_PROXY_AUTOCOMPLETE_QUERY_PARAMS = 'hawksearch_proxy/proxy/autocomplete_query_params';
+    const CONFIG_PROXY_RECOMMENDED_URL = 'hawksearch_proxy/proxy/rec_url_settings/rec_url_%s';
+    const CONFIG_PROXY_TRACKING_URL = 'hawksearch_proxy/proxy/tracking_url_settings/tracking_url_%s';
     /**#@-*/
 
     /**
@@ -101,25 +112,34 @@ class ConfigProvider
     }
 
     /**
-     * @param null $store
-     * @return bool | null
+     * @param StoreInterface|int|null $store
+     * @return bool
      */
-    public function isHawkCssIncluded($store = null) : ?bool
+    public function isEnabled($store = null) : bool
+    {
+        return (bool)$this->getConfig(self::CONFIG_PROXY_ENABLED, $store);
+    }
+
+    /**
+     * @param StoreInterface|int|null $store
+     * @return bool
+     */
+    public function isHawkCssIncluded($store = null) : bool
     {
         return (bool)$this->getConfig(self::CONFIG_INCLUDE_HAWK_CSS, $store);
     }
 
     /**
-     * @param null $store
-     * @return bool | null
+     * @param StoreInterface|int|null $store
+     * @return bool
      */
-    public function isLoggingEnabled($store = null) : ?bool
+    public function isLoggingEnabled($store = null) : bool
     {
         return (bool)$this->getConfig(self::CONFIG_IS_LOGGING_ENABLED, $store);
     }
 
     /**
-     * @param null $store
+     * @param StoreInterface|int|null $store
      * @return string | null
      */
     public function getMode($store = null) : ?string
@@ -128,7 +148,7 @@ class ConfigProvider
     }
 
     /**
-     * @param null $store
+     * @param StoreInterface|int|null $store
      * @return string | null
      */
     public function getEngineName($store = null) : ?string
@@ -137,7 +157,7 @@ class ConfigProvider
     }
 
     /**
-     * @param null $store
+     * @param StoreInterface|int|null $store
      * @return string | null
      */
     public function getHawkUrlHost($store = null) : ?string
@@ -149,33 +169,52 @@ class ConfigProvider
     }
 
     /**
-     * @param null $store
+     * @param StoreInterface|int|null $store
      * @return string | null
      */
-    public function getHawkUrl($store = null) : ?string
+    public function getTrackingUrl($store = null) : ?string
     {
-        $hawkUrl = $this->getHawkUrlHost($store);
-        if ('/' == substr($hawkUrl, -1)) {
-            return $hawkUrl . 'sites/' . $this->getEngineName($store);
-        }
-        return $hawkUrl . '/sites/' . $this->getEngineName($store);
+        return $this->getConfig(
+            sprintf(self::CONFIG_PROXY_TRACKING_URL, $this->getMode($store)),
+            $store
+        );
     }
 
     /**
-     * @param null $store
+     * @param StoreInterface|int|null $store
+     * @return string | null
+     */
+    public function getRecommendedUrl($store = null) : ?string
+    {
+        return $this->getConfig(
+            sprintf(self::CONFIG_PROXY_RECOMMENDED_URL, $this->getMode($store)),
+            $store
+        );
+    }
+
+    /**
+     * @param string|null $engine
+     * @param StoreInterface|int|null $store
+     * @return string | null
+     */
+    public function getHawkUrl($engine = null, $store = null) : ?string
+    {
+        $hawkUrl = rtrim($this->getHawkUrlHost($store), '/');
+        return $hawkUrl . '/sites/' . ($engine ?? $this->getEngineName($store));
+    }
+
+    /**
+     * @param StoreInterface|int|null $store
      * @return string | null
      */
     public function getTrackingPixelUrl($store = null) : ?string
     {
-        $hawkUrl = $this->getHawkUrlHost($store);
-        if ('/' == substr($hawkUrl, -1)) {
-            return $hawkUrl . 'sites/_hawk/hawkconversion.aspx?';
-        }
-        return $hawkUrl . '/sites/_hawk/hawkconversion.aspx?';
+        $hawkUrl = rtrim($this->getHawkUrl('_hawk', $store), '/');
+        return $hawkUrl . '/hawkconversion.aspx?';
     }
 
     /**
-     * @param null $store
+     * @param StoreInterface|int|null $store
      * @return string | null
      */
     public function getOrderTrackingKey($store = null) : ?string
@@ -184,16 +223,16 @@ class ConfigProvider
     }
 
     /**
-     * @param null $store
-     * @return bool | null
+     * @param StoreInterface|int|null $store
+     * @return bool
      */
-    public function showTabs($store = null) : ?bool
+    public function showTabs($store = null) : bool
     {
         return (bool)$this->getConfig(self::CONFIG_PROXY_SHOWTABS, $store);
     }
 
     /**
-     * @param null $store
+     * @param StoreInterface|int|null $store
      * @return string | null
      */
     public function getResultType($store = null) : ?string
@@ -202,13 +241,87 @@ class ConfigProvider
     }
 
     /**
-     * @param null $store
-     * @return bool | null
+     * @param StoreInterface|int|null $store
+     * @return bool
      */
-    public function manageSearch($store = null) : ?bool
+    public function isSearchManagementEnabled($store = null) : bool
     {
-        return (bool)$this->getConfig(self::CONFIG_PROXY_MANAGE_SEARCH, $store);
+        return $this->isEnabled() && $this->getConfig(self::CONFIG_PROXY_MANAGE_SEARCH, $store);
     }
+
+    /**
+     * @param StoreInterface|int|null $store
+     * @return bool
+     */
+    public function isLandingPageRouteEnabled($store = null) : bool
+    {
+        return $this->isEnabled() && $this->getConfig(self::CONFIG_PROXY_ENABLE_LANDING_PAGE_ROUTE, $store);
+    }
+
+    /**
+     * @param StoreInterface|int|null $store
+     * @return bool
+     */
+    public function isCategoriesManagementEnabled($store = null) : bool
+    {
+        return $this->isEnabled() && $this->getConfig(self::CONFIG_PROXY_MANAGE_CATEGORIES, $store);
+    }
+
+    /**
+     * @param StoreInterface|int|null $store
+     * @return bool
+     */
+    public function isCustomSearchRouteEnabled($store = null) : bool
+    {
+        return $this->isEnabled() && $this->getConfig(self::CONFIG_PROXY_ENABLE_CUSTOM_SEARCH_ROUTE, $store);
+    }
+
+    /**
+     * @param StoreInterface|int|null $store
+     * @return string|null
+     */
+    public function getCustomSearchRoute($store = null) : ?string
+    {
+        return $this->getConfig(self::CONFIG_PROXY_CUSTOM_SEARCH_ROUTE, $store);
+    }
+
+    /**
+     * @param StoreInterface|int|null $store
+     * @return string | null
+     */
+    public function getMetaRobots($store = null) : ?string
+    {
+        return $this->getConfig(self::CONFIG_PROXY_META_ROBOTS, $store);
+    }
+
+    /**
+     * @param StoreInterface|int|null $store
+     * @return array
+     */
+    public function getSearchBoxIds($store = null) : array
+    {
+        $ids = explode(',', $this->getConfig(self::CONFIG_PROXY_SEARCH_BOX_IDS, $store));
+        return array_filter(array_map('trim', $ids));
+    }
+
+    /**
+     * @param StoreInterface|int|null $store
+     * @return string | null
+     */
+    public function getAutocompleteDivId($store = null) : ?string
+    {
+        return $this->getConfig(self::CONFIG_PROXY_AUTOCOMPLETE_DIV_ID, $store);
+    }
+
+    /**
+     * @param StoreInterface|int|null $store
+     * @return string | null
+     */
+    public function getAutocompleteQueryParams($store = null) : ?string
+    {
+        return $this->getConfig(self::CONFIG_PROXY_AUTOCOMPLETE_QUERY_PARAMS, $store);
+    }
+
 
     /**
      * Retrieve store object

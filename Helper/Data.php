@@ -15,22 +15,9 @@ namespace HawkSearch\Proxy\Helper;
 
 use Composer\Util\Filesystem as UtilFileSystem;
 use Exception;
-use HawkSearch\Proxy\Api\Data\SearchResultContentInterface;
-use HawkSearch\Proxy\Api\Data\SearchResultContentInterfaceFactory;
-use HawkSearch\Proxy\Api\Data\SearchResultContentItemInterfaceFactory;
-use HawkSearch\Proxy\Api\Data\SearchResultDataInterface;
-use HawkSearch\Proxy\Api\Data\SearchResultDataInterfaceFactory;
-use HawkSearch\Proxy\Api\Data\SearchResultFeaturedInterface;
-use HawkSearch\Proxy\Api\Data\SearchResultFeaturedInterfaceFactory;
-use HawkSearch\Proxy\Api\Data\SearchResultFeaturedMainInterface;
-use HawkSearch\Proxy\Api\Data\SearchResultFeaturedMainInterfaceFactory;
-use HawkSearch\Proxy\Api\Data\SearchResultMerchandisingInterface;
-use HawkSearch\Proxy\Api\Data\SearchResultMerchandisingInterfaceFactory;
+use HawkSearch\Connector\Gateway\Instruction\InstructionManagerPool;
 use HawkSearch\Proxy\Api\Data\SearchResultResponseInterface;
-use HawkSearch\Proxy\Api\Data\SearchResultResponseInterfaceFactory;
-use HawkSearch\Proxy\Api\Data\SearchResultTemplateItemInterface;
-use HawkSearch\Proxy\Api\Data\SearchResultTemplateItemInterfaceFactory;
-use HawkSearch\Proxy\Exception\ApiException;
+use HawkSearch\Proxy\Model\ConfigProvider;
 use HawkSearch\Proxy\Model\ProxyEmailFactory;
 use HawkSearch\Proxy\Model\SearchResultTemplateItem;
 use Magento\Catalog\Model\Category;
@@ -45,7 +32,6 @@ use Magento\Framework\Escaper;
 use Magento\Framework\Filesystem;
 use Magento\Framework\Filesystem\Driver\File;
 use Magento\Framework\Filesystem\Io\File as ioFile;
-use Magento\Framework\Serialize\Serializer\Json;
 use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Store\Model\App\Emulation;
 use Magento\Store\Model\ResourceModel\Store\CollectionFactory as StoreCollectionFactory;
@@ -58,22 +44,14 @@ use Magento\UrlRewrite\Service\V1\Data\UrlRewrite;
 class Data extends \Magento\Framework\App\Helper\AbstractHelper
 {
     const HAWK_LANDING_PAGE_URL = 'LandingPage/';
-    const CONFIG_PROXY_ENABLED = 'hawksearch_proxy/general/enabled';
-    const CONFIG_PROXY_MANAGE_SEARCH = 'hawksearch_proxy/proxy/manage_search';
-    const CONFIG_PROXY_MANAGE_CATEGORIES = 'hawksearch_proxy/proxy/manage_categories';
 
-    const CONFIG_PROXY_RESULT_TYPE = 'hawksearch_proxy/proxy/result_type';
-    const CONFIG_PROXY_ENABLE_CUSTOM_SEARCH_ROUTE = 'hawksearch_proxy/proxy/enable_custom_search_route';
-    const CONFIG_PROXY_ENABLE_LANDING_PAGE_ROUTE = 'hawksearch_proxy/proxy/enable_hawk_landing_pages';
     const CONFIG_PROXY_CATEGORY_SYNC_CRON_ENABLED = 'hawksearch_proxy/sync/enabled';
     const CONFIG_PROXY_SHOWTABS = 'hawksearch_proxy/proxy/show_tabs';
-    const CONFIG_PROXY_MODE = 'hawksearch_proxy/proxy/mode';
     const CONFIG_PROXY_TYPE_LABEL = 'hawksearch_proxy/proxy/type_label';
     const CONFIG_PROXY_SHOW_TYPE_LABELS = 'hawksearch_proxy/proxy/show_type_labels';
 
     const LP_CACHE_KEY = 'hawk_landing_pages';
     const LOCK_FILE_NAME = 'hawkcategorysync.lock';
-    const CONFIG_PROXY_META_ROBOTS = 'hawksearch_proxy/proxy/meta_robots';
 
     protected $_syncingExceptions = [];
 
@@ -84,15 +62,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     private $hawkData;
 
-    private $rawResponse;
-    private $store = null;
     private $landingPages;
     protected $uri;
     /***
      * overrrided CatalogSearch/Helper/Data.php
      ***/
-    private $clientIP;
-    private $clientUA;
     private $isManaged;
     private $filesystem;
     /**
@@ -130,49 +104,14 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     private $utilFileSystem;
 
     /**
-     * @var Json
+     * @var InstructionManagerPool
      */
-    private $jsonSerializer;
+    private $instructionManagerPool;
 
     /**
-     * @var SearchResultResponseInterfaceFactory
+     * @var ConfigProvider
      */
-    private $resultResponseFactory;
-
-    /**
-     * @var SearchResultDataInterfaceFactory
-     */
-    private $resultDataFactory;
-
-    /**
-     * @var SearchResultMerchandisingInterfaceFactory
-     */
-    private $resultMerchandisingFactory;
-
-    /**
-     * @var SearchResultTemplateItemInterfaceFactory
-     */
-    private $resultTemplateItemFactory;
-
-    /**
-     * @var SearchResultFeaturedMainInterfaceFactory
-     */
-    private $resultFeaturedMainFactory;
-
-    /**
-     * @var SearchResultFeaturedInterfaceFactory
-     */
-    private $resultFeaturedFactory;
-
-    /**
-     * @var SearchResultContentItemInterfaceFactory
-     */
-    private $resultContentItemFactory;
-
-    /**
-     * @var SearchResultContentInterfaceFactory
-     */
-    private $resultContentFactory;
+    private $proxyConfigProvider;
 
     /**
      * Data constructor.
@@ -194,15 +133,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @param File $file
      * @param ioFile $fileDirectory
      * @param UtilFileSystem $utilFileSystem
-     * @param Json $jsonSerializer
-     * @param SearchResultResponseInterfaceFactory $resultResponseFactory
-     * @param SearchResultDataInterfaceFactory $resultDataFactory
-     * @param SearchResultMerchandisingInterfaceFactory $resultMerchandisingFactory
-     * @param SearchResultTemplateItemInterfaceFactory $resultTemplateItemFactory
-     * @param SearchResultFeaturedMainInterfaceFactory $resultFeaturedMainFactory
-     * @param SearchResultFeaturedInterfaceFactory $resultFeaturedFactory
-     * @param SearchResultContentItemInterfaceFactory $resultContentItemFactory
-     * @param SearchResultContentInterfaceFactory $resultContentFactory
+     * @param InstructionManagerPool $instructionManagerPool
+     * @param ConfigProvider $proxyConfigProvider
      */
     public function __construct(
         Context $context,
@@ -222,15 +154,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         File $file,
         ioFile $fileDirectory,
         UtilFileSystem $utilFileSystem,
-        Json $jsonSerializer,
-        SearchResultResponseInterfaceFactory $resultResponseFactory,
-        SearchResultDataInterfaceFactory $resultDataFactory,
-        SearchResultMerchandisingInterfaceFactory $resultMerchandisingFactory,
-        SearchResultTemplateItemInterfaceFactory $resultTemplateItemFactory,
-        SearchResultFeaturedMainInterfaceFactory $resultFeaturedMainFactory,
-        SearchResultFeaturedInterfaceFactory $resultFeaturedFactory,
-        SearchResultContentItemInterfaceFactory $resultContentItemFactory,
-        SearchResultContentInterfaceFactory $resultContentFactory
+        InstructionManagerPool $instructionManagerPool,
+        ConfigProvider $proxyConfigProvider
     ) {
         // parent construct first so scopeConfig gets set for use in "setUri", etc.
         parent::__construct($context);
@@ -253,15 +178,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $this->file = $file;
         $this->fileDirectory = $fileDirectory;
         $this->utilFileSystem = $utilFileSystem;
-        $this->jsonSerializer = $jsonSerializer;
-        $this->resultResponseFactory = $resultResponseFactory;
-        $this->resultDataFactory = $resultDataFactory;
-        $this->resultMerchandisingFactory = $resultMerchandisingFactory;
-        $this->resultTemplateItemFactory = $resultTemplateItemFactory;
-        $this->resultFeaturedMainFactory = $resultFeaturedMainFactory;
-        $this->resultFeaturedFactory = $resultFeaturedFactory;
-        $this->resultContentItemFactory = $resultContentItemFactory;
-        $this->resultContentFactory = $resultContentFactory;
+        $this->instructionManagerPool = $instructionManagerPool;
+        $this->proxyConfigProvider = $proxyConfigProvider;
     }
 
     public function getConfigurationData($data)
@@ -271,259 +189,16 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         return $this->scopeConfig->getValue($data, $storeScope, $this->storeManager->getStore()->getCode());
     }
 
-    public function isManageSearch()
-    {
-        return
-            $this->scopeConfig->getValue(self::CONFIG_PROXY_ENABLED, ScopeInterface::SCOPE_STORE)
-            &&
-            $this->scopeConfig->getValue(self::CONFIG_PROXY_MANAGE_SEARCH, ScopeInterface::SCOPE_STORE);
-    }
-
-    public function isManageCategories()
-    {
-        return
-            $this->scopeConfig->getValue(self::CONFIG_PROXY_ENABLED, ScopeInterface::SCOPE_STORE)
-            &&
-            $this->scopeConfig->getValue(self::CONFIG_PROXY_MANAGE_CATEGORIES, ScopeInterface::SCOPE_STORE);
-    }
-
-    public function isValidSearchRoute($route)
-    {
-        // currently only checking for presence of slash
-        $valid = strpos($route, '/') === false;
-        $valid = $valid && $route != 'hawksearch';
-        return $valid;
-    }
-
-    public function setStore($s)
-    {
-        $this->store = $s;
-        return $this;
-    }
-
-    public function setClientIp($ip)
-    {
-        $this->clientIP = $ip;
-    }
-
-    public function setClientUa($ua)
-    {
-        $this->clientUA = $ua;
-    }
-
-    public function buildUri()
-    {
-        $controller = implode('_', [$this->_request->getModuleName(), $this->_request->getControllerName()]);
-        $params = $this->_request->getParams();
-        if (isset($params['lpurl'])) {
-            $params['lpurl'] = rtrim($params['lpurl'], "/");
-        }
-        switch ($controller) {
-            case 'hawkproxy_landingPage':
-                if ($this->getConfigurationData('hawksearch_proxy/proxy/enable_hawk_landing_pages')) {
-                    $params['lpurl'] = $this->_request->getAlias('rewrite_request_path');
-                    $this->setUri($params);
-                }
-                break;
-            case 'catalog_category':
-                if ($this->getConfigurationData('hawksearch_proxy/proxy/manage_categories')) {
-                    if (empty($params['lpurl'])) {
-                        $params['lpurl'] = $this->_request->getAlias('rewrite_request_path');
-                    }
-                    $this->setUri($params);
-                }
-                break;
-            case 'catalogsearch_result':
-                if ($this->getConfigurationData('hawksearch_proxy/proxy/manage_search')) {
-                    $this->setUri($params);
-                }
-                break;
-            case 'hawkproxy_index':
-                if (isset($params['lpurl'])
-                && (substr($params['lpurl'], 0, strlen('/catalogsearch/result')) === '/catalogsearch/result')
-                ) {
-                    unset($params['lpurl']);
-                }
-                $this->setUri($params);
-                break;
-            default:
-                $this->setUri($params);
-        }
-    }
-
-    public function setUri($args)
-    {
-        unset($args['ajax']);
-        unset($args['json']);
-        $args['output'] = 'custom';
-        $args['hawkitemlist'] = 'json';
-        $args['hawkfeatured'] = 'json';
-        if ($this->getShowTabs()) {
-            $args['hawktabs'] = 'html';
-        }
-        if (empty($args['it']) && $this->getResultType()) {
-            $args['it'] = $this->getResultType();
-        }
-        if (isset($args['keyword'])) {
-            unset($args['keyword']);
-        }
-        $session = $this->session->create();
-        $sid = $session->getHawkSessionId();
-        if (!$sid) {
-            $sid = $session->getSessionId();
-            $session->setHawkSessionId($sid);
-        }
-        $args['HawkSessionId'] = $sid;
-        if (isset($args['lpurl']) && (!$this->getIsHawkManaged($args['lpurl'])
-            || $args['lpurl'] == '/catalogsearch/result/')
-        ) {
-            unset($args['lpurl']);
-        }
-
-        $this->uri = $this->getHawkUrl() . '/?' . http_build_query($args);
-    }
-
+    /**
+     * @throws \HawkSearch\Connector\Gateway\InstructionException
+     * @throws \Magento\Framework\Exception\NotFoundException
+     */
     private function fetchResponse()
     {
-        if (empty($this->uri)) {
-            $this->buildUri();
-            $this->setClientIp($this->_request->getClientIp());
-            $this->setClientUa($this->_httpHeader->getHttpUserAgent());
-        }
-        $client = new \Zend_Http_Client();
-        $client->setConfig(['timeout' => 30]);
+        $this->hawkData = $this->instructionManagerPool->get('hawksearch')
+            ->executeByCode('searchResults', $this->_getRequest()->getParams())->get();
 
-        $client->setConfig(['useragent' => $this->clientUA]);
-        $client->setUri($this->uri);
-        $client->setHeaders('HTTP-TRUE-CLIENT-IP', $this->clientIP);
-        $response = $client->request();
-        if ($response->getStatus() == '500') {
-            throw new ApiException($response->getMessage());
-        }
-        $this->log(sprintf('requesting url %s', $client->getUri()));
-
-        $this->hawkData = $this->processApiResponse($response->getBody());
-    }
-
-    /**
-     * @param string $rawResponse
-     * @return SearchResultResponseInterface
-     */
-    private function processApiResponse(string $rawResponse) : SearchResultResponseInterface
-    {
-        $response = $this->jsonSerializer->unserialize($rawResponse);
-        $response[SearchResultResponseInterface::RESPONSE_DATA] = $response['Data'];
-        unset($response['Data']);
-
-        //unserialize Response Data
-        $response[SearchResultResponseInterface::RESPONSE_DATA]
-        [SearchResultDataInterface::RESULTS] = isset($response[SearchResultResponseInterface::RESPONSE_DATA]
-        [SearchResultDataInterface::RESULTS]) ? $this->jsonSerializer
-            ->unserialize($response[SearchResultResponseInterface::RESPONSE_DATA][SearchResultDataInterface::RESULTS])
-            : [];
-
-        $response[SearchResultResponseInterface::RESPONSE_DATA]
-        [SearchResultDataInterface::FEATURED_ITEMS] = isset($response[SearchResultResponseInterface::RESPONSE_DATA]
-            [SearchResultDataInterface::FEATURED_ITEMS]) ? $this->jsonSerializer
-            ->unserialize($response[SearchResultResponseInterface::RESPONSE_DATA]
-            [SearchResultDataInterface::FEATURED_ITEMS])
-            : [];
-
-        //prepare Content items
-        $contentItems = [];
-        if (!empty($response[SearchResultResponseInterface::RESPONSE_DATA]
-        [SearchResultDataInterface::RESULTS][SearchResultContentInterface::ITEMS])) {
-            foreach ($response[SearchResultResponseInterface::RESPONSE_DATA]
-                     [SearchResultDataInterface::RESULTS][SearchResultContentInterface::ITEMS] as $item) {
-                $contentItems[] = $this->resultContentItemFactory->create(
-                    [
-                        'data' => $item
-                    ]
-                );
-            }
-        }
-
-        $response[SearchResultResponseInterface::RESPONSE_DATA]
-        [SearchResultDataInterface::RESULTS] = $this->resultContentFactory->create(
-            [
-                'data' => [
-                    SearchResultContentInterface::ITEMS => $contentItems
-                ]
-            ]
-        );
-
-        //prepare Merchandising Data
-        $merchandisingItems = [];
-        if (!empty($response[SearchResultResponseInterface::RESPONSE_DATA]
-        [SearchResultDataInterface::MERCHANDISING][SearchResultMerchandisingInterface::ITEMS])) {
-            foreach ($response[SearchResultResponseInterface::RESPONSE_DATA]
-                     [SearchResultDataInterface::MERCHANDISING][SearchResultMerchandisingInterface::ITEMS] as $item) {
-                if (isset(
-                    $item[SearchResultTemplateItemInterface::ZONE],
-                    $item[SearchResultTemplateItemInterface::HTML]
-                )) {
-                    $merchandisingItems[] = $this->resultTemplateItemFactory->create(
-                        [
-                            'data' => $item
-                        ]
-                    );
-                }
-            }
-        }
-
-        $response[SearchResultResponseInterface::RESPONSE_DATA]
-        [SearchResultDataInterface::MERCHANDISING] = $this->resultMerchandisingFactory->create(
-            [
-                'data' => [
-                    SearchResultMerchandisingInterface::ITEMS => $merchandisingItems
-                ]
-            ]
-        );
-
-        //prepare Featured Data
-        $featuredItems = [];
-        if (!empty($response[SearchResultResponseInterface::RESPONSE_DATA]
-        [SearchResultDataInterface::FEATURED_ITEMS][SearchResultFeaturedMainInterface::ITEMS]
-        [SearchResultFeaturedInterface::ITEMS])) {
-            foreach ($response[SearchResultResponseInterface::RESPONSE_DATA]
-                     [SearchResultDataInterface::FEATURED_ITEMS][SearchResultFeaturedMainInterface::ITEMS]
-                     [SearchResultFeaturedInterface::ITEMS] as $item) {
-                if (isset(
-                    $item[SearchResultTemplateItemInterface::ZONE],
-                    $item[SearchResultTemplateItemInterface::HTML]
-                )) {
-                    $featuredItems[] = $this->resultTemplateItemFactory->create(
-                        [
-                            'data' => $item
-                        ]
-                    );
-                }
-            }
-        }
-
-        $response[SearchResultResponseInterface::RESPONSE_DATA]
-        [SearchResultDataInterface::FEATURED_ITEMS] = $this->resultFeaturedMainFactory->create(
-            [
-                'data' => [
-                    SearchResultFeaturedMainInterface::ITEMS => $this->resultFeaturedFactory->create(
-                        [
-                            'data' => [
-                                SearchResultFeaturedInterface::ITEMS => $featuredItems
-                            ]
-                        ]
-                    )
-                ]
-            ]
-        );
-
-        //set Response Data
-        $response[SearchResultResponseInterface::RESPONSE_DATA] = $this->resultDataFactory->create(
-            [
-                'data' => $response[SearchResultResponseInterface::RESPONSE_DATA]
-            ]
-        );
-
-        return $this->resultResponseFactory->create(['data' => $response]);
+        return;
     }
 
     /**
@@ -537,31 +212,20 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         return $this->hawkData;
     }
 
-    public function getResultType()
-    {
-        return $this->getConfigurationData(self::CONFIG_PROXY_RESULT_TYPE);
-    }
-
-    public function getBaseUrl()
-    {
-        return $this->getConfigurationData('web/secure/base_url') . 'hawkproxy';
-    }
-
+    /**
+     * @return string
+     */
     public function getApiUrl()
     {
-        $apiUrl = $this->getConfigurationData(sprintf('hawksearch_proxy/proxy/hawk_url_settings/hawk_url_%s', $this->getMode()));
-        $apiUrl = preg_replace('|^http://|', 'https://', $apiUrl);
-        if ('/' == substr($apiUrl, -1)) {
-            return $apiUrl . 'api/v3/';
-        }
+        $apiUrl = rtrim($this->proxyConfigProvider->getHawkUrlHost(), '/');
         return $apiUrl . '/api/v3/';
     }
 
-    public function clearHawkData()
-    {
-        unset($this->hawkData);
-    }
-
+    /**
+     * @return string|null
+     * @throws \HawkSearch\Connector\Gateway\InstructionException
+     * @throws \Magento\Framework\Exception\NotFoundException
+     */
     public function getLocation()
     {
         if (empty($this->hawkData)) {
@@ -570,6 +234,12 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         return $this->hawkData->getLocation();
     }
 
+    /**
+     * @return string
+     * @throws \HawkSearch\Connector\Gateway\InstructionException
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Magento\Framework\Exception\NotFoundException
+     */
     public function getTrackingDataHtml()
     {
         if (empty($this->hawkData)) {
@@ -591,52 +261,17 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         return '<div id="hawktrackingdata" style="display:none;" data-tracking="[]"></div>';
     }
 
+    /**
+     * @return string|null
+     * @throws \HawkSearch\Connector\Gateway\InstructionException
+     * @throws \Magento\Framework\Exception\NotFoundException
+     */
     public function getFacets()
     {
         if (empty($this->hawkData)) {
             $this->fetchResponse();
         }
         return $this->hawkData->getResponseData()->getFacets();
-    }
-
-    public function getHawkUrl()
-    {
-        $trackingUrl = $this->getConfigurationData(
-            sprintf('hawksearch_proxy/proxy/hawk_url_settings/hawk_url_%s', $this->getMode())
-        );
-        if ('/' == substr($trackingUrl, -1)) {
-            return $trackingUrl . 'sites/' . $this->getEngineName();
-        }
-        return $trackingUrl . '/sites/' . $this->getEngineName();
-    }
-
-    public function getTrackingUrl()
-    {
-        return $this->getConfigurationData(
-            sprintf('hawksearch_proxy/proxy/tracking_url_settings/tracking_url_%s', $this->getMode())
-        );
-    }
-
-    public function getRecommenderUrl()
-    {
-        return $this->getConfigurationData(
-            sprintf('hawksearch_proxy/proxy/rec_url_settings/rec_url_%s', $this->getMode())
-        );
-    }
-
-    public function getOrderTackingKey()
-    {
-        return $this->getConfigurationData('hawksearch_proxy/proxy/order_tracking_key');
-    }
-
-    public function getEngineName()
-    {
-        return $this->getConfigurationData('hawksearch_proxy/proxy/engine_name');
-    }
-
-    public function getMode()
-    {
-        return $this->getConfigurationData(self::CONFIG_PROXY_MODE);
     }
 
     public function getApiKey()
@@ -656,7 +291,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
         if ($this->hawkData->getResponseData()->getResults()->getItems()) {
             foreach ($this->hawkData->getResponseData()->getResults()->getItems() as $item) {
-                if (!isset($item['Custom']['sku'])) {
+                $itemCustomData = $item->getCustom();
+                if (!isset($itemCustomData['sku'])) {
                     return false;
                 }
             }
@@ -684,10 +320,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             return $this->getResourceCollection([]);
         }
         foreach ($this->hawkData->getResponseData()->getResults()->getItems() as $item) {
-            if (isset($item['Custom']['sku'])) {
-                $skus[] = $item['Custom']['sku'];
-                $map[$item['Custom']['sku']] = $i;
-                $bySku[$item['Custom']['sku']] = $item;
+            $itemCustomData = $item->getCustom();
+            if (isset($itemCustomData['sku'])) {
+                $skus[] = $itemCustomData['sku'];
+                $map[$itemCustomData['sku']] = $i;
+                $bySku[$itemCustomData['sku']] = $item;
                 $i++;
             }
         }
@@ -695,9 +332,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             return null;
         }
 
-        /**
- * @var \Magento\Catalog\Model\ResourceModel\Product\Collection $collection
-*/
+        /** @var  \Magento\Catalog\Model\ResourceModel\Product\Collection $collection */
         $collection = $this->getResourceCollection($skus);
 
         $sorted = [];
@@ -821,32 +456,47 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             return $this->isManaged;
         }
 
-        if (substr($path, 0, 1) != '/') {
-            $path = '/' . $path;
-        }
-        $path = rtrim($path, "/");
+        $path = '/' . rtrim(ltrim($path, '/'), '/');
+
         if (in_array($path, ['/catalogsearch/result', '/hawkproxy'])
-            && $this->getConfigurationData('hawksearch_proxy/proxy/manage_search')
+            && $this->proxyConfigProvider->isSearchManagementEnabled()
         ) {
             return true;
         }
-        $hs = $this->getLandingPages();
-        $low = 0;
-        $high = count($hs) - 1;
-        while ($low <= $high) {
-            $p = (int)floor(($high + $low) / 2);
-            $sc = strcmp($hs[$p], $path);
-            if ($sc == 0) {
-                $this->isManaged = true;
-                return true;
-            } elseif ($sc < 0) {
-                $low = $p + 1;
+
+        $this->isManaged = $this->isManagedLandingPage($path);
+        return $this->isManaged;
+    }
+
+    /**
+     * @param string $pageUrl
+     * @return bool
+     */
+    private function isManagedLandingPage($pageUrl)
+    {
+        $pageUrl = '/' . rtrim(ltrim($pageUrl, '/'), '/');
+
+        $landingPages = $this->getLandingPages();
+        $lowIndex = 0;
+        $highIndex = count($landingPages) - 1;
+        $isManaged = false;
+
+        /*
+         * Search through an alphabetically sorted list of page URLs
+         */
+        while ($lowIndex <= $highIndex) {
+            $floorAverage = (int)floor(($highIndex + $lowIndex) / 2);
+            $comparisonResult = strcmp($landingPages[$floorAverage], $pageUrl);
+            if ($comparisonResult == 0) {
+                $isManaged = true;
+                break;
+            } elseif ($comparisonResult < 0) {
+                $lowIndex = $floorAverage + 1;
             } else {
-                $high = $p - 1;
+                $highIndex = $floorAverage - 1;
             }
         }
-        $this->isManaged = false;
-        return $this->isManaged;
+        return $isManaged;
     }
 
     public function getCategoryStoreId()
@@ -854,8 +504,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $code = $this->getConfigurationData('hawksearch_proxy/proxy/store_code');
 
         /**
- * @var Mage_Core_Model_Resource_Store_Collection $store
-*/
+         * @var Mage_Core_Model_Resource_Store_Collection $store
+         */
         $store = $this->storeCollectionFactory->create();
         return $store->addFieldToFilter('code', $code)->getFirstItem()->getId();
     }
@@ -1285,20 +935,6 @@ RuleType="Group" Operator="All" />'
         return $fullPath;
     }
 
-    public function getSearchBoxes()
-    {
-        $sbids = explode(',', $this->getConfigurationData('hawksearch_proxy/proxy/search_box_ids'));
-        foreach ($sbids as $id) {
-            $id = trim($id);
-        }
-        return $sbids;
-    }
-
-    public function setOverwriteFlag($bool)
-    {
-        $this->overwriteFlag = $bool;
-    }
-
     public function isCategorySyncCronEnabled()
     {
         return $this->scopeConfig->isSetFlag(self::CONFIG_PROXY_CATEGORY_SYNC_CRON_ENABLED);
@@ -1379,21 +1015,6 @@ RuleType="Group" Operator="All" />'
         return true;
     }
 
-    public function getEnableCustomSearchRoute()
-    {
-        return $this->getConfigurationData(self::CONFIG_PROXY_ENABLE_CUSTOM_SEARCH_ROUTE);
-    }
-
-    public function getEnableLandingPageRoute()
-    {
-        return $this->getConfigurationData(self::CONFIG_PROXY_ENABLE_LANDING_PAGE_ROUTE);
-    }
-
-    public function getEnabled()
-    {
-        return $this->scopeConfig->isSetFlag(self::CONFIG_PROXY_ENABLED, ScopeInterface::SCOPE_STORE);
-    }
-
     public function getShowTabs()
     {
         return $this->getConfigurationData(self::CONFIG_PROXY_SHOWTABS);
@@ -1417,9 +1038,6 @@ RuleType="Group" Operator="All" />'
 
     public function getTypeLabelMap()
     {
-        /**
-         * @var stdClass $map
-         */
         $obj = json_decode($this->getConfigurationData(self::CONFIG_PROXY_TYPE_LABEL));
         $map = [];
         if (is_object($obj)) {
@@ -1451,20 +1069,15 @@ RuleType="Group" Operator="All" />'
         return '#000';
     }
 
-    public function getSearchRobots()
-    {
-        return $this->getConfigurationData(self::CONFIG_PROXY_META_ROBOTS);
-    }
-
     public function modeActive(string $mode)
     {
         switch ($mode) {
             case 'proxy':
                 return true;
             case 'catalogsearch':
-                return $this->isManageSearch();
+                return $this->proxyConfigProvider->isSearchManagementEnabled();
             case 'category':
-                return $this->isManageCategories();
+                return $this->proxyConfigProvider->isCategoriesManagementEnabled();
         }
         return false;
     }
