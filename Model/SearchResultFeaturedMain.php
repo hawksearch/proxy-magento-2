@@ -21,7 +21,7 @@ use Magento\Framework\DataObject;
 class SearchResultFeaturedMain extends DataObject implements SearchResultFeaturedMainInterface
 {
     /**
-     * @return SearchResultFeaturedInterface
+     * @inheritDoc
      */
     public function getItems(): SearchResultFeaturedInterface
     {
@@ -29,8 +29,7 @@ class SearchResultFeaturedMain extends DataObject implements SearchResultFeature
     }
 
     /**
-     * @param SearchResultFeaturedInterface $value
-     * @return $this
+     * @inheritDoc
      */
     public function setItems(SearchResultFeaturedInterface $value)
     {

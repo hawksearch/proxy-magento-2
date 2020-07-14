@@ -21,7 +21,7 @@ use Magento\Framework\DataObject;
 class SearchResultFeatured extends DataObject implements SearchResultFeaturedInterface
 {
     /**
-     * @return SearchResultTemplateItemInterface[]
+     * @inheritDoc
      */
     public function getItems(): array
     {
@@ -29,8 +29,7 @@ class SearchResultFeatured extends DataObject implements SearchResultFeaturedInt
     }
 
     /**
-     * @param SearchResultTemplateItemInterface[] $value
-     * @return $this
+     * @inheritDoc
      */
     public function setItems(array $value)
     {

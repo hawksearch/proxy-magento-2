@@ -21,7 +21,7 @@ use Magento\Framework\DataObject;
 class SearchResultContent extends DataObject implements SearchResultContentInterface
 {
     /**
-     * @return SearchResultContentItemInterface[]
+     * @inheritDoc
      */
     public function getItems(): array
     {
@@ -29,8 +29,7 @@ class SearchResultContent extends DataObject implements SearchResultContentInter
     }
 
     /**
-     * @param SearchResultContentItemInterface[] $value
-     * @return $this
+     * @inheritDoc
      */
     public function setItems(array $value)
     {

@@ -14,7 +14,9 @@ declare(strict_types=1);
 
 namespace HawkSearch\Proxy\Api\Data;
 
-interface SearchResultTemplateItemInterface
+use Magento\Framework\Api\ExtensibleDataInterface;
+
+interface SearchResultTemplateItemInterface extends ExtensibleDataInterface
 {
     /**#@+
      * Constants for keys of data array

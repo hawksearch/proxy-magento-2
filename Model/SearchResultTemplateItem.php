@@ -20,7 +20,7 @@ use Magento\Framework\DataObject;
 class SearchResultTemplateItem extends DataObject implements SearchResultTemplateItemInterface
 {
     /**
-     * @return string|null
+     * @inheritDoc
      */
     public function getZone(): ?string
     {
@@ -28,8 +28,7 @@ class SearchResultTemplateItem extends DataObject implements SearchResultTemplat
     }
 
     /**
-     * @param string $value
-     * @return $this
+     * @inheritDoc
      */
     public function setZone(string $value)
     {
@@ -37,7 +36,7 @@ class SearchResultTemplateItem extends DataObject implements SearchResultTemplat
     }
 
     /**
-     * @return string|null
+     * @inheritDoc
      */
     public function getHtml(): ?string
     {
@@ -45,8 +44,7 @@ class SearchResultTemplateItem extends DataObject implements SearchResultTemplat
     }
 
     /**
-     * @param string $value
-     * @return $this
+     * @inheritDoc
      */
     public function setHtml(string $value)
     {
