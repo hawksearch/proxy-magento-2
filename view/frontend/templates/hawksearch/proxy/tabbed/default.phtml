@@ -1,11 +1,18 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: dev
- * Date: 12/11/18
- * Time: 10:46 AM
+ * Copyright (c) 2020 Hawksearch (www.hawksearch.com) - All Rights Reserved
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+ * IN THE SOFTWARE.
  */
+
 /** @var \HawkSearch\Proxy\Block\Tabbed\DefaultRenderer $block */
+/** @var \HawkSearch\Proxy\Api\Data\SearchResultContentItemInterface $item */
 ?>
 <div class="item hawk-contentItem">
     <div class="content hawk-contentWrapper">
@@ -13,14 +20,14 @@
         $block->getTypeLabel($item); ?>
         <h3 class="title hawk-contentTitle">
             <a href="<?= /* @noEscape */
-            $block->getCustomUrl($item['CustomURL'] ?? ''); ?>"
+            $block->getCustomUrl($item->getCustomUrl() ?? ''); ?>"
                onclick="<?= /* @noEscape */
-                sprintf("return HawkSearch.link(this,'%s',%d,'%d',0);", $block->getHawksearchTrackingId(), $block->getIncrement(), $item['Id'] ?? ''); ?>"><?= /* @noEscape */
-                $item['ItemName'] ?? ''; ?>
+                sprintf("return HawkSearch.link(this,'%s',%d,'%d',0);", $block->getHawksearchTrackingId(), $block->getIncrement(), $item->getItemId() ?? ''); ?>"><?= /* @noEscape */
+                $item->getItemName() ?? ''; ?>
             </a>
         </h3>
         <p class="hawk-contentCaption"><?= /* @noEscape */
-            $item['BestFragment'] ?? ''; ?></p>
+            $item->getBestFragment() ?? ''; ?></p>
     </div>
 </div>
 <div class="clear">&nbsp;</div>

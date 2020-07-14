@@ -10,6 +10,10 @@ namespace HawkSearch\Proxy\Block\Tabbed;
 
 class DefaultRenderer extends \HawkSearch\Proxy\Block\Tabbed
 {
+    /**
+     * @param string $path
+     * @return string
+     */
     public function getCustomUrl($path)
     {
         if (substr($path, 0, 4) === "http") {
