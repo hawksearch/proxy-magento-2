@@ -56,7 +56,7 @@ class ListProduct extends \Magento\Catalog\Block\Product\ListProduct
     public function getHawkTrackingId()
     {
         if (!empty($this->hawkHelper)) {
-            return $this->hawkHelper->getResultData()->TrackingId;
+            return $this->hawkHelper->getResultData()->getTrackingId();
         }
         return '';
     }
