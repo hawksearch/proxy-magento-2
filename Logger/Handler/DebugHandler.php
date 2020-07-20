@@ -12,26 +12,24 @@
  */
 declare(strict_types=1);
 
-namespace HawkSearch\Proxy\Api\Data;
+namespace HawkSearch\Proxy\Logger\Handler;
 
-use Magento\Framework\Api\ExtensibleDataInterface;
+use Magento\Framework\Logger\Handler\Base as BaseHandler;
+use Monolog\Logger as MonologLogger;
 
-interface SearchResultContentInterface extends ExtensibleDataInterface
+class DebugHandler extends BaseHandler
 {
-    /**#@+
-     * Constants for keys of data array
+    /**
+     * Logging level
+     *
+     * @var int
      */
-    const ITEMS = 'Items';
-    /**#@-*/
+    protected $loggerType = MonologLogger::DEBUG;
 
     /**
-     * @return \HawkSearch\Proxy\Api\Data\SearchResultContentItemInterface[]
+     * File name
+     *
+     * @var string
      */
-    public function getItems() : array;
-
-    /**
-     * @param \HawkSearch\Proxy\Api\Data\SearchResultContentItemInterface[] $value
-     * @return $this
-     */
-    public function setItems(array $value);
+    protected $fileName = '/var/log/hawksearch_proxy.log';
 }

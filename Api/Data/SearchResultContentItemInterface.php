@@ -14,7 +14,156 @@ declare(strict_types=1);
 
 namespace HawkSearch\Proxy\Api\Data;
 
-interface SearchResultContentItemInterface
-{
+use Magento\Framework\Api\ExtensibleDataInterface;
 
+interface SearchResultContentItemInterface extends ExtensibleDataInterface
+{
+    /**#@+
+     * Constants for keys of data array
+     */
+    const SCORE = 'Score';
+    const ITEM_NAME = 'ItemName';
+    const IMAGE_URL = 'ImageUrl';
+    const ITEM_ID = 'Id';
+    const CUSTOM_URL = 'CustomURL';
+    const SALE_PRICE = 'SalePrice';
+    const IS_ON_SALE = 'IsOnSale';
+    const BEST_FRAGMENT = 'BestFragment';
+    const SKU = 'SKU';
+    const CUSTOM = 'Custom';
+    const IS_PINNED = 'IsPinned';
+    const HAWK_BOOST = 'HawkBoost';
+    /**#@-*/
+
+    /**
+     * @return float
+     */
+    public function getScore() : float;
+
+    /**
+     * @param float $value
+     * @return $this
+     */
+    public function setScore(float $value);
+
+    /**
+     * @return string|null
+     */
+    public function getItemName() : ?string;
+
+    /**
+     * @param string $value
+     * @return $this
+     */
+    public function setItemName(string $value);
+
+    /**
+     * @return string|null
+     */
+    public function getImageUrl() : ?string;
+
+    /**
+     * @param string $value
+     * @return $this
+     */
+    public function setImageUrl(string $value);
+
+    /**
+     * @return string|null
+     */
+    public function getItemId() : ?string;
+
+    /**
+     * @param string $value
+     * @return $this
+     */
+    public function setItemId(string $value);
+
+    /**
+     * @return string|null
+     */
+    public function getCustomUrl() : ?string;
+
+    /**
+     * @param string $value
+     * @return $this
+     */
+    public function setCustomUrl(string $value);
+
+    /**
+     * @return float
+     */
+    public function getSalePrice() : float;
+
+    /**
+     * @param float $value
+     * @return $this
+     */
+    public function setSalePrice(float $value);
+
+    /**
+     * @return bool
+     */
+    public function getIsOnSale() : bool;
+
+    /**
+     * @param bool $value
+     * @return $this
+     */
+    public function setIsOnSale(bool $value);
+
+    /**
+     * @return string|null
+     */
+    public function getBestFragment() : ?string;
+
+    /**
+     * @param string $value
+     * @return $this
+     */
+    public function setBestFragment(string $value);
+
+    /**
+     * @return string|null
+     */
+    public function getSku() : ?string;
+
+    /**
+     * @param string $value
+     * @return $this
+     */
+    public function setSku(string $value);
+
+    /**
+     * @return string[]
+     */
+    public function getCustom() : ?array;
+
+    /**
+     * @param string[] $value
+     * @return $this
+     */
+    public function setCustom(array $value);
+
+    /**
+     * @return bool
+     */
+    public function getIsPinned() : bool;
+
+    /**
+     * @param bool $value
+     * @return $this
+     */
+    public function setIsPinned(bool $value);
+
+    /**
+     * @return float
+     */
+    public function getHawkBoost() : float;
+
+    /**
+     * @param float $value
+     * @return $this
+     */
+    public function setHawkBoost(float $value);
 }

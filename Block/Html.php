@@ -31,8 +31,6 @@ class Html extends Template
         \HawkSearch\Proxy\Block\BannerFactory $bannerFactory,
         array $data = []
     ) {
-        $helper->setClientIp($context->getRequest()->getClientIp());
-        $helper->setClientUa($context->getRequest()->getHeader('UserAgent'));
         $helper->setIsHawkManaged(true);
         $this->helper = $helper;
         $this->bannerFactory = $bannerFactory;

@@ -14,7 +14,9 @@ declare(strict_types=1);
 
 namespace HawkSearch\Proxy\Api\Data;
 
-interface SearchResultDataInterface
+use Magento\Framework\Api\ExtensibleDataInterface;
+
+interface SearchResultDataInterface extends ExtensibleDataInterface
 {
     /**#@+
      * Constants for keys of data array
@@ -89,26 +91,26 @@ interface SearchResultDataInterface
     public function setBottomPager(string $value);
 
     /**
-     * @return SearchResultContentInterface
+     * @return \HawkSearch\Proxy\Api\Data\SearchResultContentInterface
      */
-    public function getResults() : SearchResultContentInterface;
+    public function getResults() : \HawkSearch\Proxy\Api\Data\SearchResultContentInterface;
 
     /**
-     * @param SearchResultContentInterface $value
+     * @param \HawkSearch\Proxy\Api\Data\SearchResultContentInterface $value
      * @return $this
      */
-    public function setResults(SearchResultContentInterface $value);
+    public function setResults(\HawkSearch\Proxy\Api\Data\SearchResultContentInterface $value);
 
     /**
-     * @return SearchResultMerchandisingInterface
+     * @return \HawkSearch\Proxy\Api\Data\SearchResultMerchandisingInterface
      */
-    public function getMerchandising() : SearchResultMerchandisingInterface;
+    public function getMerchandising() : \HawkSearch\Proxy\Api\Data\SearchResultMerchandisingInterface;
 
     /**
-     * @param SearchResultMerchandisingInterface $value
+     * @param \HawkSearch\Proxy\Api\Data\SearchResultMerchandisingInterface $value
      * @return $this
      */
-    public function setMerchandising(SearchResultMerchandisingInterface $value);
+    public function setMerchandising(\HawkSearch\Proxy\Api\Data\SearchResultMerchandisingInterface $value);
 
     /**
      * @return string|null
@@ -144,15 +146,15 @@ interface SearchResultDataInterface
     public function setRelated(string $value);
 
     /**
-     * @return SearchResultFeaturedMainInterface
+     * @return \HawkSearch\Proxy\Api\Data\SearchResultFeaturedMainInterface
      */
-    public function getFeaturedItems() : SearchResultFeaturedMainInterface;
+    public function getFeaturedItems() : \HawkSearch\Proxy\Api\Data\SearchResultFeaturedMainInterface;
 
     /**
-     * @param SearchResultFeaturedMainInterface $value
+     * @param \HawkSearch\Proxy\Api\Data\SearchResultFeaturedMainInterface $value
      * @return $this
      */
-    public function setFeaturedItems(SearchResultFeaturedMainInterface $value);
+    public function setFeaturedItems(\HawkSearch\Proxy\Api\Data\SearchResultFeaturedMainInterface $value);
 
     /**
      * @return string|null

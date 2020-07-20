@@ -14,7 +14,9 @@ declare(strict_types=1);
 
 namespace HawkSearch\Proxy\Api\Data;
 
-interface SearchResultResponseInterface
+use Magento\Framework\Api\ExtensibleDataInterface;
+
+interface SearchResultResponseInterface extends ExtensibleDataInterface
 {
     /**#@+
      * Constants for keys of data array
@@ -29,6 +31,7 @@ interface SearchResultResponseInterface
     const META_DESCRIPTION = 'MetaDescription';
     const META_KEYWORDS = 'MetaKeywords';
     const REL_CANONICAL = 'RelCanonical';
+    const ORIGINAL = 'Original';
     const KEYWORD = 'Keyword';
     const PAGE_LAYOUT_ID = 'PageLayoutId';
     const SEARCH_DURATION = 'SearchDuration';
@@ -47,15 +50,15 @@ interface SearchResultResponseInterface
     public function setSuccess(bool $value);
 
     /**
-     * @return SearchResultDataInterface
+     * @return \HawkSearch\Proxy\Api\Data\SearchResultDataInterface
      */
-    public function getResponseData() : SearchResultDataInterface;
+    public function getResponseData() : \HawkSearch\Proxy\Api\Data\SearchResultDataInterface;
 
     /**
-     * @param SearchResultDataInterface $value
+     * @param \HawkSearch\Proxy\Api\Data\SearchResultDataInterface $value
      * @return $this
      */
-    public function setResponseData(SearchResultDataInterface $value);
+    public function setResponseData(\HawkSearch\Proxy\Api\Data\SearchResultDataInterface $value);
 
     /**
      * @return string|null
@@ -144,6 +147,17 @@ interface SearchResultResponseInterface
      * @return $this
      */
     public function setRelCanonical(string $value);
+
+    /**
+     * @return string|null
+     */
+    public function getOriginal() : ?string;
+
+    /**
+     * @param string $value
+     * @return $this
+     */
+    public function setOriginal(string $value);
 
     /**
      * @return string|null

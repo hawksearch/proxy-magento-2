@@ -10,17 +10,24 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
-/** @var Magento\Catalog\Model\ResourceModel\Product\Attribute\Collection $pac */
 
-/** @var HawkSearch\Proxy\Block\Footer $block */
+use Magento\Framework\View\Element\Template;
+use HawkSearch\Proxy\ViewModel\Config as ConfigViewModel;
+
+/** @var Template $block */
+/** @var ConfigViewModel $configViewModel */
+$configViewModel = $block->getData('configViewModel');
+if (!$configViewModel) {
+    return;
+}
 ?>
 <script type="text/javascript">
     (function (HawkSearch) {
-        HawkSearch.BaseUrl = '<?= /* @noEscape */ $block->getBaseUrl(); ?>';
-        HawkSearch.HawkUrl = '<?= /* @noEscape */ $block->getHawkUrl(); ?>';
-        HawkSearch.TrackingUrl = '<?= /* @noEscape */ $block->getTrackingUrl(); ?>';
-        HawkSearch.RecommenderUrl = '<?= /* @noEscape */ $block->getRecommenderUrl(); ?>';
-        HawkSearch.ClientGuid = '<?= /* @noEscape */ $block->getTrackingKey(); ?>';
+        HawkSearch.BaseUrl = '<?= /* @noEscape */ $configViewModel->getBaseUrl(); ?>';
+        HawkSearch.HawkUrl = '<?= /* @noEscape */ $configViewModel->getHawkUrl(); ?>';
+        HawkSearch.TrackingUrl = '<?= /* @noEscape */ $configViewModel->getTrackingUrl(); ?>';
+        HawkSearch.RecommenderUrl = '<?= /* @noEscape */ $configViewModel->getRecommendedUrl(); ?>';
+        HawkSearch.ClientGuid = '<?= /* @noEscape */ $configViewModel->getTrackingKey(); ?>';
         if ('http:' == document.location.protocol) {
             HawkSearch.BaseUrl = HawkSearch.BaseUrl.replace('https://', 'http://');
             HawkSearch.HawkUrl = HawkSearch.HawkUrl.replace('https://', 'http://');
@@ -37,10 +44,10 @@
 
     require(["jquery", "hawksearch" ], function ($) {
         HawkSearch.initAutoSuggest = function () {
-            <?php foreach ($block->getSearchBoxes() as $sbid) : ?>
+            <?php foreach ($configViewModel->getSearchBoxes() as $sbid) : ?>
             HawkSearch.suggestInit('#<?= /* @noEscape */ $sbid; ?>', {
-                lookupUrlPrefix: HawkSearch.HawkUrl + '<?= /* @noEscape */ $block->getAutosuggestParams() ?>',
-                hiddenDivName: '<?= /* @noEscape */ $block->getHiddenDivName() ?>',
+                lookupUrlPrefix: HawkSearch.HawkUrl + '<?= /* @noEscape */ $configViewModel->getAutosuggestionParams() ?>',
+                hiddenDivName: '<?= /* @noEscape */ $configViewModel->getHiddenDivName() ?>',
                 isAutoWidth: true
             });
             <?php endforeach; ?>

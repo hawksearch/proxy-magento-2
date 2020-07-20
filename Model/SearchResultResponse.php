@@ -21,7 +21,7 @@ use Magento\Framework\DataObject;
 class SearchResultResponse extends DataObject implements SearchResultResponseInterface
 {
     /**
-     * @return bool
+     * @inheritDoc
      */
     public function getSuccess(): bool
     {
@@ -29,8 +29,7 @@ class SearchResultResponse extends DataObject implements SearchResultResponseInt
     }
 
     /**
-     * @param bool $value
-     * @return $this
+     * @inheritDoc
      */
     public function setSuccess(bool $value)
     {
@@ -38,7 +37,7 @@ class SearchResultResponse extends DataObject implements SearchResultResponseInt
     }
 
     /**
-     * @return SearchResultDataInterface
+     * @inheritDoc
      */
     public function getResponseData(): SearchResultDataInterface
     {
@@ -46,8 +45,7 @@ class SearchResultResponse extends DataObject implements SearchResultResponseInt
     }
 
     /**
-     * @param SearchResultDataInterface $value
-     * @return $this
+     * @inheritDoc
      */
     public function setResponseData(SearchResultDataInterface $value)
     {
@@ -55,7 +53,7 @@ class SearchResultResponse extends DataObject implements SearchResultResponseInt
     }
 
     /**
-     * @return string|null
+     * @inheritDoc
      */
     public function getLocation(): ?string
     {
@@ -63,8 +61,7 @@ class SearchResultResponse extends DataObject implements SearchResultResponseInt
     }
 
     /**
-     * @param string $value
-     * @return $this
+     * @inheritDoc
      */
     public function setLocation(string $value)
     {
@@ -72,7 +69,7 @@ class SearchResultResponse extends DataObject implements SearchResultResponseInt
     }
 
     /**
-     * @return string|null
+     * @inheritDoc
      */
     public function getDidYouMean(): ?string
     {
@@ -80,8 +77,7 @@ class SearchResultResponse extends DataObject implements SearchResultResponseInt
     }
 
     /**
-     * @param string $value
-     * @return $this
+     * @inheritDoc
      */
     public function setDidYouMean(string $value)
     {
@@ -89,7 +85,7 @@ class SearchResultResponse extends DataObject implements SearchResultResponseInt
     }
 
     /**
-     * @return string|null
+     * @inheritDoc
      */
     public function getTrackingId(): ?string
     {
@@ -97,8 +93,7 @@ class SearchResultResponse extends DataObject implements SearchResultResponseInt
     }
 
     /**
-     * @param string $value
-     * @return $this
+     * @inheritDoc
      */
     public function setTrackingId(string $value)
     {
@@ -106,7 +101,7 @@ class SearchResultResponse extends DataObject implements SearchResultResponseInt
     }
 
     /**
-     * @return string|null
+     * @inheritDoc
      */
     public function getMetaRobots(): ?string
     {
@@ -114,8 +109,7 @@ class SearchResultResponse extends DataObject implements SearchResultResponseInt
     }
 
     /**
-     * @param string $value
-     * @return $this
+     * @inheritDoc
      */
     public function setMetaRobots(string $value)
     {
@@ -123,7 +117,7 @@ class SearchResultResponse extends DataObject implements SearchResultResponseInt
     }
 
     /**
-     * @return string|null
+     * @inheritDoc
      */
     public function getHeaderTitle(): ?string
     {
@@ -131,8 +125,7 @@ class SearchResultResponse extends DataObject implements SearchResultResponseInt
     }
 
     /**
-     * @param string $value
-     * @return $this
+     * @inheritDoc
      */
     public function setHeaderTitle(string $value)
     {
@@ -140,7 +133,7 @@ class SearchResultResponse extends DataObject implements SearchResultResponseInt
     }
 
     /**
-     * @return string|null
+     * @inheritDoc
      */
     public function getMetaDescription(): ?string
     {
@@ -148,8 +141,7 @@ class SearchResultResponse extends DataObject implements SearchResultResponseInt
     }
 
     /**
-     * @param string $value
-     * @return $this
+     * @inheritDoc
      */
     public function setMetaDescription(string $value)
     {
@@ -157,7 +149,7 @@ class SearchResultResponse extends DataObject implements SearchResultResponseInt
     }
 
     /**
-     * @return string|null
+     * @inheritDoc
      */
     public function getMetaKeywords(): ?string
     {
@@ -165,8 +157,7 @@ class SearchResultResponse extends DataObject implements SearchResultResponseInt
     }
 
     /**
-     * @param string $value
-     * @return $this
+     * @inheritDoc
      */
     public function setMetaKeywords(string $value)
     {
@@ -174,7 +165,7 @@ class SearchResultResponse extends DataObject implements SearchResultResponseInt
     }
 
     /**
-     * @return string|null
+     * @inheritDoc
      */
     public function getRelCanonical(): ?string
     {
@@ -182,8 +173,7 @@ class SearchResultResponse extends DataObject implements SearchResultResponseInt
     }
 
     /**
-     * @param string $value
-     * @return $this
+     * @inheritDoc
      */
     public function setRelCanonical(string $value)
     {
@@ -191,7 +181,23 @@ class SearchResultResponse extends DataObject implements SearchResultResponseInt
     }
 
     /**
-     * @return string|null
+     * @inheritDoc
+     */
+    public function getOriginal(): ?string
+    {
+        return $this->getData(self::ORIGINAL);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setOriginal(string $value)
+    {
+        return $this->setData(self::ORIGINAL, $value);
+    }
+
+    /**
+     * @inheritDoc
      */
     public function getKeyword(): ?string
     {
@@ -199,8 +205,7 @@ class SearchResultResponse extends DataObject implements SearchResultResponseInt
     }
 
     /**
-     * @param string $value
-     * @return $this
+     * @inheritDoc
      */
     public function setKeyword(string $value)
     {
@@ -208,7 +213,7 @@ class SearchResultResponse extends DataObject implements SearchResultResponseInt
     }
 
     /**
-     * @return int
+     * @inheritDoc
      */
     public function getPageLayoutId(): int
     {
@@ -216,8 +221,7 @@ class SearchResultResponse extends DataObject implements SearchResultResponseInt
     }
 
     /**
-     * @param int $value
-     * @return $this
+     * @inheritDoc
      */
     public function setPageLayoutId(int $value)
     {
@@ -225,7 +229,7 @@ class SearchResultResponse extends DataObject implements SearchResultResponseInt
     }
 
     /**
-     * @return int
+     * @inheritDoc
      */
     public function getSearchDuration(): int
     {
@@ -233,8 +237,7 @@ class SearchResultResponse extends DataObject implements SearchResultResponseInt
     }
 
     /**
-     * @param int $value
-     * @return $this
+     * @inheritDoc
      */
     public function setSearchDuration(int $value)
     {
@@ -242,7 +245,7 @@ class SearchResultResponse extends DataObject implements SearchResultResponseInt
     }
 
     /**
-     * @return bool
+     * @inheritDoc
      */
     public function getQueryUsedAllKeywords(): bool
     {
@@ -250,8 +253,7 @@ class SearchResultResponse extends DataObject implements SearchResultResponseInt
     }
 
     /**
-     * @param bool $value
-     * @return $this
+     * @inheritDoc
      */
     public function setQueryUsedAllKeywords(bool $value)
     {

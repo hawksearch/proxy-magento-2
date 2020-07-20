@@ -12,28 +12,42 @@
  */
 namespace HawkSearch\Proxy\Controller\Index;
 
-class Index extends \Magento\Framework\App\Action\Action
+use HawkSearch\Proxy\Model\ConfigProvider;
+use Magento\Catalog\Model\Session;
+use Magento\Framework\App\Action\Action;
+use Magento\Framework\App\Action\Context;
+use Magento\Framework\Controller\Result\Raw;
+
+class Index extends Action
 {
 
     protected $result;
     private $session;
     private $request;
-    /**
-     * @var \HawkSearch\Proxy\Helper\Data
-     */
-    private $data;
 
+    /**
+     * @var ConfigProvider
+     */
+    private $proxyConfigProvider;
+
+    /**
+     * Index constructor.
+     * @param Context $context
+     * @param Session $session
+     * @param Raw $result
+     * @param ConfigProvider $proxyConfigProvider
+     */
     public function __construct(
-        \Magento\Framework\App\Action\Context $context,
-        \Magento\Catalog\Model\Session $session,
-        \Magento\Framework\Controller\Result\Raw $result,
-        \HawkSearch\Proxy\Helper\Data $data
+        Context $context,
+        Session $session,
+        Raw $result,
+        ConfigProvider $proxyConfigProvider
     ) {
+        parent::__construct($context);
         $this->result = $result;
         $this->session = $session;
         $this->request = $context->getRequest();
-        parent::__construct($context);
-        $this->data = $data;
+        $this->proxyConfigProvider = $proxyConfigProvider;
     }
     public function execute()
     {
@@ -43,7 +57,10 @@ class Index extends \Magento\Framework\App\Action\Action
         if (!$this->_view->isLayoutLoaded()) {
             $this->_view->loadLayout();
             $block = $this->_view->getLayout()->getBlock('hawksearch_proxy_response');
-            if (!empty($tab) && !empty($this->data->getResultType()) && $tab !== $this->data->getResultType()) {
+            if (!empty($tab)
+                && !empty($this->proxyConfigProvider->getResultType())
+                && $tab !== $this->proxyConfigProvider->getResultType()
+            ) {
                 $block->setTabbedContent(true);
             }
             $html = $block->toHtml();

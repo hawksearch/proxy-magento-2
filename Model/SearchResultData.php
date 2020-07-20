@@ -23,7 +23,7 @@ use Magento\Framework\DataObject;
 class SearchResultData extends DataObject implements SearchResultDataInterface
 {
     /**
-     * @return string|null
+     * @inheritDoc
      */
     public function getTitle(): ?string
     {
@@ -31,8 +31,7 @@ class SearchResultData extends DataObject implements SearchResultDataInterface
     }
 
     /**
-     * @param string $value
-     * @return $this
+     * @inheritDoc
      */
     public function setTitle(string $value)
     {
@@ -40,7 +39,7 @@ class SearchResultData extends DataObject implements SearchResultDataInterface
     }
 
     /**
-     * @return string|null
+     * @inheritDoc
      */
     public function getTopText(): ?string
     {
@@ -48,8 +47,7 @@ class SearchResultData extends DataObject implements SearchResultDataInterface
     }
 
     /**
-     * @param string $value
-     * @return $this
+     * @inheritDoc
      */
     public function setTopText(string $value)
     {
@@ -57,7 +55,7 @@ class SearchResultData extends DataObject implements SearchResultDataInterface
     }
 
     /**
-     * @return string|null
+     * @inheritDoc
      */
     public function getBreadCrumb(): ?string
     {
@@ -65,8 +63,7 @@ class SearchResultData extends DataObject implements SearchResultDataInterface
     }
 
     /**
-     * @param string $value
-     * @return $this
+     * @inheritDoc
      */
     public function setBreadCrumb(string $value)
     {
@@ -74,7 +71,7 @@ class SearchResultData extends DataObject implements SearchResultDataInterface
     }
 
     /**
-     * @return string|null
+     * @inheritDoc
      */
     public function getTopPager(): ?string
     {
@@ -82,8 +79,7 @@ class SearchResultData extends DataObject implements SearchResultDataInterface
     }
 
     /**
-     * @param string $value
-     * @return $this
+     * @inheritDoc
      */
     public function setTopPager(string $value)
     {
@@ -91,7 +87,7 @@ class SearchResultData extends DataObject implements SearchResultDataInterface
     }
 
     /**
-     * @return string|null
+     * @inheritDoc
      */
     public function getBottomPager(): ?string
     {
@@ -99,8 +95,7 @@ class SearchResultData extends DataObject implements SearchResultDataInterface
     }
 
     /**
-     * @param string $value
-     * @return $this
+     * @inheritDoc
      */
     public function setBottomPager(string $value)
     {
@@ -108,7 +103,7 @@ class SearchResultData extends DataObject implements SearchResultDataInterface
     }
 
     /**
-     * @return SearchResultContentInterface
+     * @inheritDoc
      */
     public function getResults(): SearchResultContentInterface
     {
@@ -116,8 +111,7 @@ class SearchResultData extends DataObject implements SearchResultDataInterface
     }
 
     /**
-     * @param SearchResultContentInterface $value
-     * @return $this
+     * @inheritDoc
      */
     public function setResults(SearchResultContentInterface $value)
     {
@@ -125,7 +119,7 @@ class SearchResultData extends DataObject implements SearchResultDataInterface
     }
 
     /**
-     * @return SearchResultMerchandisingInterface
+     * @inheritDoc
      */
     public function getMerchandising(): SearchResultMerchandisingInterface
     {
@@ -133,8 +127,7 @@ class SearchResultData extends DataObject implements SearchResultDataInterface
     }
 
     /**
-     * @param SearchResultMerchandisingInterface $value
-     * @return $this
+     * @inheritDoc
      */
     public function setMerchandising(SearchResultMerchandisingInterface $value)
     {
@@ -142,7 +135,7 @@ class SearchResultData extends DataObject implements SearchResultDataInterface
     }
 
     /**
-     * @return string|null
+     * @inheritDoc
      */
     public function getSelections(): ?string
     {
@@ -150,8 +143,7 @@ class SearchResultData extends DataObject implements SearchResultDataInterface
     }
 
     /**
-     * @param string $value
-     * @return $this
+     * @inheritDoc
      */
     public function setSelections(string $value)
     {
@@ -159,7 +151,7 @@ class SearchResultData extends DataObject implements SearchResultDataInterface
     }
 
     /**
-     * @return string|null
+     * @inheritDoc
      */
     public function getFacets(): ?string
     {
@@ -167,8 +159,7 @@ class SearchResultData extends DataObject implements SearchResultDataInterface
     }
 
     /**
-     * @param string $value
-     * @return $this
+     * @inheritDoc
      */
     public function setFacets(string $value)
     {
@@ -176,7 +167,7 @@ class SearchResultData extends DataObject implements SearchResultDataInterface
     }
 
     /**
-     * @return string|null
+     * @inheritDoc
      */
     public function getRelated(): ?string
     {
@@ -184,8 +175,7 @@ class SearchResultData extends DataObject implements SearchResultDataInterface
     }
 
     /**
-     * @param string $value
-     * @return $this
+     * @inheritDoc
      */
     public function setRelated(string $value)
     {
@@ -193,7 +183,7 @@ class SearchResultData extends DataObject implements SearchResultDataInterface
     }
 
     /**
-     * @return SearchResultFeaturedMainInterface
+     * @inheritDoc
      */
     public function getFeaturedItems(): SearchResultFeaturedMainInterface
     {
@@ -201,8 +191,7 @@ class SearchResultData extends DataObject implements SearchResultDataInterface
     }
 
     /**
-     * @param SearchResultFeaturedMainInterface $value
-     * @return $this
+     * @inheritDoc
      */
     public function setFeaturedItems(SearchResultFeaturedMainInterface $value)
     {
@@ -210,7 +199,7 @@ class SearchResultData extends DataObject implements SearchResultDataInterface
     }
 
     /**
-     * @return string|null
+     * @inheritDoc
      */
     public function getTabs(): ?string
     {
@@ -218,8 +207,7 @@ class SearchResultData extends DataObject implements SearchResultDataInterface
     }
 
     /**
-     * @param string $value
-     * @return $this
+     * @inheritDoc
      */
     public function setTabs(string $value)
     {

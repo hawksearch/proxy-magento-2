@@ -16,13 +16,21 @@
       xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <body>
         <referenceBlock name="head.additional">
-            <block class="HawkSearch\Proxy\Block\Head\HawkSearchJs"
+            <block class="Magento\Framework\View\Element\Template"
                    name="hawksearch.head" as="hawksearch.head"
-                   template="HawkSearch_Proxy::hawksearch/proxy/head/js.phtml"/>
+                   template="HawkSearch_Proxy::hawksearch/proxy/head/js.phtml">
+                <arguments>
+                    <argument name="configViewModel" xsi:type="object">HawkSearch\Proxy\ViewModel\Config</argument>
+                </arguments>
+            </block>
         </referenceBlock>
         <referenceContainer name="before.body.end">
-            <block class="HawkSearch\Proxy\Block\Footer" name="hawksearch_proxyfooter"
-                   as="hawksearch_proxyfooter" template="HawkSearch_Proxy::hawksearch/proxy/footer.phtml"/>
+            <block class="Magento\Framework\View\Element\Template" name="hawksearch_proxyfooter"
+                   as="hawksearch_proxyfooter" template="HawkSearch_Proxy::hawksearch/proxy/footer.phtml">
+                <arguments>
+                    <argument name="configViewModel" xsi:type="object">HawkSearch\Proxy\ViewModel\Config</argument>
+                </arguments>
+            </block>
         </referenceContainer>
     </body>
 </page>

@@ -14,7 +14,9 @@ declare(strict_types=1);
 
 namespace HawkSearch\Proxy\Api\Data;
 
-interface SearchResultFeaturedMainInterface
+use Magento\Framework\Api\ExtensibleDataInterface;
+
+interface SearchResultFeaturedMainInterface extends ExtensibleDataInterface
 {
     /**#@+
      * Constants for keys of data array
@@ -23,13 +25,13 @@ interface SearchResultFeaturedMainInterface
     /**#@-*/
 
     /**
-     * @return SearchResultFeaturedInterface
+     * @return \HawkSearch\Proxy\Api\Data\SearchResultFeaturedInterface
      */
-    public function getItems() : SearchResultFeaturedInterface;
+    public function getItems() : \HawkSearch\Proxy\Api\Data\SearchResultFeaturedInterface;
 
     /**
-     * @param SearchResultFeaturedInterface $value
+     * @param \HawkSearch\Proxy\Api\Data\SearchResultFeaturedInterface $value
      * @return $this
      */
-    public function setItems(SearchResultFeaturedInterface $value);
+    public function setItems(\HawkSearch\Proxy\Api\Data\SearchResultFeaturedInterface $value);
 }

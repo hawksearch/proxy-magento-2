@@ -1,21 +1,25 @@
 <?xml version="1.0"?>
 <!--
-/**
- * Copyright (c) 2018 Hawksearch (www.hawksearch.com) - All Rights Reserved
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
- * IN THE SOFTWARE.
- */
--->
-<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="1column" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">   
-    <body>     
+  /**
+   * Copyright (c) 2020 Hawksearch (www.hawksearch.com) - All Rights Reserved
+   *
+   * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+   * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+   * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+   * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+   * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+   * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+   * IN THE SOFTWARE.
+   */
+  -->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="1column" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
         <referenceContainer name="order.success.additional.info">
-            <block class="HawkSearch\Proxy\Block\OnePage\Success" name="checkout.hawksearch.success" template="HawkSearch_Proxy::hawksearch/proxy/tracking.phtml" />
+            <block class="Magento\Framework\View\Element\Template" name="checkout.hawksearch.success" template="HawkSearch_Proxy::hawksearch/proxy/tracking.phtml">
+                <arguments>
+                    <argument name="hawkTracking" xsi:type="object">HawkSearch\Proxy\ViewModel\OnePage\Tracking</argument>
+                </arguments>
+            </block>
         </referenceContainer>
     </body>
 </page>
