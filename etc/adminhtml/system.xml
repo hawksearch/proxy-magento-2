@@ -1,17 +1,17 @@
 <?xml version="1.0"?>
 <!--
-/**
- * Copyright (c) 2019 Hawksearch (www.hawksearch.com) - All Rights Reserved
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
- * IN THE SOFTWARE.
- */
--->
+  /**
+   * Copyright (c) 2020 Hawksearch (www.hawksearch.com) - All Rights Reserved
+   *
+   * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+   * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+   * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+   * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+   * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+   * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+   * IN THE SOFTWARE.
+   */
+  -->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
     <system>
@@ -69,21 +69,63 @@
                     <label>Run Mode</label>
                     <source_model>HawkSearch\Proxy\Model\System\Config\Source\Mode</source_model>
                 </field>
-                <field id="tracking_url_develop"
-                       translate="label comment"
-                       type="text" showInDefault="1" showInWebsite="0" showInStore="0" sortOrder="30">
-                    <label>Hawksearch tracking URL (Development)</label>
-                </field>
-                <field id="tracking_url_staging"
-                       translate="label comment"
-                       type="text" showInDefault="1" showInWebsite="0" showInStore="0" sortOrder="35">
-                    <label>Hawksearch tracking URL (Staging)</label>
-                </field>
-                <field id="tracking_url_production"
-                       translate="label comment"
-                       type="text" showInDefault="1" showInWebsite="0" showInStore="0" sortOrder="36">
-                    <label>Hawksearch tracking URL (Production)</label>
-                </field>
+                <group id="hawk_url_settings" translate="label" type="text" sortOrder="10" showInDefault="1"
+                       showInWebsite="0" showInStore="0">
+                    <label>Hawksearch URL Settings</label>
+                    <field id="hawk_url_develop"
+                           translate="label comment"
+                           type="text" showInDefault="1" showInWebsite="0" showInStore="0" sortOrder="31">
+                        <label>Hawksearch URL (Development)</label>
+                    </field>
+                    <field id="hawk_url_staging"
+                           translate="label comment"
+                           type="text" showInDefault="1" showInWebsite="0" showInStore="0" sortOrder="32">
+                        <label>Hawksearch URL (Staging)</label>
+                    </field>
+                    <field id="hawk_url_production"
+                           translate="label comment"
+                           type="text" showInDefault="1" showInWebsite="0" showInStore="0" sortOrder="33">
+                        <label>Hawksearch URL (Production)</label>
+                    </field>
+                </group>
+                <group id="tracking_url_settings" translate="label" type="text" sortOrder="10" showInDefault="1"
+                       showInWebsite="0" showInStore="0">
+                    <label>Hawksearch Tracking URL Settings</label>
+                    <field id="tracking_url_develop"
+                           translate="label comment"
+                           type="text" showInDefault="1" showInWebsite="0" showInStore="0" sortOrder="34">
+                        <label>Hawksearch tracking URL (Development)</label>
+                    </field>
+                    <field id="tracking_url_staging"
+                           translate="label comment"
+                           type="text" showInDefault="1" showInWebsite="0" showInStore="0" sortOrder="35">
+                        <label>Hawksearch tracking URL (Staging)</label>
+                    </field>
+                    <field id="tracking_url_production"
+                           translate="label comment"
+                           type="text" showInDefault="1" showInWebsite="0" showInStore="0" sortOrder="36">
+                        <label>Hawksearch tracking URL (Production)</label>
+                    </field>
+                </group>
+                <group id="rec_url_settings" translate="label" type="text" sortOrder="10" showInDefault="1"
+                       showInWebsite="0" showInStore="0">
+                    <label>Hawksearch Recommendation URL Settings</label>
+                    <field id="rec_url_develop"
+                           translate="label comment"
+                           type="text" showInDefault="1" showInWebsite="0" showInStore="0" sortOrder="37">
+                        <label>Hawksearch recommendation URL (Development)</label>
+                    </field>
+                    <field id="rec_url_staging"
+                           translate="label comment"
+                           type="text" showInDefault="1" showInWebsite="0" showInStore="0" sortOrder="38">
+                        <label>Hawksearch recommendation URL (Staging)</label>
+                    </field>
+                    <field id="rec_url_production"
+                           translate="label comment"
+                           type="text" showInDefault="1" showInWebsite="0" showInStore="0" sortOrder="39">
+                        <label>Hawksearch recommendation URL (Production)</label>
+                    </field>
+                </group>
                 <field id="manage_categories" translate="label comment" type="select" showInDefault="0"
                        showInWebsite="0" showInStore="1" sortOrder="40">
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
@@ -163,10 +205,6 @@
                        showInDefault="0" showInStore="1" showInWebsite="0" sortOrder="80">
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <label>Use HawkSearch CSS</label>
-                </field>
-                <field id="local_js" showInStore="1" type="select" showInDefault="0" showInWebsite="0" sortOrder="81">
-                    <label>Use Local Hawksearch.js file</label>
-                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
                 <field id="autocomplete_div_id"
                        type="text"

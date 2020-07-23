@@ -8,6 +8,8 @@
 
 namespace HawkSearch\Proxy\Model\Config\Backend;
 
+use HawkSearch\Proxy\Helper\Data as ProxyHelper;
+use HawkSearch\Proxy\Model\ConfigProvider as ProxyConfigProvider;
 use Magento\Framework\Serialize\Serializer\Json;
 
 class TypeLabel extends \Magento\Config\Model\Config\Backend\Serialized\ArraySerialized
@@ -15,14 +17,33 @@ class TypeLabel extends \Magento\Config\Model\Config\Backend\Serialized\ArraySer
     /**
      * @var \HawkSearch\Proxy\Helper\DataFactory
      */
-    private $dataFactory;
+    private $proxyHelper;
 
+    /**
+     * @var ProxyConfigProvider
+     */
+    private $proxyConfigProvider;
+
+    /**
+     * TypeLabel constructor.
+     * @param ProxyHelper $proxyHelper
+     * @param \Magento\Framework\Model\Context $context
+     * @param \Magento\Framework\Registry $registry
+     * @param \Magento\Framework\App\Config\ScopeConfigInterface $config
+     * @param \Magento\Framework\App\Cache\TypeListInterface $cacheTypeList
+     * @param ProxyConfigProvider $proxyConfigProvider
+     * @param \Magento\Framework\Model\ResourceModel\AbstractResource|null $resource
+     * @param \Magento\Framework\Data\Collection\AbstractDb|null $resourceCollection
+     * @param array $data
+     * @param Json|null $serializer
+     */
     public function __construct(
-        \HawkSearch\Proxy\Helper\DataFactory $dataFactory,
+        ProxyHelper $proxyHelper,
         \Magento\Framework\Model\Context $context,
         \Magento\Framework\Registry $registry,
         \Magento\Framework\App\Config\ScopeConfigInterface $config,
         \Magento\Framework\App\Cache\TypeListInterface $cacheTypeList,
+        ProxyConfigProvider $proxyConfigProvider,
         \Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
         \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
         array $data = [],
@@ -38,20 +59,21 @@ class TypeLabel extends \Magento\Config\Model\Config\Backend\Serialized\ArraySer
             $data,
             $serializer
         );
-        $this->dataFactory = $dataFactory;
+        $this->proxyHelper = $proxyHelper;
+        $this->proxyConfigProvider = $proxyConfigProvider;
     }
 
+    /**
+     * @throws \Zend_Http_Client_Exception
+     */
     protected function _afterLoad()
     {
         parent::_afterLoad();
         if (!$this->getValue() || count($this->getValue()) == 0) {
-            /**
-             * @var \HawkSearch\Proxy\Helper\Data $helper
-             */
-            $helper = $this->dataFactory->create();
+
             $client = new \Zend_Http_Client();
             $client->setUri(
-                $helper->getTrackingUrl() . '/?'
+                $this->proxyConfigProvider->getHawkUrl() . '/?'
                 . http_build_query(['q' => '', 'hawktabs' => 'json', 'it' => 'all', 'output' => 'custom'])
             );
             $response = $client->request();
@@ -66,8 +88,8 @@ class TypeLabel extends \Magento\Config\Model\Config\Backend\Serialized\ArraySer
                     if ($tab->Value == 'all') {
                         continue;
                     }
-                    $bg = $helper->generateColor($tab->Value);
-                    $fg = $helper->generateTextColor($bg);
+                    $bg = $this->proxyHelper->generateColor($tab->Value);
+                    $fg = $this->proxyHelper->generateTextColor($bg);
                     $value['_' . $tab->Value] = [
                         'title' => $tab->Title,
                         'code' => $tab->Value,

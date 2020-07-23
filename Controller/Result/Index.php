@@ -7,63 +7,87 @@
  */
 namespace HawkSearch\Proxy\Controller\Result;
 
+use HawkSearch\Proxy\Helper\Data as ProxyHelper;
+use HawkSearch\Proxy\Model\ConfigProvider;
+use Magento\Catalog\Model\Layer\Resolver;
+use Magento\Catalog\Model\Session;
+use Magento\CatalogSearch\Helper\Data as CatalogSearchHelper;
+use Magento\Framework\App\Action\Context;
+use Magento\Search\Model\QueryFactory;
+use Magento\Store\Model\StoreManagerInterface;
+
 class Index extends \Magento\CatalogSearch\Controller\Result\Index
 {
     private $queryFactory;
     private $request;
     /**
-     * @var \Magento\CatalogSearch\Helper\Data
+     * @var CatalogSearchHelper
      */
-    private $helper;
+    private $catalogSearchHelper;
     /**
-     * @var \HawkSearch\Proxy\Helper\Data
+     * @var ProxyHelper
      */
-    private $hawkHelper;
+    private $proxyHelper;
 
+    /**
+     * @var ConfigProvider
+     */
+    private $proxyConfigProvider;
+
+    /**
+     * Index constructor.
+     * @param Context $context
+     * @param Session $catalogSession
+     * @param StoreManagerInterface $storeManager
+     * @param QueryFactory $queryFactory
+     * @param Resolver $layerResolver
+     * @param CatalogSearchHelper $catalogSearchHelper
+     * @param ProxyHelper $proxyHelper
+     * @param ConfigProvider $proxyConfigProvider
+     */
     public function __construct(
-        \Magento\Framework\App\Action\Context $context,
-        \Magento\Catalog\Model\Session $catalogSession,
-        \Magento\Store\Model\StoreManagerInterface $storeManager,
-        \Magento\Search\Model\QueryFactory $queryFactory,
-        \Magento\Catalog\Model\Layer\Resolver $layerResolver,
-        \Magento\CatalogSearch\Helper\Data $helper,
-        \HawkSearch\Proxy\Helper\Data $hawkHelper
+        Context $context,
+        Session $catalogSession,
+        StoreManagerInterface $storeManager,
+        QueryFactory $queryFactory,
+        Resolver $layerResolver,
+        CatalogSearchHelper $catalogSearchHelper,
+        ProxyHelper $proxyHelper,
+        ConfigProvider $proxyConfigProvider
     ) {
+        parent::__construct($context, $catalogSession, $storeManager, $queryFactory, $layerResolver);
         $this->queryFactory = $queryFactory;
         $this->request = $context->getRequest();
-        $this->helper = $helper;
-        $this->hawkHelper = $hawkHelper;
-        parent::__construct($context, $catalogSession, $storeManager, $queryFactory, $layerResolver);
+        $this->catalogSearchHelper = $catalogSearchHelper;
+        $this->proxyHelper = $proxyHelper;
+        $this->proxyConfigProvider = $proxyConfigProvider;
     }
 
     /**
      *
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function execute()
     {
-        if (!$this->hawkHelper->isManageSearch()) {
-            return parent::execute();
+        if (!$this->proxyConfigProvider->isSearchManagementEnabled()) {
+            parent::execute();
+            return;
         }
         $query = $this->queryFactory->get();
-        $tab = $this->getRequest()->getParam('it');
-        $this->helper->checkNotes();
-        $robots = $this->hawkHelper->getSearchRobots();
+        $this->catalogSearchHelper->checkNotes();
         if ($query->getQueryText() == '' && $this->isTopCategoryRequest()) {
             $this->_view->loadLayout();
             $this->_view->getLayout()->unsetElement('page.main.title');
-            $this->_view->getPage()->getConfig()->setRobots($robots);
-            $this->_view->renderLayout();
         } else {
 
-            if ($this->hawkHelper->productsOnly()) {
+            if ($this->proxyHelper->productsOnly()) {
                 $this->_view->loadLayout();
             } else {
                 $this->_view->loadLayout('hawksearch_proxy_tabbed');
             }
-
-            $this->_view->getPage()->getConfig()->setRobots($robots);
-            $this->_view->renderLayout();
         }
+        $this->_view->getPage()->getConfig()->setRobots($this->proxyConfigProvider->getMetaRobots());
+        $this->_view->renderLayout();
     }
 
     private function isTopCategoryRequest()

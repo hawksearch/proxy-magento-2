@@ -56,7 +56,7 @@ class ListProduct extends \Magento\Catalog\Block\Product\ListProduct
     public function getHawkTrackingId()
     {
         if (!empty($this->hawkHelper)) {
-            return $this->hawkHelper->getResultData()->TrackingId;
+            return $this->hawkHelper->getResultData()->getTrackingId();
         }
         return '';
     }
@@ -85,19 +85,21 @@ class ListProduct extends \Magento\Catalog\Block\Product\ListProduct
                     return '<div id="hawkbottompager">' . str_replace(
                         $baseUrl . '/',
                         $baseUrl,
-                        $this->hawkHelper->getResultData()->Data->BottomPager
+                        $this->hawkHelper->getResultData()->getResponseData()->getBottomPager()
                     ) . '</div>';
                 }
                 $this->topseen = true;
-                $data = $this->hawkHelper->getResultData()->Data;
                 if ($this->hawkHelper->getShowTabs()) {
                     return sprintf(
                         '<div id="hawktabs">%s</div><div id="hawktoppager">%s</div>',
-                        $data->Tabs,
-                        $data->TopPager
+                        $this->hawkHelper->getResultData()->getResponseData()->getTabs(),
+                        $this->hawkHelper->getResultData()->getResponseData()->getTopPager()
                     );
                 }
-                return sprintf('<div id="hawktoppager">%s</div>', $data->TopPager);
+                return sprintf(
+                    '<div id="hawktoppager">%s</div>',
+                    $this->hawkHelper->getResultData()->getResponseData()->getTopPager()
+                );
             } else {
                 return '';
             }
@@ -110,9 +112,10 @@ class ListProduct extends \Magento\Catalog\Block\Product\ListProduct
         $identities = [];
         if ($this->_getProductCollection() && count($this->_getProductCollection())) {
             foreach ($this->_getProductCollection() as $item) {
-                $identities = array_merge($identities, $item->getIdentities());
+                $identities[] = $item->getIdentities();
             }
         }
+        $identities = array_merge([], ...$identities);
         $category = $this->getLayer()->getCurrentCategory();
         if ($category) {
             $identities[] = Product::CACHE_PRODUCT_CATEGORY_TAG . '_' . $category->getId();

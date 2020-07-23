@@ -12,21 +12,21 @@
  */
 /**
  * Cache template
- * @var $block Sync
+ * @var $block HawkSearch\Proxy\Block\System\Config\Sync
  */
-
+// @codingStandardsIgnoreFile
 $nextScheduledId        = $block->getNextScheduledId();
 $nextScheduledTimestamp = $block->getNextScheduledTimestamp();
 ?>
 <div>
-    <a href="<?= $block->escapeHtml( $block->getInternUrl() ) ?>">
-        <button type="button" id="<?php echo $block->getHtmlId() ?>">
-            <span><?php echo $block->escapeHtml( $block->getButtonLabel() ); ?></span>
+    <a href="<?= $block->escapeHtml($block->getInternUrl()) ?>">
+        <button type="button" id="<?= $block->getHtmlId() ?>">
+            <span><?= $block->escapeHtml($block->getButtonLabel()); ?></span>
         </button>
     </a>
-    <?php if ( $nextScheduledId ): ?>
+    <?php if ($nextScheduledId): ?>
         <div id="hawk_datagenerate_next_scheduled" style="margin-top: 8px">
-            <p>Next feed generation at <?= $nextScheduledTimestamp ?> (CRON ID: <?= $nextScheduledId ?>)</p>
+            <p><?= $block->escapeHtml(__('Next feed generation at %1 (CRON ID: %2)', $nextScheduledTimestamp, $nextScheduledId)) ?></p>
         </div>
     <?php endif; ?>
 </div>

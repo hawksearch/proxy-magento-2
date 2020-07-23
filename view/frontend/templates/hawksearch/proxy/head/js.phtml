@@ -1,33 +1,31 @@
 <?php
 /**
- * Copyright (c) 2018 Hawksearch (www.hawksearch.com) - All Rights Reserved
+ *  Copyright (c) 2020 Hawksearch (www.hawksearch.com) - All Rights Reserved
  *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
- * IN THE SOFTWARE.
+ *  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ *  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ *  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ *  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ *  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ *  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+ *  IN THE SOFTWARE.
  */
 
-/** @var HawkSearch\Proxy\Block\Head\HawkSearchJs $block */
-$trackingUrl  = $block->getTrackingUrl();
-$includeCss = $block->getIncludeHawkCss();
+use Magento\Framework\View\Element\Template;
+use HawkSearch\Proxy\ViewModel\Config as ConfigViewModel;
+
+/** @var Template $block */
+/** @var ConfigViewModel $configViewModel */
+$configViewModel = $block->getData('configViewModel');
+if (!$configViewModel) {
+    return;
+}
 ?>
 <!-- Hawk Search Header Includes -->
 <script type="text/javascript">
-    <?php if ($includeCss) :?>
+    <?php if ($configViewModel->isHawkCssIncluded()) :?>
     document.write(unescape(
-        "%3Clink rel='stylesheet' type='text/css' href='<?= /* @noEscape */ $trackingUrl; ?>/includes/hawksearch.css'%3E%3C/link%3E")
+        "%3Clink rel='stylesheet' type='text/css' href='<?= /* @noEscape */ $configViewModel->getHawkUrl(); ?>/includes/hawksearch.css'%3E%3C/link%3E")
     );
     <?php endif; ?>
-    (function() {
-        var config = {
-            paths: {
-                "hawksearch": "<?= /* @noEscape */ $block->getJsPath(); ?>"
-            }
-        };
-        require.config(config);
-    })();
 </script>

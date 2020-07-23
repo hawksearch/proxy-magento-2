@@ -3,7 +3,6 @@
 
 namespace HawkSearch\Proxy\Model\Task\SyncCategories;
 
-
 class TaskResults
 {
     /** @var array */
@@ -20,7 +19,7 @@ class TaskResults
     /**
      * @param array $errors
      */
-    public function setErrors( array $errors ) : void
+    public function setErrors(array $errors) : void
     {
         $this->errors = $errors;
     }

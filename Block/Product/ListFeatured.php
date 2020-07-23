@@ -90,7 +90,7 @@ class ListFeatured extends \Magento\Catalog\Block\Product\ListProduct
     public function getHawkTrackingId()
     {
         if (!empty($this->hawkHelper)) {
-            return $this->hawkHelper->getResultData()->TrackingId;
+            return $this->hawkHelper->getResultData()->getTrackingId();
         }
         return '';
     }
@@ -137,11 +137,12 @@ class ListFeatured extends \Magento\Catalog\Block\Product\ListProduct
     public function getIdentities()
     {
         $identities = [];
-        if (count($this->_getProductCollection())) {
-            foreach ($this->_getProductCollection() as $item) {
-                $identities = array_merge($identities, $item->getIdentities());
+        if ($this->_getProductCollection()) {
+            foreach ($this->_getProductCollection()->getItems() as $item) {
+                $identities[] = $item->getIdentities();
             }
         }
+        $identities = array_merge([], ...$identities);
         $category = $this->getLayer()->getCurrentCategory();
         if ($category) {
             $identities[] = \Magento\Catalog\Model\Product::CACHE_PRODUCT_CATEGORY_TAG . '_' . $category->getId();

@@ -16,6 +16,7 @@ namespace HawkSearch\Proxy\Setup;
 use Magento\Catalog\Model\Category;
 use Magento\Catalog\Setup\CategorySetupFactory;
 use Magento\Eav\Model\Entity\Attribute\ScopedAttributeInterface;
+use Magento\Eav\Model\Entity\Attribute\Source\Boolean;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Setup\InstallDataInterface;
 use Magento\Framework\Setup\ModuleContextInterface;
@@ -23,8 +24,7 @@ use Magento\Framework\Setup\ModuleDataSetupInterface;
 
 /**
  * Class InstallData
- *
- * @package HawkSearch\Proxy\Setup
+ * adding hawk_landing_page attribute to the Category entity
  */
 class InstallData implements InstallDataInterface
 {
@@ -34,7 +34,6 @@ class InstallData implements InstallDataInterface
      * @var CategorySetupFactory
      */
     private $_categorySetupFactory;
-
 
     /**
      * InstallData constructor.
@@ -67,7 +66,7 @@ class InstallData implements InstallDataInterface
                 'type' => 'int',
                 'label' => 'Hawksearch Landing Page',
                 'input' => 'select',
-                'source' => Magento\Eav\Model\Entity\Attribute\Source\Boolean::class,
+                'source' => Boolean::class,
                 'required' => false,
                 'sort_order' => 100,
                 'global' => ScopedAttributeInterface::SCOPE_STORE,

@@ -3,7 +3,6 @@
 
 namespace HawkSearch\Proxy\Console\Command;
 
-
 use HawkSearch\Proxy\Model\Task\Exception\TaskException;
 use HawkSearch\Proxy\Model\Task\Exception\TaskLockException;
 use HawkSearch\Proxy\Model\Task\Exception\TaskUnlockException;
@@ -40,9 +39,8 @@ class SyncCategories extends Command
         Task $task,
         TaskOptionsFactory $taskOptionsFactory,
         string $name = null
-    )
-    {
-        parent::__construct( $name );
+    ) {
+        parent::__construct($name);
 
         $this->state              = $state;
         $this->task               = $task;
@@ -54,8 +52,8 @@ class SyncCategories extends Command
      */
     protected function configure() : void
     {
-        $this->setName( 'hawksearch:proxy:sync-categories' )
-            ->setDescription( 'Run the HawkSearch Category Sync Task' );
+        $this->setName('hawksearch:proxy:sync-categories')
+            ->setDescription('Run the HawkSearch Category Sync Task');
         parent::configure();
     }
 
@@ -65,25 +63,22 @@ class SyncCategories extends Command
      * @return void
      * @throws LocalizedException
      */
-    protected function execute( InputInterface $input, OutputInterface $output ) : void
+    protected function execute(InputInterface $input, OutputInterface $output) : void
     {
-        $this->state->setAreaCode( Area::AREA_CRONTAB );
+        $this->state->setAreaCode(Area::AREA_CRONTAB);
 
         /** @var TaskOptions $options */
         $options = $this->taskOptionsFactory->create();
 
         try {
-            $results = $this->task->execute( $options );
-            $this->reportSuccess( $results, $output );
-        }
-        catch ( TaskLockException $exception ) {
-            $output->writeln( 'Failed to lock, please check the status of the database lock' );
-        }
-        catch ( TaskUnlockException $exception ) {
-            $output->writeln( 'Failed to unlock, please verify that the database lock was cleared' );
-        }
-        catch ( TaskException $exception ) {
-            $output->writeln( 'An error occurred: ' . $exception->getMessage() );
+            $results = $this->task->execute($options);
+            $this->reportSuccess($results, $output);
+        } catch (TaskLockException $exception) {
+            $output->writeln('Failed to lock, please check the status of the database lock');
+        } catch (TaskUnlockException $exception) {
+            $output->writeln('Failed to unlock, please verify that the database lock was cleared');
+        } catch (TaskException $exception) {
+            $output->writeln('An error occurred: ' . $exception->getMessage());
         }
     }
 
@@ -92,8 +87,8 @@ class SyncCategories extends Command
      * @param TaskResults $results
      * @param OutputInterface $output
      */
-    private function reportSuccess( TaskResults $results, OutputInterface $output ) : void
+    private function reportSuccess(TaskResults $results, OutputInterface $output) : void
     {
-        $output->writeln( 'Successfully synchronized categories' );
+        $output->writeln('Successfully synchronized categories');
     }
 }

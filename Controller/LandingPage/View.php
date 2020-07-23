@@ -59,13 +59,7 @@ class View extends \Magento\Framework\App\Action\Action
         $category = $this->categoryFactory->create();
         $category->setHawksearchLandingPage(true);
         $data = $this->helper->getResultData();
-        if (property_exists($data, 'Name')) {
-            $category->setName($data->Name);
-        } elseif (property_exists($data, 'HeaderTitle')) {
-            $category->setName(strip_tags($data->HeaderTitle));
-        } else {
-            $category->setName('-');
-        }
+        $category->setName($data->getHeaderTitle() ?: '-');
         $category->setHawkBreadcrumbPath(
             [ 0 => [
             'label' => $category->getName(),

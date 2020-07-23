@@ -1,9 +1,14 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: dev
- * Date: 9/7/18
- * Time: 8:50 AM
+ * Copyright (c) 2020 Hawksearch (www.hawksearch.com) - All Rights Reserved
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+ * IN THE SOFTWARE.
  */
 
 namespace HawkSearch\Proxy\Block;
@@ -16,7 +21,15 @@ class Tabbed extends Html
      * @var \HawkSearch\Proxy\Helper\Data
      */
     private $helper;
+
+    /**
+     * @var string
+     */
     private $labelMap;
+
+    /**
+     * @var int
+     */
     public static $increment = 1;
 
     public function __construct(
@@ -29,50 +42,64 @@ class Tabbed extends Html
         $this->helper = $helper;
     }
 
+    /**
+     * @return string|null
+     */
     public function getTabs()
     {
-        $resultData = $this->helper->getResultData()->Data;
-        if (property_exists($resultData, 'Tabs')) {
-            return $resultData->Tabs;
-        }
-        return null;
-    }
-    public function getContent()
-    {
-        $data = $this->helper->getResultData()->Data;
-        $results = json_decode($data->Results);
-        return $results->Items;
+        return $this->helper->getResultData()->getResponseData()->getTabs() ?? null;
     }
 
+    /**
+     * @return \HawkSearch\Proxy\Api\Data\SearchResultContentItemInterface[]
+     */
+    public function getContent()
+    {
+        return $this->helper->getResultData()->getResponseData()->getResults()->getItems();
+    }
+
+    /**
+     * @param \HawkSearch\Proxy\Api\Data\SearchResultContentItemInterface $item
+     * @return mixed
+     */
     public function getTabbedItemHtml($item)
     {
         $rendererList = $this->getChildBlock('item.renderers');
         $type = 'default';
-        if ($this->helper->getShowTypeLabels() && $this->getRequest()->getParam('it') != 'all') {
-            $type = strstr($item->Custom->it, '|^|', true);
+        if ($this->helper->getShowTypeLabels()
+            && $this->getRequest()->getParam('it') != 'all' && isset($item->getCustom()['it'])) {
+            $type = strstr($item->getCustom()['it'], '|^|', true);
         }
 
         $renderer = $rendererList->getRenderer($type, 'default');
         $renderer->_viewVars = ['item' => $item];
         return $renderer->toHtml();
     }
+
+    /**
+     * @return int
+     */
     public function getIncrement()
     {
         return self::$increment++;
     }
 
+    /**
+     * @param \HawkSearch\Proxy\Api\Data\SearchResultContentItemInterface $item
+     * @return string
+     */
     public function getTypeLabel($item)
     {
-        if (!$this->helper->getShowTypeLabels() || !isset($item->Custom->it)) {
+        if (!$this->helper->getShowTypeLabels() || !isset($item->getCustom()['it'])) {
             return '';
         }
         if (!$this->labelMap) {
             $this->labelMap = $this->helper->getTypeLabelMap();
         }
-        $type = strstr($item->Custom->it, '|^|', true);
+        $type = explode('|^|', $item->getCustom()['it'])[0] ?? '';
 
         if (!isset($this->labelMap[$type])) {
-            preg_match_all('/tab="(.*?)"/', $this->helper->getResultData()->Data->Tabs, $matches);
+            preg_match_all('/tab="(.*?)"/', $this->getTabs(), $matches);
             if (count($matches) > 0) {
                 foreach ($matches[1] as $foundType) {
                     if ($foundType == 'all' || isset($this->labelMap[$foundType])) {
@@ -88,11 +115,12 @@ class Tabbed extends Html
             }
         }
 
-        $bg = $this->labelMap[$type]->color;
-        $label = $this->labelMap[$type]->title;
-        $fg = $this->labelMap[$type]->textColor;
+        $bg = $this->labelMap[$type]->color ?? '';
+        $label = $this->labelMap[$type]->title ?? '';
+        $fg = $this->labelMap[$type]->textColor ?? '';
         return sprintf(
-            '<p style="background-color: %s; padding: 5px 10px; display:inline-block; font-weight: bold; color: %s">%s</p>',
+            '<p style="background-color: %s;
+padding: 5px 10px; display:inline-block; font-weight: bold; color: %s">%s</p>',
             $bg,
             $fg,
             $label

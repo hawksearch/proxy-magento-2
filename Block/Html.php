@@ -14,6 +14,7 @@
 namespace HawkSearch\Proxy\Block;
 
 use Magento\Framework\View\Element\Template;
+use HawkSearch\Proxy\Block\Product\ListFeatured;
 
 /**
  *  Html block
@@ -30,8 +31,6 @@ class Html extends Template
         \HawkSearch\Proxy\Block\BannerFactory $bannerFactory,
         array $data = []
     ) {
-        $helper->setClientIp($context->getRequest()->getClientIp());
-        $helper->setClientUa($context->getRequest()->getHeader('UserAgent'));
         $helper->setIsHawkManaged(true);
         $this->helper = $helper;
         $this->bannerFactory = $bannerFactory;
@@ -47,66 +46,62 @@ class Html extends Template
     public function getFacets()
     {
 
-        return $this->helper->getResultData()->Data->Facets;
+        return $this->helper->getResultData()->getResponseData()->getFacets();
     }
 
     public function getTopPager()
     {
-        return $this->helper->getResultData()->Data->TopPager;
+        return $this->helper->getResultData()->getResponseData()->getTopPager();
     }
 
     public function getBottomPager()
     {
-        return $this->helper->getResultData()->Data->BottomPager;
+        return $this->helper->getResultData()->getResponseData()->getBottomPager();
     }
 
     public function getMetaRobots()
     {
-        $results = $this->helper->getResultData();
-        if (property_exists($results, 'MetaRobots')) {
-            return $results->MetaRobots;
-        }
-        return '';
+        return $this->helper->getResultData()->getMetaRobots() ?? '';
     }
 
     public function getHeaderTitle()
     {
-        return $this->helper->getResultData()->HeaderTitle;
+        return $this->helper->getResultData()->getHeaderTitle();
     }
 
     public function getMetaDescription()
     {
-        return $this->helper->getResultData()->MetaDescription;
+        return $this->helper->getResultData()->getMetaDescription();
     }
 
     public function getMetaKeywords()
     {
-        return $this->helper->getResultData()->MetaKeywords;
+        return $this->helper->getResultData()->getMetaKeywords();
     }
 
     public function getRelCanonical()
     {
-        return $this->helper->getResultData()->RelCanonical;
+        return $this->helper->getResultData()->getRelCanonical();
     }
 
     public function getTopText()
     {
-        return $this->helper->getResultData()->Data->TopText;
+        return $this->helper->getResultData()->getResponseData()->getTopText();
     }
 
     public function getRelated()
     {
-        return $this->helper->getResultData()->Data->Related;
+        return $this->helper->getResultData()->getResponseData()->getRelated();
     }
 
     public function getBreadCrumb()
     {
-        return $this->helper->getResultData()->Data->BreadCrumb;
+        return $this->helper->getResultData()->getResponseData()->getBreadCrumb();
     }
 
     public function getTitle()
     {
-        return $this->helper->getResultData()->Data->Title;
+        return $this->helper->getResultData()->getResponseData()->getTitle();
     }
 
     public function getHawkTrackingData()
@@ -129,7 +124,7 @@ class Html extends Template
     public function getFeaturedZone($zone)
     {
         $layout = $this->getLayout();
-        $block = $layout->createBlock('HawkSearch\Proxy\Block\Product\ListFeatured');
+        $block = $layout->createBlock(ListFeatured::class);
         $block->setZone($zone);
         $productCollection = $block->getLoadedProductCollection();
         if ($productCollection->count() > 0) {
@@ -142,7 +137,7 @@ class Html extends Template
     public function getFeaturedLeftZone($zone)
     {
         $layout = $this->getLayout();
-        $block = $layout->createBlock('HawkSearch\Proxy\Block\Product\ListFeatured');
+        $block = $layout->createBlock(ListFeatured::class);
         $block->setZone($zone);
         $productCollection = $block->getLoadedProductCollection();
         if ($productCollection->count() > 0) {
@@ -154,14 +149,10 @@ class Html extends Template
 
     public function getHawksearchTrackingId()
     {
-        return $this->helper->getResultData()->TrackingId;
+        return $this->helper->getResultData()->getTrackingId();
     }
     public function getTabs()
     {
-        $resultData = $this->helper->getResultData()->Data;
-        if (property_exists($resultData, 'Tabs')) {
-            return $resultData->Tabs;
-        }
-        return null;
+        return $this->helper->getResultData()->getResponseData()->getTabs() ?? '';
     }
 }

@@ -3,7 +3,6 @@
 
 namespace HawkSearch\Proxy\Model\Task;
 
-
 use HawkSearch\Proxy\Model\Task\Exception\TaskLockException;
 use HawkSearch\Proxy\Model\Task\Exception\TaskUnlockException;
 use InvalidArgumentException;
@@ -27,7 +26,7 @@ abstract class AbstractTaskLock
     /**
      * @param DatabaseLockManager $databaseLockManager
      */
-    public function __construct( DatabaseLockManager $databaseLockManager )
+    public function __construct(DatabaseLockManager $databaseLockManager)
     {
         $this->lockManager = $databaseLockManager;
     }
@@ -41,12 +40,11 @@ abstract class AbstractTaskLock
         $this->requireLockName();
 
         try {
-            if ( ! $this->lockManager->lock( $this->lockName, $this->lockTimeout ) ) {
-                throw new TaskLockException( 'failed to lock' );
+            if (! $this->lockManager->lock($this->lockName, $this->lockTimeout)) {
+                throw new TaskLockException('failed to lock');
             }
-        }
-        catch ( AlreadyExistsException | InputException | Zend_Db_Statement_Exception $exception ) {
-            throw new TaskLockException( 'failed to lock' );
+        } catch (AlreadyExistsException | InputException | Zend_Db_Statement_Exception $exception) {
+            throw new TaskLockException('failed to lock');
         }
     }
 
@@ -60,10 +58,9 @@ abstract class AbstractTaskLock
 
         try {
             // no return check, if 'falsy' then nothing was locked
-            $this->lockManager->unlock( $this->lockName );
-        }
-        catch ( InputException | Zend_Db_Statement_Exception $exception ) {
-            throw new TaskUnlockException( 'failed to unlock' );
+            $this->lockManager->unlock($this->lockName);
+        } catch (InputException | Zend_Db_Statement_Exception $exception) {
+            throw new TaskUnlockException('failed to unlock');
         }
     }
 
@@ -77,10 +74,9 @@ abstract class AbstractTaskLock
         $this->requireLockName();
 
         try {
-            return $this->lockManager->isLocked( $this->lockName );
-        }
-        catch ( InputException | Zend_Db_Statement_Exception $exception ) {
-            throw new TaskLockException( 'failed to verify lock status' );
+            return $this->lockManager->isLocked($this->lockName);
+        } catch (InputException | Zend_Db_Statement_Exception $exception) {
+            throw new TaskLockException('failed to verify lock status');
         }
     }
 
@@ -89,8 +85,8 @@ abstract class AbstractTaskLock
      */
     private function requireLockName() : void
     {
-        if ( $this->lockName === '' ) {
-            throw new InvalidArgumentException( 'no lock name provided' );
+        if ($this->lockName === '') {
+            throw new InvalidArgumentException('no lock name provided');
         }
     }
 }

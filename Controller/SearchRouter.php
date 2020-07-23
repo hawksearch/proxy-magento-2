@@ -12,41 +12,45 @@
  */
 namespace HawkSearch\Proxy\Controller;
 
+use HawkSearch\Proxy\Model\ConfigProvider;
+use Magento\Framework\App\Action\Forward;
+use Magento\Framework\App\ActionFactory;
+use Magento\Framework\App\RequestInterface;
+
 class SearchRouter implements \Magento\Framework\App\RouterInterface
 {
     /**
-     * @var \Magento\Framework\App\ActionFactory
+     * @var ActionFactory
      */
     protected $actionFactory;
-    /**
-     * @var \HawkSearch\Proxy\Helper\Data
-     */
-    private $helper;
 
     /**
-     * @param \Magento\Framework\App\ActionFactory $actionFactory
-     * @param \HawkSearch\Proxy\Helper\Data        $helper
+     * @var ConfigProvider
+     */
+    private $proxyConfigProvider;
+
+    /**
+     * @param ActionFactory $actionFactory
+     * @param ConfigProvider $proxyConfigProvider
      */
     public function __construct(
-        \Magento\Framework\App\ActionFactory $actionFactory,
-        \HawkSearch\Proxy\Helper\Data $helper
+        ActionFactory $actionFactory,
+        ConfigProvider $proxyConfigProvider
     ) {
         $this->actionFactory = $actionFactory;
-        $this->helper = $helper;
+        $this->proxyConfigProvider = $proxyConfigProvider;
     }
 
     /**
      * Validate and Match Cms Page and modify request
-     *
-     * @param  \Magento\Framework\App\RequestInterface $request
-     * @return bool
+     * @inheritDoc
      */
-    public function match(\Magento\Framework\App\RequestInterface $request)
+    public function match(RequestInterface $request)
     {
-        if (!$this->helper->getEnableCustomSearchRoute()) {
+        if (!$this->proxyConfigProvider->isCustomSearchRouteEnabled()) {
             return false;
         }
-        $stem = $this->helper->getConfigurationData('hawksearch_proxy/proxy/custom_search_route');
+        $stem = $this->proxyConfigProvider->getCustomSearchRoute();
         $parts = explode('/', trim($request->getPathInfo(), '/'));
         $identifier = array_shift($parts);
 
@@ -63,8 +67,7 @@ class SearchRouter implements \Magento\Framework\App\RouterInterface
          * We have match and now we will forward action
          */
         return $this->actionFactory->create(
-            Magento\Framework\App\Action\Forward::class,
-            ['request' => $request]
+            Forward::class
         );
     }
 }
