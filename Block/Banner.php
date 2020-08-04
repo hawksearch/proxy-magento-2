@@ -12,17 +12,24 @@
  */
 namespace HawkSearch\Proxy\Block;
 
+use HawkSearch\Proxy\Helper\Data as ProxyHelper;
 use Magento\Framework\View\Element\Template;
 
 class Banner extends Template
 {
     /**
-     * @var \HawkSearch\Proxy\Helper\Data
+     * @var ProxyHelper
      */
     private $helper;
 
+    /**
+     * Banner constructor.
+     * @param ProxyHelper $helper
+     * @param Template\Context $context
+     * @param array $data
+     */
     public function __construct(
-        \HawkSearch\Proxy\Helper\Data $helper,
+        ProxyHelper $helper,
         Template\Context $context,
         array $data = []
     ) {
@@ -38,8 +45,8 @@ class Banner extends Template
                 $this->setData($this->_underscore($banner->getZone()), $banner->getHtml());
             }
         }
-        if ($resultData->getFeaturedItems()->getItems()->getItems()) {
-            foreach ($resultData->getFeaturedItems()->getItems()->getItems() as $banner) {
+        if ($resultData->getFeaturedItems()->getItems()) {
+            foreach ($resultData->getFeaturedItems()->getItems() as $banner) {
                 $this->setData($this->_underscore($banner->getZone()), $banner->getHtml());
             }
         }

@@ -19,7 +19,7 @@ use HawkSearch\Connector\Gateway\Instruction\InstructionManagerPool;
 use HawkSearch\Proxy\Api\Data\SearchResultResponseInterface;
 use HawkSearch\Proxy\Model\ConfigProvider;
 use HawkSearch\Proxy\Model\ProxyEmailFactory;
-use HawkSearch\Proxy\Model\SearchResultTemplateItem;
+use HawkSearch\Proxy\Model\SearchResultBanner;
 use Magento\Catalog\Model\Category;
 use Magento\Catalog\Model\Config;
 use Magento\Catalog\Model\ResourceModel\Category\CollectionFactory as CategoryCollectionFactory;
@@ -363,16 +363,16 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $map = [];
         $i = 0;
 
-        if (!$this->hawkData->getResponseData()->getFeaturedItems()->getItems()->getItems()) {
+        if (!$this->hawkData->getResponseData()->getFeaturedItems()->getItems()) {
             return null;
         } else {
-            foreach ($this->hawkData->getResponseData()->getFeaturedItems()->getItems()->getItems() as $banner) {
-                /** @var SearchResultTemplateItem $banner */
-                if ($banner->getZone() == $zone && $banner->getData['Items']) {
-                    foreach ($banner->getData['Items'] as $item) {
-                        if (isset($item['Custom']['sku'])) {
-                            $skus[] = $item['Custom']['sku'];
-                            $map[$item['Custom']['sku']] = $i;
+            foreach ($this->hawkData->getResponseData()->getFeaturedItems()->getItems() as $banner) {
+                /** @var SearchResultBanner $banner */
+                if ($banner->getZone() == $zone && $banner->getItems()) {
+                    foreach ($banner->getItems() as $item) {
+                        if (isset($item->getCustom()['sku'])) {
+                            $skus[] = $item->getCustom()['sku'];
+                            $map[$item->getCustom()['sku']] = $i;
                             $i++;
                         }
                     }

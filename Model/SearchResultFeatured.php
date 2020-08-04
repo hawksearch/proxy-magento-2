@@ -14,18 +14,17 @@ declare(strict_types=1);
 
 namespace HawkSearch\Proxy\Model;
 
-use HawkSearch\Proxy\Api\Data\SearchResultTemplateItemInterface;
 use HawkSearch\Proxy\Api\Data\SearchResultFeaturedInterface;
-use Magento\Framework\DataObject;
+use Magento\Framework\Api\AbstractSimpleObject;
 
-class SearchResultFeatured extends DataObject implements SearchResultFeaturedInterface
+class SearchResultFeatured extends AbstractSimpleObject implements SearchResultFeaturedInterface
 {
     /**
      * @inheritDoc
      */
     public function getItems(): array
     {
-        return $this->getData(self::ITEMS);
+        return $this->_get(self::ITEMS) ?? [];
     }
 
     /**

@@ -57,25 +57,31 @@ class SearchResultHandler implements HandlerInterface
         $searchResults = $this->httpResponseReader->readResponseData($response);
 
         //unserialize values
-        $results = &$searchResults['Data'][SearchResultDataInterface::RESULTS];
-        $featuredItems = &$searchResults['Data'][SearchResultDataInterface::FEATURED_ITEMS];
-
-        try {
-            $results = ($results !== null) ? $this->converter->convert($results) : [];
-        } catch (ConverterException $e) {
-            $results = [];
-        } catch (\InvalidArgumentException $e) {
-            $results = [];
-        }
-
-        try {
-            $featuredItems = ($featuredItems !== null) ? $this->converter->convert($featuredItems) : [];
-        } catch (ConverterException $e) {
-            $featuredItems = [];
-        } catch (\InvalidArgumentException $e) {
-            $featuredItems = [];
-        }
+        $searchResults['Data'][SearchResultDataInterface::RESULTS] = $this->processString(
+            $searchResults['Data'][SearchResultDataInterface::RESULTS]
+        );
+        $searchResults['Data'][SearchResultDataInterface::FEATURED_ITEMS] = $this->processString(
+            $searchResults['Data'][SearchResultDataInterface::FEATURED_ITEMS]
+        );
 
         return $searchResults;
+    }
+
+    /**
+     * Convert Json string to array
+     * @param string $string
+     * @return array
+     */
+    private function processString(string $string) : array
+    {
+        try {
+            $result = ($string !== null) ? $this->converter->convert($string) : [];
+        } catch (ConverterException $e) {
+            $result = [];
+        } catch (\InvalidArgumentException $e) {
+            $result = [];
+        }
+
+        return $result;
     }
 }

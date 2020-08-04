@@ -16,18 +16,18 @@ namespace HawkSearch\Proxy\Model;
 
 use HawkSearch\Proxy\Api\Data\SearchResultContentInterface;
 use HawkSearch\Proxy\Api\Data\SearchResultDataInterface;
-use HawkSearch\Proxy\Api\Data\SearchResultFeaturedMainInterface;
+use HawkSearch\Proxy\Api\Data\SearchResultFeaturedInterface;
 use HawkSearch\Proxy\Api\Data\SearchResultMerchandisingInterface;
-use Magento\Framework\DataObject;
+use Magento\Framework\Api\AbstractSimpleObject;
 
-class SearchResultData extends DataObject implements SearchResultDataInterface
+class SearchResultData extends AbstractSimpleObject implements SearchResultDataInterface
 {
     /**
      * @inheritDoc
      */
     public function getTitle(): ?string
     {
-        return $this->getData(self::TITLE);
+        return $this->_get(self::TITLE);
     }
 
     /**
@@ -43,7 +43,7 @@ class SearchResultData extends DataObject implements SearchResultDataInterface
      */
     public function getTopText(): ?string
     {
-        return $this->getData(self::TOP_TEXT);
+        return $this->_get(self::TOP_TEXT);
     }
 
     /**
@@ -59,7 +59,7 @@ class SearchResultData extends DataObject implements SearchResultDataInterface
      */
     public function getBreadCrumb(): ?string
     {
-        return $this->getData(self::BREADCRUMB);
+        return $this->_get(self::BREADCRUMB);
     }
 
     /**
@@ -75,7 +75,7 @@ class SearchResultData extends DataObject implements SearchResultDataInterface
      */
     public function getTopPager(): ?string
     {
-        return $this->getData(self::TOP_PAGER);
+        return $this->_get(self::TOP_PAGER);
     }
 
     /**
@@ -91,7 +91,7 @@ class SearchResultData extends DataObject implements SearchResultDataInterface
      */
     public function getBottomPager(): ?string
     {
-        return $this->getData(self::BOTTOM_PAGER);
+        return $this->_get(self::BOTTOM_PAGER);
     }
 
     /**
@@ -107,7 +107,7 @@ class SearchResultData extends DataObject implements SearchResultDataInterface
      */
     public function getResults(): SearchResultContentInterface
     {
-        return $this->getData(self::RESULTS);
+        return $this->_get(self::RESULTS);
     }
 
     /**
@@ -123,7 +123,7 @@ class SearchResultData extends DataObject implements SearchResultDataInterface
      */
     public function getMerchandising(): SearchResultMerchandisingInterface
     {
-        return $this->getData(self::MERCHANDISING);
+        return $this->_get(self::MERCHANDISING);
     }
 
     /**
@@ -139,7 +139,7 @@ class SearchResultData extends DataObject implements SearchResultDataInterface
      */
     public function getSelections(): ?string
     {
-        return $this->getData(self::SELECTIONS);
+        return $this->_get(self::SELECTIONS);
     }
 
     /**
@@ -155,7 +155,7 @@ class SearchResultData extends DataObject implements SearchResultDataInterface
      */
     public function getFacets(): ?string
     {
-        return $this->getData(self::FACETS);
+        return $this->_get(self::FACETS);
     }
 
     /**
@@ -171,7 +171,7 @@ class SearchResultData extends DataObject implements SearchResultDataInterface
      */
     public function getRelated(): ?string
     {
-        return $this->getData(self::RELATED);
+        return $this->_get(self::RELATED);
     }
 
     /**
@@ -185,15 +185,15 @@ class SearchResultData extends DataObject implements SearchResultDataInterface
     /**
      * @inheritDoc
      */
-    public function getFeaturedItems(): SearchResultFeaturedMainInterface
+    public function getFeaturedItems(): SearchResultFeaturedInterface
     {
-        return $this->getData(self::FEATURED_ITEMS);
+        return $this->_get(self::FEATURED_ITEMS);
     }
 
     /**
      * @inheritDoc
      */
-    public function setFeaturedItems(SearchResultFeaturedMainInterface $value)
+    public function setFeaturedItems(SearchResultFeaturedInterface $value)
     {
         return $this->setData(self::FEATURED_ITEMS, $value);
     }
@@ -203,7 +203,7 @@ class SearchResultData extends DataObject implements SearchResultDataInterface
      */
     public function getTabs(): ?string
     {
-        return $this->getData(self::TABS);
+        return $this->_get(self::TABS);
     }
 
     /**
