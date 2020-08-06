@@ -22,6 +22,8 @@ use HawkSearch\Proxy\Block\Product\ListFeatured;
 
 /**
  *  Html block
+ * @method getTabbedContent() string
+ * @method setTabbedContent(bool $value) string
  */
 class Html extends Template
 {

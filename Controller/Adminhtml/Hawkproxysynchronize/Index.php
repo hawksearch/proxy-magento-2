@@ -27,10 +27,14 @@ class Index extends Action
 {
     private const SUCCESS_MESSAGE = 'Successfully scheduled Category Sync Task';
 
-    /** @var TaskScheduler */
+    /**
+     * @var TaskScheduler
+     */
     private $taskScheduler;
 
-    /** @var TimezoneInterface */
+    /**
+     * @var TimezoneInterface
+     */
     private $timezone;
 
     /**
