@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2013 Hawksearch (www.hawksearch.com) - All Rights Reserved
+ * Copyright (c) 2020 Hawksearch (www.hawksearch.com) - All Rights Reserved
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -13,36 +13,83 @@
 
 namespace HawkSearch\Proxy\Block\Product;
 
+use HawkSearch\Connector\Gateway\InstructionException;
+use HawkSearch\Proxy\Helper\Data as ProxyHelper;
 use Magento\Catalog\Api\CategoryRepositoryInterface;
+use Magento\Catalog\Block\Product\Context;
+use Magento\Catalog\Model\Layer\Resolver;
 use Magento\Catalog\Model\Product;
+use Magento\Catalog\Model\ResourceModel\Product\Collection;
+use Magento\Catalog\Pricing\Price\FinalPrice;
+use Magento\Eav\Model\Entity\Collection\AbstractCollection;
+use Magento\Framework\App\Response\Http;
+use Magento\Framework\Data\Helper\PostHelper;
+use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Framework\Exception\NotFoundException;
+use Magento\Framework\Pricing\Helper\Data as PricingHelper;
+use Magento\Framework\Pricing\Render as PriceRenderer;
+use Magento\Framework\Url\Helper\Data as UrlHelper;
 
 class ListProduct extends \Magento\Catalog\Block\Product\ListProduct
 {
-    private $topseen = false;
+    /**
+     * @var bool
+     */
+    private $topSeen = false;
+
+    /**
+     * @var ProxyHelper
+     */
     private $hawkHelper;
+
+    /**
+     * @var bool
+     */
     private $pagers = true;
+
+    /**
+     * @var
+     */
     protected $_productCollection;
+
+    /**
+     * @var PricingHelper
+     */
     private $pricingHelper;
+
+    /**
+     * @var Http
+     */
     protected $response;
+
     /**
      * @var string
      */
     private $mode;
 
-    public function setPagers($bool)
-    {
-        $this->pagers = $bool;
-    }
-
+    /**
+     * ListProduct constructor.
+     * @param Context $context
+     * @param PostHelper $postDataHelper
+     * @param Resolver $layerResolver
+     * @param CategoryRepositoryInterface $categoryRepository
+     * @param UrlHelper $urlHelper
+     * @param PricingHelper $pricingHelper
+     * @param ProxyHelper $hawkHelper
+     * @param Http $response
+     * @param string $mode
+     * @param array $data
+     */
     public function __construct(
-        \Magento\Catalog\Block\Product\Context $context,
-        \Magento\Framework\Data\Helper\PostHelper $postDataHelper,
-        \Magento\Catalog\Model\Layer\Resolver $layerResolver,
+        Context $context,
+        PostHelper $postDataHelper,
+        Resolver $layerResolver,
         CategoryRepositoryInterface $categoryRepository,
-        \Magento\Framework\Url\Helper\Data $urlHelper,
-        \Magento\Framework\Pricing\Helper\Data $pricingHelper,
-        \HawkSearch\Proxy\Helper\Data $hawkHelper,
-        \Magento\Framework\App\Response\Http $response,
+        UrlHelper $urlHelper,
+        PricingHelper $pricingHelper,
+        ProxyHelper $hawkHelper,
+        Http $response,
         string $mode = 'proxy',
         array $data = []
     ) {
@@ -53,14 +100,12 @@ class ListProduct extends \Magento\Catalog\Block\Product\ListProduct
         $this->mode = $mode;
     }
 
-    public function getHawkTrackingId()
-    {
-        if (!empty($this->hawkHelper)) {
-            return $this->hawkHelper->getResultData()->getTrackingId();
-        }
-        return '';
-    }
-
+    /**
+     * @return string
+     * @throws InstructionException
+     * @throws NoSuchEntityException
+     * @throws NotFoundException
+     */
     public function getToolbarHtml()
     {
         if ($this->hawkHelper->modeActive($this->mode)) {
@@ -69,7 +114,7 @@ class ListProduct extends \Magento\Catalog\Block\Product\ListProduct
                     $this->hawkHelper->log(sprintf('Redirecting to location: %s', $this->hawkHelper->getLocation()));
                     $this->response->setRedirect($this->hawkHelper->getLocation());
                     $this->response->send();
-                    return;
+                    return '';
                 }
             } catch (\Exception $e) {
                 return parent::getToolbarHtml();
@@ -79,34 +124,37 @@ class ListProduct extends \Magento\Catalog\Block\Product\ListProduct
                 $this->hawkHelper->log('page not managed, returning core pager');
                 return parent::getToolbarHtml();
             }
-            if ($this->pagers) {
-                $baseUrl = $this->_storeManager->getStore()->getBaseUrl();
-                if ($this->topseen) {
-                    return '<div id="hawkbottompager">' . str_replace(
+            $baseUrl = $this->_storeManager->getStore()->getBaseUrl();
+            if ($this->topSeen) {
+                return '<div id="hawkbottompager">' . str_replace(
                         $baseUrl . '/',
                         $baseUrl,
                         $this->hawkHelper->getResultData()->getResponseData()->getBottomPager()
                     ) . '</div>';
-                }
-                $this->topseen = true;
-                if ($this->hawkHelper->getShowTabs()) {
-                    return sprintf(
-                        '<div id="hawktabs">%s</div><div id="hawktoppager">%s</div>',
-                        $this->hawkHelper->getResultData()->getResponseData()->getTabs(),
-                        $this->hawkHelper->getResultData()->getResponseData()->getTopPager()
-                    );
-                }
+            }
+            $this->topSeen = true;
+            if ($this->hawkHelper->getShowTabs()) {
                 return sprintf(
-                    '<div id="hawktoppager">%s</div>',
+                    '<div id="hawktabs">%s</div><div id="hawktoppager">%s</div>',
+                    $this->hawkHelper->getResultData()->getResponseData()->getTabs(),
                     $this->hawkHelper->getResultData()->getResponseData()->getTopPager()
                 );
-            } else {
-                return '';
             }
+            return sprintf(
+                '<div id="hawktoppager">%s</div>',
+                $this->hawkHelper->getResultData()->getResponseData()->getTopPager()
+            );
         }
         return parent::getToolbarHtml();
     }
 
+    /**
+     * @return array
+     * @throws InstructionException
+     * @throws NoSuchEntityException
+     * @throws NotFoundException
+     * @throws LocalizedException
+     */
     public function getIdentities()
     {
         $identities = [];
@@ -123,6 +171,13 @@ class ListProduct extends \Magento\Catalog\Block\Product\ListProduct
         return $identities;
     }
 
+    /**
+     * @return Collection|AbstractCollection|null|void
+     * @throws InstructionException
+     * @throws LocalizedException
+     * @throws NoSuchEntityException
+     * @throws NotFoundException
+     */
     protected function _getProductCollection()
     {
         if ($this->_productCollection === null) {
@@ -134,7 +189,6 @@ class ListProduct extends \Magento\Catalog\Block\Product\ListProduct
                             $this->hawkHelper->getLocation()
                         )
                     );
-                    //return $this->helper->_redirectUrl($this->hawkHelper->getLocation());
                     $this->response->setRedirect($this->hawkHelper->getLocation());
                     $this->response->send();
                     return;
@@ -148,6 +202,10 @@ class ListProduct extends \Magento\Catalog\Block\Product\ListProduct
         return $this->_productCollection !== null ? $this->_productCollection : parent::_getProductCollection();
     }
 
+    /**
+     * @param null $template
+     * @return bool|string
+     */
     public function getTemplateFile($template = null)
     {
         $this->setData('module_name', 'Magento_Catalog');
@@ -156,21 +214,25 @@ class ListProduct extends \Magento\Catalog\Block\Product\ListProduct
         return $ret;
     }
 
-    public function getProductPrice(\Magento\Catalog\Model\Product $product)
+    /**
+     * @param Product $product
+     * @return string
+     * @throws LocalizedException
+     */
+    public function getProductPrice(Product $product)
     {
         $block = $this->getLayout()->getBlock('product.price.render.default');
+        $price = '';
         if ($block) {
             $priceRender = $this->getPriceRender();
-
-            $price = '';
             if ($priceRender) {
                 $price = $priceRender->render(
-                    \Magento\Catalog\Pricing\Price\FinalPrice::PRICE_CODE,
+                    FinalPrice::PRICE_CODE,
                     $product,
                     [
                         'include_container' => true,
                         'display_minimal_price' => true,
-                        'zone' => \Magento\Framework\Pricing\Render::ZONE_ITEM_LIST
+                        'zone' => PriceRenderer::ZONE_ITEM_LIST
                     ]
                 );
             } else {
@@ -190,8 +252,7 @@ class ListProduct extends \Magento\Catalog\Block\Product\ListProduct
                 $price .= '" data-price-type="finalPrice" class="price-wrapper ">';
                 $price .= '<span class="price">' . $priceamount . '</span></span></span></div>';
             }
-
-            return $price;
         }
+        return $price;
     }
 }

@@ -13,12 +13,17 @@
 
 namespace HawkSearch\Proxy\Block;
 
+use HawkSearch\Connector\Gateway\InstructionException;
+use HawkSearch\Proxy\Api\Data\SearchResultContentItemInterface;
+use HawkSearch\Proxy\Helper\Data as ProxyHelper;
+use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Framework\Exception\NotFoundException;
 use Magento\Framework\View\Element\Template;
 
 class Tabbed extends Html
 {
     /**
-     * @var \HawkSearch\Proxy\Helper\Data
+     * @var ProxyHelper
      */
     private $helper;
 
@@ -32,10 +37,17 @@ class Tabbed extends Html
      */
     public static $increment = 1;
 
+    /**
+     * Tabbed constructor.
+     * @param Template\Context $context
+     * @param ProxyHelper $helper
+     * @param BannerFactory $bannerFactory
+     * @param array $data
+     */
     public function __construct(
         Template\Context $context,
-        \HawkSearch\Proxy\Helper\Data $helper,
-        \HawkSearch\Proxy\Block\BannerFactory $bannerFactory,
+        ProxyHelper $helper,
+        BannerFactory $bannerFactory,
         array $data = []
     ) {
         parent::__construct($context, $helper, $bannerFactory, $data);
@@ -44,6 +56,8 @@ class Tabbed extends Html
 
     /**
      * @return string|null
+     * @throws InstructionException
+     * @throws NotFoundException
      */
     public function getTabs()
     {
@@ -51,7 +65,9 @@ class Tabbed extends Html
     }
 
     /**
-     * @return \HawkSearch\Proxy\Api\Data\SearchResultContentItemInterface[]
+     * @return SearchResultContentItemInterface[]
+     * @throws InstructionException
+     * @throws NotFoundException
      */
     public function getContent()
     {
@@ -59,8 +75,9 @@ class Tabbed extends Html
     }
 
     /**
-     * @param \HawkSearch\Proxy\Api\Data\SearchResultContentItemInterface $item
+     * @param SearchResultContentItemInterface $item
      * @return mixed
+     * @throws NoSuchEntityException
      */
     public function getTabbedItemHtml($item)
     {
@@ -85,8 +102,11 @@ class Tabbed extends Html
     }
 
     /**
-     * @param \HawkSearch\Proxy\Api\Data\SearchResultContentItemInterface $item
+     * @param SearchResultContentItemInterface $item
      * @return string
+     * @throws InstructionException
+     * @throws NoSuchEntityException
+     * @throws NotFoundException
      */
     public function getTypeLabel($item)
     {

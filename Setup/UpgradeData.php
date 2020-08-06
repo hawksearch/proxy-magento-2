@@ -1,7 +1,19 @@
 <?php
+/**
+ * Copyright (c) 2020 Hawksearch (www.hawksearch.com) - All Rights Reserved
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+ * IN THE SOFTWARE.
+ */
 
 namespace HawkSearch\Proxy\Setup;
 
+use HawkSearch\Proxy\Helper\Data;
 use Magento\Catalog\Setup\CategorySetupFactory;
 use Magento\Framework\App\Cache\Type\Config;
 use Magento\Framework\App\Config\ConfigResource\ConfigInterface;
@@ -31,23 +43,31 @@ class UpgradeData implements \Magento\Framework\Setup\UpgradeDataInterface
     private $serializer;
 
     /**
+     * @var Data
+     */
+    private $proxyHelper;
+
+    /**
      * Init
      *
-     * @param Json                 $serializer
+     * @param Json $serializer
      * @param CategorySetupFactory $categorySetupFactory
-     * @param ConfigInterface      $config
-     * @param Config               $cache
+     * @param ConfigInterface $config
+     * @param Config $cache
+     * @param Data $proxyHelper
      */
     public function __construct(
         Json $serializer,
         CategorySetupFactory $categorySetupFactory,
         ConfigInterface $config,
-        Config $cache
+        Config $cache,
+        Data $proxyHelper
     ) {
         $this->categorySetupFactory = $categorySetupFactory;
         $this->config = $config;
         $this->cache = $cache;
         $this->serializer = $serializer;
+        $this->proxyHelper = $proxyHelper;
     }
 
     /**
@@ -160,7 +180,7 @@ class UpgradeData implements \Magento\Framework\Setup\UpgradeDataInterface
         foreach ($this->config->getConnection()->fetchAll($select) as $item) {
             $tabs = $this->serializer->unserialize($item['value']);
             foreach (array_keys($tabs) as $tab) {
-                $tabs[$tab]['textColor'] = $this->generateTextColor($tabs[$tab]['color']);
+                $tabs[$tab]['textColor'] = $this->proxyHelper->generateTextColor($tabs[$tab]['color']);
             }
             $this->config->saveConfig(
                 $item['path'],
@@ -170,16 +190,5 @@ class UpgradeData implements \Magento\Framework\Setup\UpgradeDataInterface
             );
         }
         $this->cache->clean();
-    }
-
-    private function generateTextColor($rgb)
-    {
-        $r = hexdec(substr($rgb, 1, 2));
-        $g = hexdec(substr($rgb, 3, 2));
-        $b = hexdec(substr($rgb, 5, 2));
-        if (($r * 299 + $g * 587 + $b * 114) / 1000 < 123) {
-            return '#fff';
-        }
-        return '#000';
     }
 }

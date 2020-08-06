@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2013 Hawksearch (www.hawksearch.com) - All Rights Reserved
+ * Copyright (c) 2020 Hawksearch (www.hawksearch.com) - All Rights Reserved
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -12,7 +12,9 @@
  */
 namespace HawkSearch\Proxy\Block;
 
+use HawkSearch\Proxy\Helper\Data as ProxyHelper;
 use Magento\Catalog\Model\Layer\Resolver as LayerResolver;
+use Magento\CatalogSearch\Block\Result as CatalogSearchResult;
 use Magento\CatalogSearch\Helper\Data;
 use Magento\Framework\View\Element\Template\Context;
 use Magento\Search\Model\QueryFactory;
@@ -20,35 +22,38 @@ use Magento\Search\Model\QueryFactory;
 /**
  * Product search result block
  */
-class Result extends \Magento\CatalogSearch\Block\Result
+class Result extends CatalogSearchResult
 {
     /**
-     * @var \HawkSearch\Proxy\Helper\Data
+     * @var ProxyHelper
      */
     private $helper;
 
     /**
      * Result constructor.
      *
-     * @param Context                       $context
-     * @param LayerResolver                 $layerResolver
-     * @param Data                          $catalogSearchData
-     * @param QueryFactory                  $queryFactory
-     * @param \HawkSearch\Proxy\Helper\Data $helper
-     * @param array                         $data
+     * @param Context $context
+     * @param LayerResolver $layerResolver
+     * @param Data $catalogSearchData
+     * @param QueryFactory  $queryFactory
+     * @param ProxyHelper $helper
+     * @param array $data
      */
     public function __construct(
         Context $context,
         LayerResolver $layerResolver,
         Data $catalogSearchData,
         QueryFactory $queryFactory,
-        \HawkSearch\Proxy\Helper\Data $helper,
+        ProxyHelper $helper,
         array $data = []
     ) {
         $this->helper = $helper;
         parent::__construct($context, $layerResolver, $catalogSearchData, $queryFactory, $data);
     }
 
+    /**
+     * @inheritDoc
+     */
     public function getSearchQueryText()
     {
         $qt = $this->_getQuery()->getQueryText();
@@ -58,9 +63,12 @@ class Result extends \Magento\CatalogSearch\Block\Result
         return parent::getSearchQueryText();
     }
 
+    /**
+     * @inheritDoc
+     */
     public function getTemplateFile($template = null)
     {
-        $this->setModuleName('Magento_CatalogSearch');
+        $this->setData('module_name', 'Magento_CatalogSearch');
         return parent::getTemplateFile($template);
     }
 }

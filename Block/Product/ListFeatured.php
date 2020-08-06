@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2017 Hawksearch (www.hawksearch.com) - All Rights Reserved
+ * Copyright (c) 2020 Hawksearch (www.hawksearch.com) - All Rights Reserved
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -12,7 +12,18 @@
  */
 namespace HawkSearch\Proxy\Block\Product;
 
+use HawkSearch\Connector\Gateway\InstructionException;
+use HawkSearch\Proxy\Helper\Data as ProxyHelper;
 use Magento\Catalog\Api\CategoryRepositoryInterface;
+use Magento\Catalog\Block\Product\Context;
+use Magento\Catalog\Model\Layer\Resolver;
+use Magento\Catalog\Model\Product;
+use Magento\Catalog\Model\ResourceModel\Product\Collection;
+use Magento\Eav\Model\Entity\Collection\AbstractCollection;
+use Magento\Framework\Data\Helper\PostHelper;
+use Magento\Framework\Exception\NotFoundException;
+use Magento\Framework\Pricing\Helper\Data as PricingHelper;
+use Magento\Framework\Url\Helper\Data as UrlHelper;
 
 /**
  * Class ListFeatured
@@ -21,54 +32,45 @@ use Magento\Catalog\Api\CategoryRepositoryInterface;
 class ListFeatured extends \Magento\Catalog\Block\Product\ListProduct
 {
     /**
-     * @var \HawkSearch\Proxy\Helper\Data
+     * @var ProxyHelper
      */
     private $hawkHelper;
-    /**
-     * @var bool
-     */
-    private $pagers = false;
+
     /**
      * @var
      */
     protected $_productCollection;
+
     /**
-     * @var \Magento\Framework\Pricing\Helper\Data
+     * @var PricingHelper
      */
     private $_pricingHelper;
+
     /**
      * @var string
      */
     private $_zone = "";
 
     /**
-     * @param $bool
-     */
-    public function setPagers($bool)
-    {
-        $this->pagers = $bool;
-    }
-
-    /**
      * ListFeatured constructor.
      *
-     * @param \Magento\Catalog\Block\Product\Context    $context
-     * @param \Magento\Framework\Data\Helper\PostHelper $postDataHelper
-     * @param \Magento\Catalog\Model\Layer\Resolver     $layerResolver
-     * @param CategoryRepositoryInterface               $categoryRepository
-     * @param \Magento\Framework\Url\Helper\Data        $urlHelper
-     * @param \Magento\Framework\Pricing\Helper\Data    $pricingHelper
-     * @param \HawkSearch\Proxy\Helper\Data             $hawkHelper
-     * @param array                                     $data
+     * @param Context $context
+     * @param PostHelper $postDataHelper
+     * @param Resolver $layerResolver
+     * @param CategoryRepositoryInterface $categoryRepository
+     * @param UrlHelper $urlHelper
+     * @param PricingHelper $pricingHelper
+     * @param ProxyHelper $hawkHelper
+     * @param array $data
      */
     public function __construct(
-        \Magento\Catalog\Block\Product\Context $context,
-        \Magento\Framework\Data\Helper\PostHelper $postDataHelper,
-        \Magento\Catalog\Model\Layer\Resolver $layerResolver,
-        \Magento\Catalog\Api\CategoryRepositoryInterface $categoryRepository,
-        \Magento\Framework\Url\Helper\Data $urlHelper,
-        \Magento\Framework\Pricing\Helper\Data $pricingHelper,
-        \HawkSearch\Proxy\Helper\Data $hawkHelper,
+        Context $context,
+        PostHelper $postDataHelper,
+        Resolver $layerResolver,
+        CategoryRepositoryInterface $categoryRepository,
+        UrlHelper $urlHelper,
+        PricingHelper $pricingHelper,
+        ProxyHelper $hawkHelper,
         array $data = []
     ) {
         $this->_pricingHelper = $pricingHelper;
@@ -77,7 +79,7 @@ class ListFeatured extends \Magento\Catalog\Block\Product\ListProduct
     }
 
     /**
-     * @param $zone
+     * @param string $zone
      */
     public function setZone($zone)
     {
@@ -86,6 +88,8 @@ class ListFeatured extends \Magento\Catalog\Block\Product\ListProduct
 
     /**
      * @return string
+     * @throws InstructionException
+     * @throws NotFoundException
      */
     public function getHawkTrackingId()
     {
@@ -104,7 +108,7 @@ class ListFeatured extends \Magento\Catalog\Block\Product\ListProduct
     }
 
     /**
-     * @return \Magento\Catalog\Model\ResourceModel\Product\Collection|\Magento\Eav\Model\Entity\Collection\AbstractCollection|null
+     * @return Collection|AbstractCollection|null
      */
     protected function _getProductCollection()
     {
@@ -116,7 +120,7 @@ class ListFeatured extends \Magento\Catalog\Block\Product\ListProduct
     }
 
     /**
-     * @return \Magento\Catalog\Model\ResourceModel\Product\Collection|\Magento\Eav\Model\Entity\Collection\AbstractCollection|null
+     * @return Collection|AbstractCollection|null
      */
     public function getProductCollection()
     {
@@ -145,16 +149,16 @@ class ListFeatured extends \Magento\Catalog\Block\Product\ListProduct
         $identities = array_merge([], ...$identities);
         $category = $this->getLayer()->getCurrentCategory();
         if ($category) {
-            $identities[] = \Magento\Catalog\Model\Product::CACHE_PRODUCT_CATEGORY_TAG . '_' . $category->getId();
+            $identities[] = Product::CACHE_PRODUCT_CATEGORY_TAG . '_' . $category->getId();
         }
         return $identities;
     }
 
     /**
-     * @param  \Magento\Catalog\Model\Product $product
+     * @param  Product $product
      * @return string
      */
-    public function getProductPrice(\Magento\Catalog\Model\Product $product)
+    public function getProductPrice(Product $product)
     {
         $priceRender = $this->getPriceRender();
 

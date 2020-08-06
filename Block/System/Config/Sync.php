@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2013 Hawksearch (www.hawksearch.com) - All Rights Reserved
+ * Copyright (c) 2020 Hawksearch (www.hawksearch.com) - All Rights Reserved
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -10,6 +10,8 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
+declare(strict_types=1);
+
 namespace HawkSearch\Proxy\Block\System\Config;
 
 use DateTime;
@@ -24,15 +26,24 @@ use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 
 class Sync extends Field
 {
+    /**
+     * @var Data
+     */
     private $helper;
 
-    /** @var TaskScheduler */
+    /**
+     * @var TaskScheduler
+     */
     private $taskScheduler;
 
-    /** @var Schedule */
+    /**
+     * @var Schedule
+     */
     private $nextScheduled = null;
 
-    /** @var TimezoneInterface */
+    /**
+     * @var TimezoneInterface
+     */
     private $timezone;
 
     /**
@@ -49,12 +60,15 @@ class Sync extends Field
         TimezoneInterface $timezone,
         array $data = []
     ) {
-        $this->helper = $helper;
         parent::__construct($context, $data);
+        $this->helper = $helper;
         $this->taskScheduler = $taskScheduler;
-        $this->timezone      = $timezone;
+        $this->timezone = $timezone;
     }
 
+    /**
+     * @return self
+     */
     protected function _prepareLayout()
     {
         parent::_prepareLayout();
@@ -71,8 +85,9 @@ class Sync extends Field
      */
     public function render(AbstractElement $element)
     {
-        // Remove scope label
-        $element->unsScope()->unsCanUseWebsiteValue()->unsCanUseDefaultValue();
+        $element->unsetData('scope')
+            ->unsetData('can_use_website_value')
+            ->unsetData('can_use_default_value');
         return parent::render($element);
     }
     /**
@@ -92,10 +107,6 @@ class Sync extends Field
             ]
         );
         return $this->_toHtml();
-    }
-    public function isSyncLocked()
-    {
-        return $this->helper->isSyncLocked();
     }
 
     /**
