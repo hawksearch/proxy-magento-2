@@ -13,8 +13,17 @@
 
 namespace HawkSearch\Proxy\Plugin;
 
-class StoreRedirect extends \Magento\Store\App\Response\Redirect
+use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Store\App\Response\Redirect as ResponseRedirect;
+
+class StoreRedirect extends ResponseRedirect
 {
+    /**
+     * @param $subject
+     * @param $result
+     * @return mixed
+     * @throws NoSuchEntityException
+     */
     public function afterGetRefererUrl($subject, $result)
     {
         $baseurl = $this->_storeManager->getStore()->getBaseUrl();

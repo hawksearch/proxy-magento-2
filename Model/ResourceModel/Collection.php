@@ -13,8 +13,14 @@
 
 namespace HawkSearch\Proxy\Model\ResourceModel;
 
+use Magento\Framework\Exception\LocalizedException;
+
 class Collection extends \Magento\CatalogSearch\Model\ResourceModel\Fulltext\Collection
 {
+    /**
+     * @inheritDoc
+     * @throws LocalizedException
+     */
     protected function _renderFiltersBefore()
     {
         if ($this->_scopeConfig->getValue('hawksearch_proxy/proxy/manage_categories', 'stores')) {
@@ -22,6 +28,6 @@ class Collection extends \Magento\CatalogSearch\Model\ResourceModel\Fulltext\Col
                 return;
             }
         }
-        return parent::_renderFiltersBefore();
+        parent::_renderFiltersBefore();
     }
 }

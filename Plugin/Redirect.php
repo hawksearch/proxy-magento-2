@@ -16,12 +16,13 @@ namespace HawkSearch\Proxy\Plugin;
 
 use Magento\Framework\App;
 use Magento\Framework\App\Request\Http;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\UrlInterface;
 use Magento\Framework\App\Response\RedirectInterface;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Framework\Controller\Result\Redirect as ControllerRedirect;
 
-class Redirect extends \Magento\Framework\Controller\Result\Redirect
+class Redirect extends ControllerRedirect
 {
     /**
      * @var Http
@@ -32,6 +33,13 @@ class Redirect extends \Magento\Framework\Controller\Result\Redirect
      */
     private $storeManager;
 
+    /**
+     * Redirect constructor.
+     * @param Http $request
+     * @param StoreManagerInterface $storeManager
+     * @param RedirectInterface $redirect
+     * @param UrlInterface $urlBuilder
+     */
     public function __construct(
         Http $request,
         StoreManagerInterface $storeManager,
@@ -43,9 +51,14 @@ class Redirect extends \Magento\Framework\Controller\Result\Redirect
         $this->storeManager = $storeManager;
     }
 
+    /**
+     * @param ControllerRedirect $subject
+     * @param ControllerRedirect $result
+     * @return ControllerRedirect
+     * @throws NoSuchEntityException
+     */
     public function afterSetRefererOrBaseUrl(ControllerRedirect $subject, ControllerRedirect $result)
     {
-
         $baseurl = $this->storeManager->getStore()->getBaseUrl();
         if (substr($result->url, strlen($baseurl), 9) == 'hawkproxy') {
             $result->setUrl($this->request->getServer('HTTP_REFERER'));

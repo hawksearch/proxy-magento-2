@@ -19,6 +19,7 @@ use HawkSearch\Connector\Gateway\Http\Converter\JsonToArray;
 use HawkSearch\Connector\Gateway\Http\ConverterException;
 use HawkSearch\Connector\Gateway\Response\HandlerInterface;
 use HawkSearch\Proxy\Api\Data\SearchResultDataInterface;
+use InvalidArgumentException;
 
 class SearchResultHandler implements HandlerInterface
 {
@@ -78,7 +79,7 @@ class SearchResultHandler implements HandlerInterface
             $result = ($string !== null) ? $this->converter->convert($string) : [];
         } catch (ConverterException $e) {
             $result = [];
-        } catch (\InvalidArgumentException $e) {
+        } catch (InvalidArgumentException $e) {
             $result = [];
         }
 

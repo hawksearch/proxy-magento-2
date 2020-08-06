@@ -12,28 +12,54 @@
  */
 namespace HawkSearch\Proxy\Model\Config\Backend;
 
+use Magento\Config\Model\ResourceModel\Config;
+use Magento\Framework\App\Cache\TypeListInterface;
+use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Framework\App\Config\Value;
+use Magento\Framework\Data\Collection\AbstractDb;
 use Magento\Framework\Exception\FileSystemException;
+use Magento\Framework\Model\Context;
+use Magento\Framework\Model\ResourceModel\AbstractResource;
+use Magento\Framework\Registry;
 
-class Cron extends \Magento\Framework\App\Config\Value
+class Cron extends Value
 {
     const CRON_CATEGORY_SYNC_EXPR = 'crontab/default/jobs/hawksearch_category_sync/schedule';
 
+    /**
+     * @var Config
+     */
     private $resourceConfig;
 
+    /**
+     * Cron constructor.
+     * @param Context $context
+     * @param Registry $registry
+     * @param ScopeConfigInterface $config
+     * @param TypeListInterface $cacheTypeList
+     * @param Config $resourceConfig
+     * @param AbstractResource|null $resource
+     * @param AbstractDb|null $resourceCollection
+     * @param array $data
+     */
     public function __construct(
-        \Magento\Framework\Model\Context $context,
-        \Magento\Framework\Registry $registry,
-        \Magento\Framework\App\Config\ScopeConfigInterface $config,
-        \Magento\Framework\App\Cache\TypeListInterface $cacheTypeList,
-        \Magento\Config\Model\ResourceModel\Config $resourceConfig,
-        \Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
-        \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
+        Context $context,
+        Registry $registry,
+        ScopeConfigInterface $config,
+        TypeListInterface $cacheTypeList,
+        Config $resourceConfig,
+        AbstractResource $resource = null,
+        AbstractDb $resourceCollection = null,
         array $data = []
     ) {
         $this->resourceConfig = $resourceConfig;
         parent::__construct($context, $registry, $config, $cacheTypeList, $resource, $resourceCollection, $data);
     }
 
+    /**
+     * @return Cron
+     * @throws FileSystemException
+     */
     public function afterSave()
     {
         switch ($this->getPath()) {

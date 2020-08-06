@@ -10,14 +10,16 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
+
 namespace HawkSearch\Proxy\Controller;
 
 use HawkSearch\Proxy\Model\ConfigProvider;
 use Magento\Framework\App\Action\Forward;
 use Magento\Framework\App\ActionFactory;
 use Magento\Framework\App\RequestInterface;
+use Magento\Framework\App\RouterInterface;
 
-class SearchRouter implements \Magento\Framework\App\RouterInterface
+class SearchRouter implements RouterInterface
 {
     /**
      * @var ActionFactory
@@ -36,13 +38,14 @@ class SearchRouter implements \Magento\Framework\App\RouterInterface
     public function __construct(
         ActionFactory $actionFactory,
         ConfigProvider $proxyConfigProvider
-    ) {
+    )
+    {
         $this->actionFactory = $actionFactory;
         $this->proxyConfigProvider = $proxyConfigProvider;
     }
 
     /**
-     * Validate and Match Cms Page and modify request
+     * Hawk custom router
      * @inheritDoc
      */
     public function match(RequestInterface $request)

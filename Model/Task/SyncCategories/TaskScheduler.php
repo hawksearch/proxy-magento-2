@@ -17,5 +17,8 @@ use HawkSearch\Proxy\Model\Task\AbstractTaskScheduler;
 
 class TaskScheduler extends AbstractTaskScheduler
 {
+    /**
+     * @var string
+     */
     protected $jobCode = 'hawksearch_category_sync';
 }

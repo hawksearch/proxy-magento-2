@@ -15,9 +15,10 @@ declare(strict_types=1);
 
 namespace HawkSearch\Proxy\Gateway\Http\Uri;
 
+use HawkSearch\Connector\Gateway\Http\Uri\UriBuilderInterface;
 use HawkSearch\Connector\Model\ConfigProvider as ConnectorConfigProvider;
 
-class SearchUriBuilder implements \HawkSearch\Connector\Gateway\Http\Uri\UriBuilderInterface
+class SearchUriBuilder implements UriBuilderInterface
 {
     /**
      * Engine part identification in URI

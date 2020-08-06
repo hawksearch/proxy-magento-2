@@ -16,7 +16,6 @@ namespace HawkSearch\Proxy\Model;
 
 use HawkSearch\Proxy\Api\Data\SearchResultBannerInterface;
 use Magento\Framework\Api\AbstractSimpleObject;
-use Magento\Framework\DataObject;
 
 class SearchResultBanner extends AbstractSimpleObject implements SearchResultBannerInterface
 {

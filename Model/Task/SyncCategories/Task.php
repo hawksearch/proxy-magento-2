@@ -21,13 +21,19 @@ use HawkSearch\Proxy\Model\Task\Exception\TaskUnlockException;
 
 class Task
 {
-    /** @var Data */
+    /**
+     * @var Data
+     */
     private $helper;
 
-    /** @var TaskLock */
+    /**
+     * @var TaskLock
+     */
     private $taskLock;
 
-    /** @var TaskResultsFactory */
+    /**
+     * @var TaskResultsFactory
+     */
     private $taskResultsFactory;
 
     /**

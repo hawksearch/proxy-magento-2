@@ -14,14 +14,16 @@
 namespace HawkSearch\Proxy\Setup;
 
 use HawkSearch\Proxy\Helper\Data;
+use Magento\Catalog\Model\Category;
 use Magento\Catalog\Setup\CategorySetupFactory;
 use Magento\Framework\App\Cache\Type\Config;
 use Magento\Framework\App\Config\ConfigResource\ConfigInterface;
 use Magento\Framework\Serialize\Serializer\Json;
 use Magento\Framework\Setup\ModuleContextInterface;
 use Magento\Framework\Setup\ModuleDataSetupInterface;
+use Magento\Framework\Setup\UpgradeDataInterface;
 
-class UpgradeData implements \Magento\Framework\Setup\UpgradeDataInterface
+class UpgradeData implements UpgradeDataInterface
 {
     /**
      * Category setup factory
@@ -29,14 +31,17 @@ class UpgradeData implements \Magento\Framework\Setup\UpgradeDataInterface
      * @var CategorySetupFactory
      */
     private $categorySetupFactory;
+
     /**
      * @var \Magento\Config\Model\ResourceModel\Config
      */
     private $config;
+
     /**
      * @var Config
      */
     private $cache;
+
     /**
      * @var Json
      */
@@ -62,7 +67,8 @@ class UpgradeData implements \Magento\Framework\Setup\UpgradeDataInterface
         ConfigInterface $config,
         Config $cache,
         Data $proxyHelper
-    ) {
+    )
+    {
         $this->categorySetupFactory = $categorySetupFactory;
         $this->config = $config;
         $this->cache = $cache;
@@ -75,7 +81,6 @@ class UpgradeData implements \Magento\Framework\Setup\UpgradeDataInterface
      *
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-
     public function upgrade(ModuleDataSetupInterface $setup, ModuleContextInterface $context)
     {
         $setup->startSetup();
@@ -91,15 +96,15 @@ class UpgradeData implements \Magento\Framework\Setup\UpgradeDataInterface
         $setup->endSetup();
     }
 
-    /*
-     * upgrade to 212
+    /**
+     * @param ModuleDataSetupInterface $setup
      */
     private function upgradeToLdgPage(ModuleDataSetupInterface $setup)
     {
         $categorySetup = $this->categorySetupFactory->create(['setup' => $setup]);
-        $entityTypeId = $categorySetup->getEntityTypeId(\Magento\Catalog\Model\Category::ENTITY);
+        $entityTypeId = $categorySetup->getEntityTypeId(Category::ENTITY);
         $attributeSetId = $categorySetup->getDefaultAttributeSetId($entityTypeId);
-        $attribute = $categorySetup->getAttribute(\Magento\Catalog\Model\Category::ENTITY, 'hawk_landing_page');
+        $attribute = $categorySetup->getAttribute(Category::ENTITY, 'hawk_landing_page');
         if ($attribute) {
             $idg = $categorySetup->getAttributeGroupId($entityTypeId, $attributeSetId, 'Display Settings');
             $categorySetup->addAttributeToGroup(
@@ -110,7 +115,7 @@ class UpgradeData implements \Magento\Framework\Setup\UpgradeDataInterface
                 46
             );
             $categorySetup->updateAttribute(
-                \Magento\Catalog\Model\Category::ENTITY,
+                Category::ENTITY,
                 'group',
                 'hawk_landing_page',
                 'Display Settings'
@@ -118,8 +123,8 @@ class UpgradeData implements \Magento\Framework\Setup\UpgradeDataInterface
         }
     }
 
-    /*
-     * upgrade to 220
+    /**
+     * @param ModuleDataSetupInterface $setup
      */
     private function upgradeConfigData(ModuleDataSetupInterface $setup)
     {
@@ -139,7 +144,7 @@ class UpgradeData implements \Magento\Framework\Setup\UpgradeDataInterface
             ->where(
                 'path in (?)',
                 ['hawksearch_proxy/proxy/tracking_url_staging',
-                'hawksearch_proxy/proxy/tracking_url_live', 'hawksearch_proxy/proxy/mode']
+                    'hawksearch_proxy/proxy/tracking_url_live', 'hawksearch_proxy/proxy/mode']
             )
             ->order('path');
         foreach ($config->getConnection()->fetchAll($select) as $item) {
@@ -164,8 +169,8 @@ class UpgradeData implements \Magento\Framework\Setup\UpgradeDataInterface
         $this->cache->clean();
     }
 
-    /*
-     * upgrade to 2223
+    /**
+     * @param $setup
      */
     private function upgradeTextColor($setup)
     {

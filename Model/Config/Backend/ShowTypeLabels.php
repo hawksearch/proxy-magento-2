@@ -13,29 +13,55 @@
 
 namespace HawkSearch\Proxy\Model\Config\Backend;
 
-use Magento\Framework\Message\ManagerInterface;
+use HawkSearch\Proxy\Helper\Data;
+use Magento\Framework\App\Cache\TypeListInterface;
+use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Framework\App\Config\Value;
+use Magento\Framework\Data\Collection\AbstractDb;
+use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Framework\Model\Context;
+use Magento\Framework\Model\ResourceModel\AbstractResource;
+use Magento\Framework\Registry;
+use Zend_Http_Client;
+use Zend_Http_Client_Exception;
 
-class ShowTypeLabels extends \Magento\Framework\App\Config\Value
+class ShowTypeLabels extends Value
 {
     /**
-     * @var \HawkSearch\Proxy\Helper\Data
+     * @var Data
      */
     private $helper;
 
+    /**
+     * ShowTypeLabels constructor.
+     * @param Data $helper
+     * @param Context $context
+     * @param Registry $registry
+     * @param ScopeConfigInterface $config
+     * @param TypeListInterface $cacheTypeList
+     * @param AbstractResource|null $resource
+     * @param AbstractDb|null $resourceCollection
+     * @param array $data
+     */
     public function __construct(
-        \HawkSearch\Proxy\Helper\Data $helper,
-        \Magento\Framework\Model\Context $context,
-        \Magento\Framework\Registry $registry,
-        \Magento\Framework\App\Config\ScopeConfigInterface $config,
-        \Magento\Framework\App\Cache\TypeListInterface $cacheTypeList,
-        \Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
-        \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
+        Data $helper,
+        Context $context,
+        Registry $registry,
+        ScopeConfigInterface $config,
+        TypeListInterface $cacheTypeList,
+        AbstractResource $resource = null,
+        AbstractDb $resourceCollection = null,
         array $data = []
     ) {
         parent::__construct($context, $registry, $config, $cacheTypeList, $resource, $resourceCollection, $data);
         $this->helper = $helper;
     }
 
+    /**
+     * @return ShowTypeLabels
+     * @throws NoSuchEntityException
+     * @throws Zend_Http_Client_Exception
+     */
     public function afterLoad()
     {
         if ($this->getValue() === null) {
@@ -51,6 +77,9 @@ class ShowTypeLabels extends \Magento\Framework\App\Config\Value
         return parent::afterLoad();
     }
 
+    /**
+     * @return ShowTypeLabels
+     */
     public function beforeSave()
     {
         if ($this->getValue() === 1 && $this->getOldValue() === 0) {
@@ -66,6 +95,11 @@ class ShowTypeLabels extends \Magento\Framework\App\Config\Value
         return parent::beforeSave();
     }
 
+    /**
+     * @return string
+     * @throws NoSuchEntityException
+     * @throws Zend_Http_Client_Exception
+     */
     public function activateTypeInResult()
     {
         $res = $this->apiGetCall('Field', ['fieldName' => 'it']);
@@ -84,6 +118,11 @@ class ShowTypeLabels extends \Magento\Framework\App\Config\Value
         }
     }
 
+    /**
+     * @return string
+     * @throws NoSuchEntityException
+     * @throws Zend_Http_Client_Exception
+     */
     public function deactivateTypeInResult()
     {
         $res = $this->apiGetCall('Field', ['fieldName' => 'it']);
@@ -102,11 +141,18 @@ class ShowTypeLabels extends \Magento\Framework\App\Config\Value
         }
     }
 
+    /**
+     * @param $path
+     * @param $args
+     * @return array
+     * @throws NoSuchEntityException
+     * @throws Zend_Http_Client_Exception
+     */
     private function apiGetCall($path, $args)
     {
-        $client = new \Zend_Http_Client();
+        $client = new Zend_Http_Client();
         $client->setUri($this->helper->getApiUrl() . $path . '?' . http_build_query($args));
-        $client->setMethod(\Zend_Http_Client::GET);
+        $client->setMethod(Zend_Http_Client::GET);
         $client->setHeaders('X-HawkSearch-ApiKey', $this->helper->getApiKey());
         $client->setHeaders('Accept', 'application/json');
 
@@ -114,11 +160,18 @@ class ShowTypeLabels extends \Magento\Framework\App\Config\Value
         return ['code' => $response->getStatus(), 'object' => json_decode($response->getBody())];
     }
 
+    /**
+     * @param $path
+     * @param $body
+     * @return array
+     * @throws NoSuchEntityException
+     * @throws Zend_Http_Client_Exception
+     */
     private function apiPutCall($path, $body)
     {
-        $client = new \Zend_Http_Client();
+        $client = new Zend_Http_Client();
         $client->setUri($this->helper->getApiUrl() . $path . '?');
-        $client->setMethod(\Zend_Http_Client::PUT);
+        $client->setMethod(Zend_Http_Client::PUT);
         $client->setHeaders('X-HawkSearch-ApiKey', $this->helper->getApiKey());
         $client->setHeaders('Accept', 'application/json');
         $client->setHeaders('Content-Type', 'application/json');

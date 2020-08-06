@@ -15,9 +15,10 @@ declare(strict_types=1);
 
 namespace HawkSearch\Proxy\Gateway\Request;
 
+use HawkSearch\Connector\Gateway\Request\BuilderInterface;
 use Magento\Framework\App\RequestInterface;
 
-class SearchResultsHeaders implements \HawkSearch\Connector\Gateway\Request\BuilderInterface
+class SearchResultsHeaders implements BuilderInterface
 {
     /**
      * @var RequestInterface

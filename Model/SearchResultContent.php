@@ -14,10 +14,8 @@ declare(strict_types=1);
 
 namespace HawkSearch\Proxy\Model;
 
-use HawkSearch\Proxy\Api\Data\SearchResultContentItemInterface;
 use HawkSearch\Proxy\Api\Data\SearchResultContentInterface;
 use Magento\Framework\Api\AbstractSimpleObject;
-use Magento\Framework\DataObject;
 
 class SearchResultContent extends AbstractSimpleObject implements SearchResultContentInterface
 {

@@ -12,7 +12,9 @@
  */
 namespace HawkSearch\Proxy\Model\System\Config\Source;
 
-class Mode implements \Magento\Framework\Option\ArrayInterface
+use Magento\Framework\Option\ArrayInterface;
+
+class Mode implements ArrayInterface
 {
     /**
      * @return array

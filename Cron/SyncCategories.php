@@ -19,7 +19,6 @@ use HawkSearch\Proxy\Model\Task\Exception\TaskException;
 use HawkSearch\Proxy\Model\Task\Exception\TaskLockException;
 use HawkSearch\Proxy\Model\Task\Exception\TaskUnlockException;
 use HawkSearch\Proxy\Model\Task\SyncCategories\Task;
-use HawkSearch\Proxy\Model\Task\SyncCategories\TaskOptions;
 use HawkSearch\Proxy\Model\Task\SyncCategories\TaskOptionsFactory;
 
 class SyncCategories
@@ -47,10 +46,11 @@ class SyncCategories
         ProxyEmail $email,
         Task $task,
         TaskOptionsFactory $taskOptionsFactory
-    ) {
-        $this->helper             = $helper;
-        $this->email              = $email;
-        $this->task               = $task;
+    )
+    {
+        $this->helper = $helper;
+        $this->email = $email;
+        $this->task = $task;
         $this->taskOptionsFactory = $taskOptionsFactory;
     }
 
@@ -59,16 +59,15 @@ class SyncCategories
      */
     public function execute()
     {
-        if (! $this->helper->isCategorySyncCronEnabled()) {
+        if (!$this->helper->isCategorySyncCronEnabled()) {
             return;
         }
 
-        /** @var TaskOptions $options */
         $options = $this->taskOptionsFactory->create();
 
         try {
             $results = $this->task->execute($options);
-            $errors  = $results->getErrors();
+            $errors = $results->getErrors();
 
             $subject = sprintf('HawkSearch Category Sync Completed %s errors', empty($errors) ? 'without' : 'WITH');
             $this->sendEmail($subject, $errors);
@@ -86,12 +85,12 @@ class SyncCategories
      * @param string $subject
      * @param array $errors
      */
-    private function sendEmail(string $subject, array $errors = []) : void
+    private function sendEmail(string $subject, array $errors = [])
     {
         $errors = implode("\n", $errors);
 
         $this->email->sendEmail([
-            'errors'  => $errors,
+            'errors' => $errors,
             'subject' => $subject
         ]);
     }

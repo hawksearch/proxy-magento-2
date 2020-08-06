@@ -24,13 +24,19 @@ use Zend_Db_Statement_Exception;
 
 abstract class AbstractTaskLock
 {
-    /** @var LockManagerInterface */
+    /**
+     * @var DatabaseLockManager
+     */
     private $lockManager;
 
-    /** @var string */
+    /**
+     * @var string
+     */
     protected $lockName = '';
 
-    /** @var int */
+    /**
+     * @var int
+     */
     protected $lockTimeout = 300;
 
     /**
@@ -93,7 +99,7 @@ abstract class AbstractTaskLock
     /**
      * Throws an exception if the lock name is not overridden by subclass.
      */
-    private function requireLockName() : void
+    private function requireLockName()
     {
         if ($this->lockName === '') {
             throw new InvalidArgumentException('no lock name provided');

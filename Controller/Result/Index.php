@@ -17,19 +17,31 @@ use HawkSearch\Proxy\Helper\Data as ProxyHelper;
 use HawkSearch\Proxy\Model\ConfigProvider;
 use Magento\Catalog\Model\Layer\Resolver;
 use Magento\Catalog\Model\Session;
+use Magento\CatalogSearch\Controller\Result\Index as CatalogSearchResultIndex;
 use Magento\CatalogSearch\Helper\Data as CatalogSearchHelper;
 use Magento\Framework\App\Action\Context;
+use Magento\Framework\App\RequestInterface;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Search\Model\QueryFactory;
 use Magento\Store\Model\StoreManagerInterface;
 
-class Index extends \Magento\CatalogSearch\Controller\Result\Index
+class Index extends CatalogSearchResultIndex
 {
+    /**
+     * @var QueryFactory
+     */
     private $queryFactory;
+
+    /**
+     * @var RequestInterface
+     */
     private $request;
+
     /**
      * @var CatalogSearchHelper
      */
     private $catalogSearchHelper;
+
     /**
      * @var ProxyHelper
      */
@@ -60,7 +72,8 @@ class Index extends \Magento\CatalogSearch\Controller\Result\Index
         CatalogSearchHelper $catalogSearchHelper,
         ProxyHelper $proxyHelper,
         ConfigProvider $proxyConfigProvider
-    ) {
+    )
+    {
         parent::__construct($context, $catalogSession, $storeManager, $queryFactory, $layerResolver);
         $this->queryFactory = $queryFactory;
         $this->request = $context->getRequest();
@@ -70,8 +83,8 @@ class Index extends \Magento\CatalogSearch\Controller\Result\Index
     }
 
     /**
-     *
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @inheritDoc
+     * @throws LocalizedException
      */
     public function execute()
     {
@@ -96,6 +109,9 @@ class Index extends \Magento\CatalogSearch\Controller\Result\Index
         $this->_view->renderLayout();
     }
 
+    /**
+     * @return bool
+     */
     private function isTopCategoryRequest()
     {
         $params = $this->request->getParams();
