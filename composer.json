@@ -5,9 +5,9 @@
   "type": "magento2-module",
   "version": "2.3.41",
   "require": {
-    "php": "^7.2|^7.3",
+    "php": "^7.2|^7.3|^7.4",
     "magento/magento-composer-installer": "*",
-    "magento/magento2-base": "2.3.*"
+    "magento/magento2-base": "2.3.*|2.4.*"
   },
   "autoload": {
     "psr-4": {
