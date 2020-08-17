@@ -13,7 +13,7 @@ class GetFacetedData
 
     public function aroundGetFacetedData($subject, $proceed, $field) {
         if($this->helper->getIsHawkManaged()){
-            return;
+            return [];
         }
         return $proceed($field);
     }
