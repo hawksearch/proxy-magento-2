@@ -16,13 +16,15 @@ namespace HawkSearch\Proxy\Api\Data;
 
 use Magento\Framework\Api\ExtensibleDataInterface;
 
-interface SearchResultTemplateItemInterface extends ExtensibleDataInterface
+interface SearchResultBannerInterface extends ExtensibleDataInterface
 {
     /**#@+
      * Constants for keys of data array
      */
     const ZONE = 'Zone';
     const HTML = 'Html';
+    const Title = 'Title';
+    const Items = 'Items';
     /**#@-*/
 
     /**
@@ -46,4 +48,26 @@ interface SearchResultTemplateItemInterface extends ExtensibleDataInterface
      * @return $this
      */
     public function setHtml(string $value);
+
+    /**
+     * @return string|null
+     */
+    public function getTitle() : ?string;
+
+    /**
+     * @param string $value
+     * @return $this
+     */
+    public function setTitle(string $value);
+
+    /**
+     * @return \HawkSearch\Proxy\Api\Data\SearchResultContentItemInterface[]
+     */
+    public function getItems() : array;
+
+    /**
+     * @param \HawkSearch\Proxy\Api\Data\SearchResultContentItemInterface[] $value
+     * @return $this
+     */
+    public function setItems(array $value);
 }

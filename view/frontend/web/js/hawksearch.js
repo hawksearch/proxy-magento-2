@@ -1,4 +1,15 @@
-﻿
+﻿/*
+ * Copyright (c) 2020 Hawksearch (www.hawksearch.com) - All Rights Reserved
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+ * IN THE SOFTWARE.
+ */
+
 (function (HawkSearchLoader, undefined) {
     var jQuery;
 
@@ -4246,7 +4257,7 @@
                             return;
                         }
 
-                        //otherwise 
+                        //otherwise
                         //remove no results
                         items.find(":contains('No Results Found')").remove();
 
@@ -4495,7 +4506,7 @@
 
         /*
 		 * Match Heights jQuery Plugin
-		 * 
+		 *
 		 * Version 1.7.2 (Updated 7/31/2013)
 		 * Copyright (c) 2010-2013 Mike Avello
 		 * Dual licensed under the MIT and GPL licenses:
@@ -4567,7 +4578,7 @@
 
 
         // register indexOf() method if browser does not natively support it
-        // this algorithm is exactly as specified in ECMA-262 standard, 5th edition, assuming Object, TypeError, Number, Math.floor, Math.abs, and Math.max have their original value.  
+        // this algorithm is exactly as specified in ECMA-262 standard, 5th edition, assuming Object, TypeError, Number, Math.floor, Math.abs, and Math.max have their original value.
         // see https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/indexOf for more details
         if (HawkSearch.loadPlugins.indexOf == true) {
             if (!Array.prototype.indexOf) {
@@ -4621,7 +4632,7 @@
          * Copyright 2012 @louis_remi
          * Licensed under the MIT license.
          *
-         * This saved you an hour of work? 
+         * This saved you an hour of work?
          * Send me music http://www.amazon.co.uk/wishlist/HNTU0468LQON
          */
         if (HawkSearch.loadPlugins.debounce == true) {
@@ -4692,7 +4703,7 @@
          * Copyright (c) 2006-2011 Sam Collett (http://www.texotela.co.uk)
          * Dual licensed under the MIT (http://www.opensource.org/licenses/mit-license.php)
          * and GPL (http://www.opensource.org/licenses/gpl-license.php) licenses.
-         * 
+         *
          * Version 1.3
         * demo: http://www.texotela.co.uk/code/jquery/numeric/
          *
@@ -5103,19 +5114,19 @@
 
         /*
          The MIT License (MIT)
-        
+
          Copyright (c) 2015 Jonathan Peterson
-        
+
          Permission is hereby granted, free of charge, to any person obtaining a copy
          of this software and associated documentation files (the "Software"), to deal
          in the Software without restriction, including without limitation the rights
          to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
          copies of the Software, and to permit persons to whom the Software is
          furnished to do so, subject to the following conditions:
-        
+
          The above copyright notice and this permission notice shall be included in
          all copies or substantial portions of the Software.
-        
+
          THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
          IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
          FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE

@@ -1,15 +1,29 @@
 <?php
+/**
+ * Copyright (c) 2020 Hawksearch (www.hawksearch.com) - All Rights Reserved
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+ * IN THE SOFTWARE.
+ */
 
 namespace HawkSearch\Proxy\Setup;
 
+use HawkSearch\Proxy\Helper\Data;
+use Magento\Catalog\Model\Category;
 use Magento\Catalog\Setup\CategorySetupFactory;
 use Magento\Framework\App\Cache\Type\Config;
 use Magento\Framework\App\Config\ConfigResource\ConfigInterface;
 use Magento\Framework\Serialize\Serializer\Json;
 use Magento\Framework\Setup\ModuleContextInterface;
 use Magento\Framework\Setup\ModuleDataSetupInterface;
+use Magento\Framework\Setup\UpgradeDataInterface;
 
-class UpgradeData implements \Magento\Framework\Setup\UpgradeDataInterface
+class UpgradeData implements UpgradeDataInterface
 {
     /**
      * Category setup factory
@@ -17,37 +31,49 @@ class UpgradeData implements \Magento\Framework\Setup\UpgradeDataInterface
      * @var CategorySetupFactory
      */
     private $categorySetupFactory;
+
     /**
      * @var \Magento\Config\Model\ResourceModel\Config
      */
     private $config;
+
     /**
      * @var Config
      */
     private $cache;
+
     /**
      * @var Json
      */
     private $serializer;
 
     /**
+     * @var Data
+     */
+    private $proxyHelper;
+
+    /**
      * Init
      *
-     * @param Json                 $serializer
+     * @param Json $serializer
      * @param CategorySetupFactory $categorySetupFactory
-     * @param ConfigInterface      $config
-     * @param Config               $cache
+     * @param ConfigInterface $config
+     * @param Config $cache
+     * @param Data $proxyHelper
      */
     public function __construct(
         Json $serializer,
         CategorySetupFactory $categorySetupFactory,
         ConfigInterface $config,
-        Config $cache
-    ) {
+        Config $cache,
+        Data $proxyHelper
+    )
+    {
         $this->categorySetupFactory = $categorySetupFactory;
         $this->config = $config;
         $this->cache = $cache;
         $this->serializer = $serializer;
+        $this->proxyHelper = $proxyHelper;
     }
 
     /**
@@ -55,7 +81,6 @@ class UpgradeData implements \Magento\Framework\Setup\UpgradeDataInterface
      *
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-
     public function upgrade(ModuleDataSetupInterface $setup, ModuleContextInterface $context)
     {
         $setup->startSetup();
@@ -71,15 +96,15 @@ class UpgradeData implements \Magento\Framework\Setup\UpgradeDataInterface
         $setup->endSetup();
     }
 
-    /*
-     * upgrade to 212
+    /**
+     * @param ModuleDataSetupInterface $setup
      */
     private function upgradeToLdgPage(ModuleDataSetupInterface $setup)
     {
         $categorySetup = $this->categorySetupFactory->create(['setup' => $setup]);
-        $entityTypeId = $categorySetup->getEntityTypeId(\Magento\Catalog\Model\Category::ENTITY);
+        $entityTypeId = $categorySetup->getEntityTypeId(Category::ENTITY);
         $attributeSetId = $categorySetup->getDefaultAttributeSetId($entityTypeId);
-        $attribute = $categorySetup->getAttribute(\Magento\Catalog\Model\Category::ENTITY, 'hawk_landing_page');
+        $attribute = $categorySetup->getAttribute(Category::ENTITY, 'hawk_landing_page');
         if ($attribute) {
             $idg = $categorySetup->getAttributeGroupId($entityTypeId, $attributeSetId, 'Display Settings');
             $categorySetup->addAttributeToGroup(
@@ -90,7 +115,7 @@ class UpgradeData implements \Magento\Framework\Setup\UpgradeDataInterface
                 46
             );
             $categorySetup->updateAttribute(
-                \Magento\Catalog\Model\Category::ENTITY,
+                Category::ENTITY,
                 'group',
                 'hawk_landing_page',
                 'Display Settings'
@@ -98,8 +123,8 @@ class UpgradeData implements \Magento\Framework\Setup\UpgradeDataInterface
         }
     }
 
-    /*
-     * upgrade to 220
+    /**
+     * @param ModuleDataSetupInterface $setup
      */
     private function upgradeConfigData(ModuleDataSetupInterface $setup)
     {
@@ -119,7 +144,7 @@ class UpgradeData implements \Magento\Framework\Setup\UpgradeDataInterface
             ->where(
                 'path in (?)',
                 ['hawksearch_proxy/proxy/tracking_url_staging',
-                'hawksearch_proxy/proxy/tracking_url_live', 'hawksearch_proxy/proxy/mode']
+                    'hawksearch_proxy/proxy/tracking_url_live', 'hawksearch_proxy/proxy/mode']
             )
             ->order('path');
         foreach ($config->getConnection()->fetchAll($select) as $item) {
@@ -144,8 +169,8 @@ class UpgradeData implements \Magento\Framework\Setup\UpgradeDataInterface
         $this->cache->clean();
     }
 
-    /*
-     * upgrade to 2223
+    /**
+     * @param $setup
      */
     private function upgradeTextColor($setup)
     {
@@ -160,7 +185,7 @@ class UpgradeData implements \Magento\Framework\Setup\UpgradeDataInterface
         foreach ($this->config->getConnection()->fetchAll($select) as $item) {
             $tabs = $this->serializer->unserialize($item['value']);
             foreach (array_keys($tabs) as $tab) {
-                $tabs[$tab]['textColor'] = $this->generateTextColor($tabs[$tab]['color']);
+                $tabs[$tab]['textColor'] = $this->proxyHelper->generateTextColor($tabs[$tab]['color']);
             }
             $this->config->saveConfig(
                 $item['path'],
@@ -170,16 +195,5 @@ class UpgradeData implements \Magento\Framework\Setup\UpgradeDataInterface
             );
         }
         $this->cache->clean();
-    }
-
-    private function generateTextColor($rgb)
-    {
-        $r = hexdec(substr($rgb, 1, 2));
-        $g = hexdec(substr($rgb, 3, 2));
-        $b = hexdec(substr($rgb, 5, 2));
-        if (($r * 299 + $g * 587 + $b * 114) / 1000 < 123) {
-            return '#fff';
-        }
-        return '#000';
     }
 }

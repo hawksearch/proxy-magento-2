@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2013 Hawksearch (www.hawksearch.com) - All Rights Reserved
+ * Copyright (c) 2020 Hawksearch (www.hawksearch.com) - All Rights Reserved
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -12,40 +12,63 @@
  */
 namespace HawkSearch\Proxy\Controller\LandingPage;
 
+use HawkSearch\Connector\Gateway\InstructionException;
+use HawkSearch\Proxy\Helper\Data as ProxyHelper;
+use Magento\Catalog\Model\CategoryFactory;
+use Magento\Catalog\Model\Session;
+use Magento\Framework\App\Action\Context;
+use Magento\Framework\App\ResponseInterface;
+use Magento\Framework\Controller\ResultInterface;
+use Magento\Framework\Exception\NotFoundException;
+use Magento\Framework\Registry;
+use Magento\Framework\View\Result\Page;
+use Magento\Framework\View\Result\PageFactory;
+
 class View extends \Magento\Framework\App\Action\Action
 {
 
-    protected $resultPageFactory;
-    private $session;
     /**
-     * @var \Magento\Framework\Registry
+     * @var PageFactory
+     */
+    protected $resultPageFactory;
+
+    /**
+     * @var Session
+     */
+    private $session;
+
+    /**
+     * @var Registry
      */
     private $coreRegistry;
+
     /**
-     * @var \Magento\Catalog\Model\CategoryFactory
+     * @var CategoryFactory
      */
     private $categoryFactory;
+
     /**
-     * @var \HawkSearch\Proxy\Helper\Data
+     * @var ProxyHelper
      */
     private $helper;
+
     /**
      * View constructor.
      *
-     * @param \Magento\Framework\App\Action\Context      $context
-     * @param \Magento\Catalog\Model\Session             $session
-     * @param \Magento\Framework\Registry                $coreRegistry
-     * @param \Magento\Catalog\Model\CategoryFactory     $categoryFactory
-     * @param \HawkSearch\Proxy\Helper\Data              $helper
-     * @param \Magento\Framework\View\Result\PageFactory $resultPageFactory
+     * @param Context      $context
+     * @param Session             $session
+     * @param Registry                $coreRegistry
+     * @param CategoryFactory     $categoryFactory
+     * @param ProxyHelper $helper
+     * @param PageFactory $resultPageFactory
      */
     public function __construct(
-        \Magento\Framework\App\Action\Context $context,
-        \Magento\Catalog\Model\Session $session,
-        \Magento\Framework\Registry $coreRegistry,
-        \Magento\Catalog\Model\CategoryFactory $categoryFactory,
-        \HawkSearch\Proxy\Helper\Data $helper,
-        \Magento\Framework\View\Result\PageFactory $resultPageFactory
+        Context $context,
+        Session $session,
+        Registry $coreRegistry,
+        CategoryFactory $categoryFactory,
+        ProxyHelper $helper,
+        PageFactory $resultPageFactory
     ) {
         parent::__construct($context);
         $this->resultPageFactory = $resultPageFactory;
@@ -54,16 +77,22 @@ class View extends \Magento\Framework\App\Action\Action
         $this->categoryFactory = $categoryFactory;
         $this->helper = $helper;
     }
+
+    /**
+     * @return ResponseInterface|ResultInterface|Page
+     * @throws InstructionException
+     * @throws NotFoundException
+     */
     public function execute()
     {
         $category = $this->categoryFactory->create();
-        $category->setHawksearchLandingPage(true);
+        $category->setData('hawksearch_landing_page', true);
         $data = $this->helper->getResultData();
         $category->setName($data->getHeaderTitle() ?: '-');
-        $category->setHawkBreadcrumbPath(
+        $category->setData('hawk_breadcrumb_path',
             [ 0 => [
-            'label' => $category->getName(),
-            'link' => ''
+                'label' => $category->getName(),
+                'link' => ''
             ]]
         );
 

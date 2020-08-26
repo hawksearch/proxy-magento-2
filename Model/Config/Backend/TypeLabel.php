@@ -1,21 +1,35 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: dev
- * Date: 12/7/18
- * Time: 8:15 AM
+ * Copyright (c) 2020 Hawksearch (www.hawksearch.com) - All Rights Reserved
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+ * IN THE SOFTWARE.
  */
 
 namespace HawkSearch\Proxy\Model\Config\Backend;
 
 use HawkSearch\Proxy\Helper\Data as ProxyHelper;
 use HawkSearch\Proxy\Model\ConfigProvider as ProxyConfigProvider;
+use Magento\Config\Model\Config\Backend\Serialized\ArraySerialized;
+use Magento\Framework\App\Cache\TypeListInterface;
+use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Framework\Data\Collection\AbstractDb;
+use Magento\Framework\Model\Context;
+use Magento\Framework\Model\ResourceModel\AbstractResource;
+use Magento\Framework\Registry;
 use Magento\Framework\Serialize\Serializer\Json;
+use Zend_Http_Client;
+use Zend_Http_Client_Exception;
 
-class TypeLabel extends \Magento\Config\Model\Config\Backend\Serialized\ArraySerialized
+class TypeLabel extends ArraySerialized
 {
     /**
-     * @var \HawkSearch\Proxy\Helper\DataFactory
+     * @var ProxyHelper
      */
     private $proxyHelper;
 
@@ -27,25 +41,25 @@ class TypeLabel extends \Magento\Config\Model\Config\Backend\Serialized\ArraySer
     /**
      * TypeLabel constructor.
      * @param ProxyHelper $proxyHelper
-     * @param \Magento\Framework\Model\Context $context
-     * @param \Magento\Framework\Registry $registry
-     * @param \Magento\Framework\App\Config\ScopeConfigInterface $config
-     * @param \Magento\Framework\App\Cache\TypeListInterface $cacheTypeList
+     * @param Context $context
+     * @param Registry $registry
+     * @param ScopeConfigInterface $config
+     * @param TypeListInterface $cacheTypeList
      * @param ProxyConfigProvider $proxyConfigProvider
-     * @param \Magento\Framework\Model\ResourceModel\AbstractResource|null $resource
-     * @param \Magento\Framework\Data\Collection\AbstractDb|null $resourceCollection
+     * @param AbstractResource|null $resource
+     * @param AbstractDb|null $resourceCollection
      * @param array $data
      * @param Json|null $serializer
      */
     public function __construct(
         ProxyHelper $proxyHelper,
-        \Magento\Framework\Model\Context $context,
-        \Magento\Framework\Registry $registry,
-        \Magento\Framework\App\Config\ScopeConfigInterface $config,
-        \Magento\Framework\App\Cache\TypeListInterface $cacheTypeList,
+        Context $context,
+        Registry $registry,
+        ScopeConfigInterface $config,
+        TypeListInterface $cacheTypeList,
         ProxyConfigProvider $proxyConfigProvider,
-        \Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
-        \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
+        AbstractResource $resource = null,
+        AbstractDb $resourceCollection = null,
         array $data = [],
         Json $serializer = null
     ) {
@@ -64,14 +78,15 @@ class TypeLabel extends \Magento\Config\Model\Config\Backend\Serialized\ArraySer
     }
 
     /**
-     * @throws \Zend_Http_Client_Exception
+     * @inheritDoc
+     * @throws Zend_Http_Client_Exception
      */
     protected function _afterLoad()
     {
         parent::_afterLoad();
         if (!$this->getValue() || count($this->getValue()) == 0) {
 
-            $client = new \Zend_Http_Client();
+            $client = new Zend_Http_Client();
             $client->setUri(
                 $this->proxyConfigProvider->getHawkUrl() . '/?'
                 . http_build_query(['q' => '', 'hawktabs' => 'json', 'it' => 'all', 'output' => 'custom'])
@@ -97,6 +112,7 @@ class TypeLabel extends \Magento\Config\Model\Config\Backend\Serialized\ArraySer
                         'textColor' => $fg
                     ];
                 }
+                //@TODO expected parameter is 'string'
                 $this->setValue($value);
             }
         }

@@ -100,6 +100,7 @@
         <arguments>
             <argument name="handlers" xsi:type="array">
                 <item name="result_data" xsi:type="string">HawkSearch\Proxy\Gateway\Response\SearchResultHandler</item>
+                <item name="featured_items" xsi:type="string">HawkSearch\Proxy\Gateway\Response\FeaturedItemsHandler</item>
             </argument>
         </arguments>
     </virtualType>
@@ -135,10 +136,9 @@
     <preference for="HawkSearch\Proxy\Api\Data\SearchResultDataInterface" type="HawkSearch\Proxy\Model\SearchResultData" />
     <preference for="HawkSearch\Proxy\Api\Data\SearchResultResponseInterface" type="HawkSearch\Proxy\Model\SearchResultResponse" />
     <preference for="HawkSearch\Proxy\Api\Data\SearchResultMerchandisingInterface" type="HawkSearch\Proxy\Model\SearchResultMerchandising" />
-    <preference for="HawkSearch\Proxy\Api\Data\SearchResultFeaturedMainInterface" type="HawkSearch\Proxy\Model\SearchResultFeaturedMain" />
     <preference for="HawkSearch\Proxy\Api\Data\SearchResultFeaturedInterface" type="HawkSearch\Proxy\Model\SearchResultFeatured" />
     <preference for="HawkSearch\Proxy\Api\Data\SearchResultContentInterface" type="HawkSearch\Proxy\Model\SearchResultContent" />
-    <preference for="HawkSearch\Proxy\Api\Data\SearchResultTemplateItemInterface" type="HawkSearch\Proxy\Model\SearchResultTemplateItem" />
+    <preference for="HawkSearch\Proxy\Api\Data\SearchResultBannerInterface" type="HawkSearch\Proxy\Model\SearchResultBanner" />
     <preference for="HawkSearch\Proxy\Api\Data\SearchResultContentItemInterface" type="HawkSearch\Proxy\Model\SearchResultContentItem" />
     <preference for="HawkSearch\Proxy\Api\Data\SearchResultContentItemCustomDataInterface" type="HawkSearch\Proxy\Model\SearchResultContentItemCustomData" />
 </config>

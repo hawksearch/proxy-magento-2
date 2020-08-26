@@ -146,15 +146,15 @@ interface SearchResultDataInterface extends ExtensibleDataInterface
     public function setRelated(string $value);
 
     /**
-     * @return \HawkSearch\Proxy\Api\Data\SearchResultFeaturedMainInterface
+     * @return \HawkSearch\Proxy\Api\Data\SearchResultFeaturedInterface
      */
-    public function getFeaturedItems() : \HawkSearch\Proxy\Api\Data\SearchResultFeaturedMainInterface;
+    public function getFeaturedItems() : \HawkSearch\Proxy\Api\Data\SearchResultFeaturedInterface;
 
     /**
-     * @param \HawkSearch\Proxy\Api\Data\SearchResultFeaturedMainInterface $value
+     * @param \HawkSearch\Proxy\Api\Data\SearchResultFeaturedInterface $value
      * @return $this
      */
-    public function setFeaturedItems(\HawkSearch\Proxy\Api\Data\SearchResultFeaturedMainInterface $value);
+    public function setFeaturedItems(\HawkSearch\Proxy\Api\Data\SearchResultFeaturedInterface $value);
 
     /**
      * @return string|null

@@ -1,5 +1,15 @@
 <?php
-
+/**
+ * Copyright (c) 2020 Hawksearch (www.hawksearch.com) - All Rights Reserved
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+ * IN THE SOFTWARE.
+ */
 
 namespace HawkSearch\Proxy\Model\Task;
 
@@ -14,13 +24,19 @@ use Zend_Db_Statement_Exception;
 
 abstract class AbstractTaskLock
 {
-    /** @var LockManagerInterface */
+    /**
+     * @var DatabaseLockManager
+     */
     private $lockManager;
 
-    /** @var string */
+    /**
+     * @var string
+     */
     protected $lockName = '';
 
-    /** @var int */
+    /**
+     * @var int
+     */
     protected $lockTimeout = 300;
 
     /**
@@ -83,7 +99,7 @@ abstract class AbstractTaskLock
     /**
      * Throws an exception if the lock name is not overridden by subclass.
      */
-    private function requireLockName() : void
+    private function requireLockName()
     {
         if ($this->lockName === '') {
             throw new InvalidArgumentException('no lock name provided');

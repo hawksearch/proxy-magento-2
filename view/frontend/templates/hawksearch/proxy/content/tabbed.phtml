@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2018 Hawksearch (www.hawksearch.com) - All Rights Reserved
+ * Copyright (c) 2020 Hawksearch (www.hawksearch.com) - All Rights Reserved
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -19,32 +19,21 @@ $tabs = $block->getTabs();
 
 <div>
     <div id="hawktitle"><?= /* @noEscape */
-        $block->getTitle() ?></div>
-    <div id="hawkbannertop"
-         class="bannerTop"> <?= /* @noEscape */
-            $block->getBanner()->getFeaturedTop() ?>
-        <?= /* @noEscape */
-        $block->getBanner()->getBannerTop() ?>
+        $block->getTitle() ?>
     </div>
+
+    <?= /* @noEscape */ $block->getChildHtml('hawksearch_tabbed_additional_top'); ?>
+
     <div id="hawktoptext"><?= /* @noEscape */
-        $block->getTopText(); ?></div>
+        $block->getTopText(); ?>
+    </div>
     <div id="hawkrelated"><?= /* @noEscape */
-        $block->getRelated() ?></div>
+        $block->getRelated() ?>
+    </div>
 
     <div id="hawkitemlist">
-        <?= /* @noEscape */
-        $block->getChildHtml('hawksearch_tabbed_items'); ?>
+        <?= /* @noEscape */ $block->getChildHtml('hawksearch_tabbed_items'); ?>
     </div>
 
-    <div id="hawkbannerbottom"
-         class="bannerBottom"> <?= /* @noEscape */
-            $block->getBanner()->getFeaturedBottom() ?>
-        <?= /* @noEscape */
-        $block->getBanner()->getBannerBottom() ?>
-    </div>
-    <div id="hawkbannerbottom2"
-         class="bannerBottom"> <?= /* @noEscape */
-            $block->getBanner()->getBannerBottom2() ?>
-        <?= /* @noEscape */ $block->getBanner()->getFeaturedBottom2() ?>
-    </div>
+    <?= /* @noEscape */ $block->getChildHtml('hawksearch_tabbed_additional_bottom'); ?>
 </div>

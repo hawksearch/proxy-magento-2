@@ -1,14 +1,14 @@
 <?php
 /**
- *  Copyright (c) 2020 Hawksearch (www.hawksearch.com) - All Rights Reserved
+ * Copyright (c) 2020 Hawksearch (www.hawksearch.com) - All Rights Reserved
  *
- *  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- *  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- *  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- *  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- *  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- *  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
- *  IN THE SOFTWARE.
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+ * IN THE SOFTWARE.
  */
 
 use HawkSearch\Proxy\Block\Html;
@@ -40,23 +40,9 @@ $tabs = $block->getTabs();
         $block->getRelated() ?></div>
     <div id="hawkfacets"><?= /* @noEscape */
         $block->getFacets() ?></div>
-    <div id="hawkbannertop"
-         class="bannerTop"> <?= /* @noEscape */
-            $block->getBanner()->getFeaturedTop() ?><?= /* @noEscape */
-        $block->getBanner()->getBannerTop() ?></div>
-    <div id="hawkbannerlefttop" class="bannerLeftTop"><?= /* @noEscape */
-        $block->getBanner()->getBannerLeftTop() ?></div>
-    <div id="hawkbannerleftbottom"
-         class="bannerLeftBottom"><?= /* @noEscape */
-            $block->getBanner()->getBannerLeftBottom() ?></div>
-    <div id="hawkbannerbottom"
-         class="bannerBottom"> <?= /* @noEscape */
-            $block->getBanner()->getFeaturedBottom() ?><?= /* @noEscape */
-        $block->getBanner()->getBannerBottom() ?></div>
-    <div id="hawkbannerbottom2"
-         class="bannerBottom"> <?= /* @noEscape */
-            $block->getBanner()->getBannerBottom2() ?><?= /* @noEscape */
-        $block->getBanner()->getFeaturedBottom2() ?></div>
+
+    <?= $block->getChildHtml('hawksearch_html_additional') ?>
+
     <div id="hawkbreadcrumb"><?= /* @noEscape */
         $block->getBreadCrumb() ?></div>
     <div id="hawktitle"><?= /* @noEscape */

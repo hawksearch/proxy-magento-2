@@ -25,12 +25,12 @@ interface SearchResultFeaturedInterface extends ExtensibleDataInterface
     /**#@-*/
 
     /**
-     * @return \HawkSearch\Proxy\Api\Data\SearchResultTemplateItemInterface[]
+     * @return \HawkSearch\Proxy\Api\Data\SearchResultBannerInterface[]
      */
     public function getItems() : array;
 
     /**
-     * @param \HawkSearch\Proxy\Api\Data\SearchResultTemplateItemInterface[] $value
+     * @param \HawkSearch\Proxy\Api\Data\SearchResultBannerInterface[] $value
      * @return $this
      */
     public function setItems(array $value);
