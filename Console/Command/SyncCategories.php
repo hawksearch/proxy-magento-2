@@ -1,5 +1,15 @@
 <?php
-
+/**
+ * Copyright (c) 2020 Hawksearch (www.hawksearch.com) - All Rights Reserved
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+ * IN THE SOFTWARE.
+ */
 
 namespace HawkSearch\Proxy\Console\Command;
 
@@ -19,13 +29,19 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class SyncCategories extends Command
 {
-    /** @var State */
+    /**
+     * @var State
+     */
     private $state;
 
-    /** @var Task */
+    /**
+     * @var Task
+     */
     private $task;
 
-    /** @var TaskOptionsFactory */
+    /**
+     * @var TaskOptionsFactory
+     */
     private $taskOptionsFactory;
 
     /**
@@ -42,8 +58,8 @@ class SyncCategories extends Command
     ) {
         parent::__construct($name);
 
-        $this->state              = $state;
-        $this->task               = $task;
+        $this->state = $state;
+        $this->task = $task;
         $this->taskOptionsFactory = $taskOptionsFactory;
     }
 
@@ -67,7 +83,6 @@ class SyncCategories extends Command
     {
         $this->state->setAreaCode(Area::AREA_CRONTAB);
 
-        /** @var TaskOptions $options */
         $options = $this->taskOptionsFactory->create();
 
         try {

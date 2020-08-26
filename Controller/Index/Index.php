@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2013 Hawksearch (www.hawksearch.com) - All Rights Reserved
+ * Copyright (c) 2020 Hawksearch (www.hawksearch.com) - All Rights Reserved
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -12,17 +12,32 @@
  */
 namespace HawkSearch\Proxy\Controller\Index;
 
+use HawkSearch\Proxy\Block\Html;
 use HawkSearch\Proxy\Model\ConfigProvider;
 use Magento\Catalog\Model\Session;
 use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
+use Magento\Framework\App\RequestInterface;
+use Magento\Framework\App\ResponseInterface;
 use Magento\Framework\Controller\Result\Raw;
+use Magento\Framework\Controller\ResultInterface;
 
 class Index extends Action
 {
 
+    /**
+     * @var Raw
+     */
     protected $result;
+
+    /**
+     * @var Session
+     */
     private $session;
+
+    /**
+     * @var RequestInterface
+     */
     private $request;
 
     /**
@@ -49,6 +64,10 @@ class Index extends Action
         $this->request = $context->getRequest();
         $this->proxyConfigProvider = $proxyConfigProvider;
     }
+
+    /**
+     * @return ResponseInterface|Raw|ResultInterface
+     */
     public function execute()
     {
         $tab = $this->getRequest()->getParam('it');
@@ -56,6 +75,7 @@ class Index extends Action
 
         if (!$this->_view->isLayoutLoaded()) {
             $this->_view->loadLayout();
+            /** @var Html $block */
             $block = $this->_view->getLayout()->getBlock('hawksearch_proxy_response');
             if (!empty($tab)
                 && !empty($this->proxyConfigProvider->getResultType())

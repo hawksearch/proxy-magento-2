@@ -15,11 +15,9 @@ declare(strict_types=1);
 namespace HawkSearch\Proxy\Model;
 
 use Magento\Framework\App\Config\ScopeConfigInterface;
-use Magento\Framework\Exception\FileSystemException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Filesystem;
 use Magento\Store\Api\Data\StoreInterface;
-use Magento\Store\Model\ResourceModel\Store\Collection;
 use Magento\Store\Model\ResourceModel\Store\CollectionFactory;
 use Magento\Store\Model\ScopeInterface;
 use Magento\Store\Model\StoreManagerInterface;
@@ -115,18 +113,59 @@ class ConfigProvider
      * @param StoreInterface|int|null $store
      * @return bool
      */
-    public function isEnabled($store = null) : bool
-    {
-        return (bool)$this->getConfig(self::CONFIG_PROXY_ENABLED, $store);
-    }
-
-    /**
-     * @param StoreInterface|int|null $store
-     * @return bool
-     */
     public function isHawkCssIncluded($store = null) : bool
     {
         return (bool)$this->getConfig(self::CONFIG_INCLUDE_HAWK_CSS, $store);
+    }
+
+    /**
+     * Get Store Config value for path
+     *
+     * @param string $path Path to config value. Absolute from root or Relative from initialized root
+     * @param int|StoreInterface|null $store
+     * @return mixed
+     */
+    private function getConfig($path, $store)
+    {
+        $value = null;
+
+        if ($store === null) {
+            $store = $this->store;
+        }
+
+        try {
+            $value = $this->scopeConfig->getValue(
+                $path,
+                ScopeInterface::SCOPE_STORE,
+                $this->getStore($store)
+            );
+        } catch (NoSuchEntityException $e) {
+            $this->logger->error($e->getMessage());
+        }
+
+        return $value;
+    }
+
+    /**
+     * Retrieve store object
+     *
+     * @param StoreInterface|int|null $store
+     * @return StoreInterface
+     * @throws NoSuchEntityException
+     */
+    public function getStore($store = null) : StoreInterface
+    {
+        if ($store) {
+            if ($store instanceof StoreInterface) {
+                $this->store = $store;
+            } elseif (is_int($store)) {
+                $this->store = $this->storeManager->getStore($store);
+            }
+        } else {
+            $this->store = $this->storeManager->getStore();
+        }
+
+        return $this->store;
     }
 
     /**
@@ -136,36 +175,6 @@ class ConfigProvider
     public function isLoggingEnabled($store = null) : bool
     {
         return (bool)$this->getConfig(self::CONFIG_IS_LOGGING_ENABLED, $store);
-    }
-
-    /**
-     * @param StoreInterface|int|null $store
-     * @return string | null
-     */
-    public function getMode($store = null) : ?string
-    {
-        return $this->getConfig(self::CONFIG_PROXY_MODE, $store);
-    }
-
-    /**
-     * @param StoreInterface|int|null $store
-     * @return string | null
-     */
-    public function getEngineName($store = null) : ?string
-    {
-        return $this->getConfig(self::CONFIG_ENGINE_NAME, $store);
-    }
-
-    /**
-     * @param StoreInterface|int|null $store
-     * @return string | null
-     */
-    public function getHawkUrlHost($store = null) : ?string
-    {
-        return $this->getConfig(
-            sprintf(self::CONFIG_HAWK_URL, $this->getMode($store)),
-            $store
-        );
     }
 
     /**
@@ -184,12 +193,31 @@ class ConfigProvider
      * @param StoreInterface|int|null $store
      * @return string | null
      */
+    public function getMode($store = null) : ?string
+    {
+        return $this->getConfig(self::CONFIG_PROXY_MODE, $store);
+    }
+
+    /**
+     * @param StoreInterface|int|null $store
+     * @return string | null
+     */
     public function getRecommendedUrl($store = null) : ?string
     {
         return $this->getConfig(
             sprintf(self::CONFIG_PROXY_RECOMMENDED_URL, $this->getMode($store)),
             $store
         );
+    }
+
+    /**
+     * @param StoreInterface|int|null $store
+     * @return string | null
+     */
+    public function getTrackingPixelUrl($store = null) : ?string
+    {
+        $hawkUrl = rtrim($this->getHawkUrl('_hawk', $store), '/');
+        return $hawkUrl . '/hawkconversion.aspx?';
     }
 
     /**
@@ -207,10 +235,21 @@ class ConfigProvider
      * @param StoreInterface|int|null $store
      * @return string | null
      */
-    public function getTrackingPixelUrl($store = null) : ?string
+    public function getHawkUrlHost($store = null) : ?string
     {
-        $hawkUrl = rtrim($this->getHawkUrl('_hawk', $store), '/');
-        return $hawkUrl . '/hawkconversion.aspx?';
+        return $this->getConfig(
+            sprintf(self::CONFIG_HAWK_URL, $this->getMode($store)),
+            $store
+        );
+    }
+
+    /**
+     * @param StoreInterface|int|null $store
+     * @return string | null
+     */
+    public function getEngineName($store = null) : ?string
+    {
+        return $this->getConfig(self::CONFIG_ENGINE_NAME, $store);
     }
 
     /**
@@ -247,6 +286,15 @@ class ConfigProvider
     public function isSearchManagementEnabled($store = null) : bool
     {
         return $this->isEnabled() && $this->getConfig(self::CONFIG_PROXY_MANAGE_SEARCH, $store);
+    }
+
+    /**
+     * @param StoreInterface|int|null $store
+     * @return bool
+     */
+    public function isEnabled($store = null) : bool
+    {
+        return (bool)$this->getConfig(self::CONFIG_PROXY_ENABLED, $store);
     }
 
     /**
@@ -320,56 +368,5 @@ class ConfigProvider
     public function getAutocompleteQueryParams($store = null) : ?string
     {
         return $this->getConfig(self::CONFIG_PROXY_AUTOCOMPLETE_QUERY_PARAMS, $store);
-    }
-
-
-    /**
-     * Retrieve store object
-     *
-     * @param StoreInterface|int|null $store
-     * @return StoreInterface
-     * @throws NoSuchEntityException
-     */
-    public function getStore($store = null) : StoreInterface
-    {
-        if ($store) {
-            if ($store instanceof StoreInterface) {
-                $this->store = $store;
-            } elseif (is_int($store)) {
-                $this->store = $this->storeManager->getStore($store);
-            }
-        } else {
-            $this->store = $this->storeManager->getStore();
-        }
-
-        return $this->store;
-    }
-
-    /**
-     * Get Store Config value for path
-     *
-     * @param string $path Path to config value. Absolute from root or Relative from initialized root
-     * @param int|StoreInterface|null $store
-     * @return mixed
-     */
-    private function getConfig($path, $store)
-    {
-        $value = null;
-
-        if ($store === null) {
-            $store = $this->store;
-        }
-
-        try {
-            $value = $this->scopeConfig->getValue(
-                $path,
-                ScopeInterface::SCOPE_STORE,
-                $this->getStore($store)
-            );
-        } catch (NoSuchEntityException $e) {
-            $this->logger->error($e->getMessage());
-        }
-
-        return $value;
     }
 }

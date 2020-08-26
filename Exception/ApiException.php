@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2017 Hawksearch (www.hawksearch.com) - All Rights Reserved
+ * Copyright (c) 2020 Hawksearch (www.hawksearch.com) - All Rights Reserved
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -14,12 +14,13 @@ declare(strict_types=1);
 
 namespace HawkSearch\Proxy\Exception;
 
+use Exception;
+
 /**
  * A generic exception during an API call
- *
  * @api
  */
-class ApiException extends \Exception
+class ApiException extends Exception
 {
 
 }

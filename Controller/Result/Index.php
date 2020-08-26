@@ -1,29 +1,47 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: dev
- * Date: 8/29/18
- * Time: 10:59 AM
+ * Copyright (c) 2020 Hawksearch (www.hawksearch.com) - All Rights Reserved
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+ * IN THE SOFTWARE.
  */
+
 namespace HawkSearch\Proxy\Controller\Result;
 
 use HawkSearch\Proxy\Helper\Data as ProxyHelper;
 use HawkSearch\Proxy\Model\ConfigProvider;
 use Magento\Catalog\Model\Layer\Resolver;
 use Magento\Catalog\Model\Session;
+use Magento\CatalogSearch\Controller\Result\Index as CatalogSearchResultIndex;
 use Magento\CatalogSearch\Helper\Data as CatalogSearchHelper;
 use Magento\Framework\App\Action\Context;
+use Magento\Framework\App\RequestInterface;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Search\Model\QueryFactory;
 use Magento\Store\Model\StoreManagerInterface;
 
-class Index extends \Magento\CatalogSearch\Controller\Result\Index
+class Index extends CatalogSearchResultIndex
 {
+    /**
+     * @var QueryFactory
+     */
     private $queryFactory;
+
+    /**
+     * @var RequestInterface
+     */
     private $request;
+
     /**
      * @var CatalogSearchHelper
      */
     private $catalogSearchHelper;
+
     /**
      * @var ProxyHelper
      */
@@ -54,7 +72,8 @@ class Index extends \Magento\CatalogSearch\Controller\Result\Index
         CatalogSearchHelper $catalogSearchHelper,
         ProxyHelper $proxyHelper,
         ConfigProvider $proxyConfigProvider
-    ) {
+    )
+    {
         parent::__construct($context, $catalogSession, $storeManager, $queryFactory, $layerResolver);
         $this->queryFactory = $queryFactory;
         $this->request = $context->getRequest();
@@ -64,8 +83,8 @@ class Index extends \Magento\CatalogSearch\Controller\Result\Index
     }
 
     /**
-     *
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @inheritDoc
+     * @throws LocalizedException
      */
     public function execute()
     {
@@ -90,6 +109,9 @@ class Index extends \Magento\CatalogSearch\Controller\Result\Index
         $this->_view->renderLayout();
     }
 
+    /**
+     * @return bool
+     */
     private function isTopCategoryRequest()
     {
         $params = $this->request->getParams();

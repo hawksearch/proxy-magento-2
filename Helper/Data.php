@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2018 Hawksearch (www.hawksearch.com) - All Rights Reserved
+ * Copyright (c) 2020 Hawksearch (www.hawksearch.com) - All Rights Reserved
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -16,22 +16,30 @@ namespace HawkSearch\Proxy\Helper;
 use Composer\Util\Filesystem as UtilFileSystem;
 use Exception;
 use HawkSearch\Connector\Gateway\Instruction\InstructionManagerPool;
+use HawkSearch\Connector\Gateway\InstructionException;
 use HawkSearch\Proxy\Api\Data\SearchResultResponseInterface;
 use HawkSearch\Proxy\Model\ConfigProvider;
 use HawkSearch\Proxy\Model\ProxyEmailFactory;
-use HawkSearch\Proxy\Model\SearchResultTemplateItem;
+use HawkSearch\Proxy\Model\SearchResultBanner;
 use Magento\Catalog\Model\Category;
 use Magento\Catalog\Model\Config;
 use Magento\Catalog\Model\ResourceModel\Category\CollectionFactory as CategoryCollectionFactory;
+use Magento\Catalog\Model\ResourceModel\Product\Collection;
 use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
 use Magento\Catalog\Model\SessionFactory;
 use Magento\CatalogUrlRewrite\Model\CategoryUrlRewriteGenerator;
 use Magento\Framework\App\CacheInterface as Cache;
+use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\App\Helper\Context;
 use Magento\Framework\Escaper;
+use Magento\Framework\Exception\FileSystemException;
+use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Framework\Exception\NotFoundException;
 use Magento\Framework\Filesystem;
 use Magento\Framework\Filesystem\Driver\File;
 use Magento\Framework\Filesystem\Io\File as ioFile;
+use Magento\Framework\Logger\Monolog;
 use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Store\Model\App\Emulation;
 use Magento\Store\Model\ResourceModel\Store\CollectionFactory as StoreCollectionFactory;
@@ -40,21 +48,32 @@ use Magento\Store\Model\Store;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\UrlRewrite\Model\UrlFinderInterface;
 use Magento\UrlRewrite\Service\V1\Data\UrlRewrite;
+use Zend_Http_Client;
+use Magento\Catalog\Model\Attribute\Config as AttributeConfig;
 
-class Data extends \Magento\Framework\App\Helper\AbstractHelper
+class Data extends AbstractHelper
 {
-    const HAWK_LANDING_PAGE_URL = 'LandingPage/';
-
+    /**#@+
+     * Config xml path constants
+     */
     const CONFIG_PROXY_CATEGORY_SYNC_CRON_ENABLED = 'hawksearch_proxy/sync/enabled';
     const CONFIG_PROXY_SHOWTABS = 'hawksearch_proxy/proxy/show_tabs';
     const CONFIG_PROXY_TYPE_LABEL = 'hawksearch_proxy/proxy/type_label';
     const CONFIG_PROXY_SHOW_TYPE_LABELS = 'hawksearch_proxy/proxy/show_type_labels';
+    /**#@-*/
 
+    const HAWK_LANDING_PAGE_URL = 'LandingPage/';
     const LP_CACHE_KEY = 'hawk_landing_pages';
     const LOCK_FILE_NAME = 'hawkcategorysync.lock';
 
+    /**
+     * @var array
+     */
     protected $_syncingExceptions = [];
 
+    /**
+     * @var StoreManagerInterface
+     */
     protected $storeManager;
 
     /**
@@ -62,45 +81,94 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     private $hawkData;
 
-    private $landingPages;
-    protected $uri;
-    /***
-     * overrrided CatalogSearch/Helper/Data.php
-     ***/
-    private $isManaged;
-    private $filesystem;
     /**
-     * @var \Magento\Framework\Logger\Monolog $logger
+     * @var
+     */
+    protected $uri;
+
+    /**
+     * @var bool
+     */
+    private $isManaged;
+
+    /**
+     * @var Filesystem
+     */
+    private $filesystem;
+
+    /**
+     * @var Monolog $logger
      */
     private $overwriteFlag;
+
+    /**
+     * @var ProxyEmailFactory
+     */
     private $email_helper;
+
+    /**
+     * @var CollectionFactory
+     */
     private $collectionFactory;
+
+    /**
+     * @var SessionFactory
+     */
     protected $session;
-    /***
-     * overrrided CatalogSearch/Helper/Data.php
-     ***/
+
+    /**
+     * @var Config
+     */
     private $catalogConfig;
+
     /**
      * @var CategoryCollectionFactory
      */
     private $categoryCollectionFactory;
+
     /**
      * @var Emulation
      */
     private $emulation;
+
     /**
      * @var StoreCollectionFactory
      */
     private $storeCollectionFactory;
+
     /**
      * @var Cache
      */
     private $cache;
+
+    /**
+     * @var UrlFinderInterface
+     */
     private $urlFinder;
+
+    /**
+     * @var Escaper
+     */
     protected $escaper;
+
+    /**
+     * @var SerializerInterface
+     */
     protected $serializer;
+
+    /**
+     * @var File
+     */
     protected $file;
+
+    /**
+     * @var ioFile
+     */
     protected $fileDirectory;
+
+    /**
+     * @var UtilFileSystem
+     */
     private $utilFileSystem;
 
     /**
@@ -112,6 +180,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @var ConfigProvider
      */
     private $proxyConfigProvider;
+
+    /**
+     * @var AttributeConfig
+     */
+    private $attributeConfig;
 
     /**
      * Data constructor.
@@ -135,6 +208,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @param UtilFileSystem $utilFileSystem
      * @param InstructionManagerPool $instructionManagerPool
      * @param ConfigProvider $proxyConfigProvider
+     * @param AttributeConfig $attributeConfig
      */
     public function __construct(
         Context $context,
@@ -155,9 +229,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         ioFile $fileDirectory,
         UtilFileSystem $utilFileSystem,
         InstructionManagerPool $instructionManagerPool,
-        ConfigProvider $proxyConfigProvider
+        ConfigProvider $proxyConfigProvider,
+        AttributeConfig $attributeConfig
     ) {
-        // parent construct first so scopeConfig gets set for use in "setUri", etc.
         parent::__construct($context);
         $this->storeManager = $storeManager;
         $this->filesystem = $filesystem;
@@ -180,8 +254,14 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $this->utilFileSystem = $utilFileSystem;
         $this->instructionManagerPool = $instructionManagerPool;
         $this->proxyConfigProvider = $proxyConfigProvider;
+        $this->attributeConfig = $attributeConfig;
     }
 
+    /**
+     * @param string $data
+     * @return mixed
+     * @throws NoSuchEntityException
+     */
     public function getConfigurationData($data)
     {
         $storeScope = ScopeInterface::SCOPE_STORE;
@@ -190,8 +270,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
-     * @throws \HawkSearch\Connector\Gateway\InstructionException
-     * @throws \Magento\Framework\Exception\NotFoundException
+     * @throws InstructionException
+     * @throws NotFoundException
      */
     private function fetchResponse()
     {
@@ -203,6 +283,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     /**
      * @return SearchResultResponseInterface
+     * @throws InstructionException
+     * @throws NotFoundException
      */
     public function getResultData()
     {
@@ -223,8 +305,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     /**
      * @return string|null
-     * @throws \HawkSearch\Connector\Gateway\InstructionException
-     * @throws \Magento\Framework\Exception\NotFoundException
+     * @throws InstructionException
+     * @throws NotFoundException
      */
     public function getLocation()
     {
@@ -236,9 +318,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     /**
      * @return string
-     * @throws \HawkSearch\Connector\Gateway\InstructionException
-     * @throws \Magento\Framework\Exception\LocalizedException
-     * @throws \Magento\Framework\Exception\NotFoundException
+     * @throws InstructionException
+     * @throws LocalizedException
+     * @throws NotFoundException
      */
     public function getTrackingDataHtml()
     {
@@ -248,7 +330,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $counter = 1;
         $obj = [];
         $productCollection = $this->getProductCollection();
-        if ($productCollection instanceof \Magento\Catalog\Model\ResourceModel\Product\Collection) {
+        if ($productCollection instanceof Collection) {
             foreach ($productCollection as $item) {
                 $obj[] = ['url' => $item->getProductUrl(),
                     'tid' => $this->hawkData->getTrackingId(), 'sku' => $item->getSku(), 'i' => $counter++];
@@ -263,8 +345,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     /**
      * @return string|null
-     * @throws \HawkSearch\Connector\Gateway\InstructionException
-     * @throws \Magento\Framework\Exception\NotFoundException
+     * @throws InstructionException
+     * @throws NotFoundException
      */
     public function getFacets()
     {
@@ -274,6 +356,10 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         return $this->hawkData->getResponseData()->getFacets();
     }
 
+    /**
+     * @return string|null
+     * @throws NoSuchEntityException
+     */
     public function getApiKey()
     {
         return $this->getConfigurationData('hawksearch_proxy/proxy/hawksearch_api_key');
@@ -303,8 +389,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
-     * @return null
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @return Collection|null
+     * @throws LocalizedException
      */
     public function getProductCollection()
     {
@@ -332,7 +418,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             return null;
         }
 
-        /** @var  \Magento\Catalog\Model\ResourceModel\Product\Collection $collection */
         $collection = $this->getResourceCollection($skus);
 
         $sorted = [];
@@ -354,6 +439,13 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         return $collection;
     }
 
+    /**
+     * @param string $zone
+     * @return Collection|null
+     * @throws InstructionException
+     * @throws LocalizedException
+     * @throws NotFoundException
+     */
     public function getFeaturedProductCollection($zone)
     {
         if (empty($this->hawkData)) {
@@ -363,16 +455,16 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $map = [];
         $i = 0;
 
-        if (!$this->hawkData->getResponseData()->getFeaturedItems()->getItems()->getItems()) {
+        if (!$this->hawkData->getResponseData()->getFeaturedItems()->getItems()) {
             return null;
         } else {
-            foreach ($this->hawkData->getResponseData()->getFeaturedItems()->getItems()->getItems() as $banner) {
-                /** @var SearchResultTemplateItem $banner */
-                if ($banner->getZone() == $zone && $banner->getData['Items']) {
-                    foreach ($banner->getData['Items'] as $item) {
-                        if (isset($item['Custom']['sku'])) {
-                            $skus[] = $item['Custom']['sku'];
-                            $map[$item['Custom']['sku']] = $i;
+            foreach ($this->hawkData->getResponseData()->getFeaturedItems()->getItems() as $banner) {
+                /** @var SearchResultBanner $banner */
+                if ($banner->getZone() == $zone && $banner->getItems()) {
+                    foreach ($banner->getItems() as $item) {
+                        if (isset($item->getCustom()['sku'])) {
+                            $skus[] = $item->getCustom()['sku'];
+                            $map[$item->getCustom()['sku']] = $i;
                             $i++;
                         }
                     }
@@ -380,9 +472,13 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             }
         }
 
+        $catalogAttributes = $this->catalogConfig->getProductAttributes();
+        $featuredSidebarAttributes = $this->attributeConfig->getAttributeNames('hawksearch_featured_item');
+        $featuredSidebarAttributes = array_merge($catalogAttributes, $featuredSidebarAttributes);
+
         $productCollection = $this->collectionFactory->create();
         $collection = $productCollection
-            ->addAttributeToSelect($this->catalogConfig->getProductAttributes())
+            ->addAttributeToSelect($featuredSidebarAttributes)
             ->addAttributeToFilter('sku', ['in' => $skus])
             ->addMinimalPrice()
             ->addFinalPrice()
@@ -407,10 +503,16 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         return $collection;
     }
 
+    /**
+     * @param string $method
+     * @param string $url
+     * @param string|resource $data
+     * @return string
+     */
     public function getHawkResponse($method, $url, $data = null)
     {
         try {
-            $client = new \Zend_Http_Client();
+            $client = new Zend_Http_Client();
             $client->setConfig(['timeout' => 60]);
             $client->setUri($this->getApiUrl() . $url);
             $client->setMethod($method);
@@ -428,28 +530,44 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         }
     }
 
+    /**
+     * @return string
+     * @throws NoSuchEntityException
+     */
     public function getLPCacheKey()
     {
         return self::LP_CACHE_KEY . $this->storeManager->getStore()->getId();
     }
 
+    /**
+     * @param bool $force
+     * @return array
+     * @throws NoSuchEntityException
+     */
     public function getLandingPages($force = false)
     {
         if (($serialized = $this->cache->load($this->getLPCacheKey()))) {
-            $this->landingPages = $this->serializer->unserialize($serialized);
+            $landingPages = $this->serializer->unserialize($serialized);
         } else {
-            $this->landingPages = json_decode($this->getHawkResponse(\Zend_Http_Client::GET, 'LandingPage/Urls'));
-            sort($this->landingPages, SORT_STRING);
-            $this->cache->save($this->serializer->serialize($this->landingPages), $this->getLPCacheKey(), [], 300);
+            $landingPages = json_decode($this->getHawkResponse(Zend_Http_Client::GET, 'LandingPage/Urls'));
+            sort($landingPages, SORT_STRING);
+            $this->cache->save($this->serializer->serialize($landingPages), $this->getLPCacheKey(), [], 300);
         }
-        return $this->landingPages;
+        return $landingPages;
     }
 
+    /**
+     * @param bool $im
+     */
     public function setIsHawkManaged($im)
     {
         $this->isManaged = $im;
     }
 
+    /**
+     * @param string|null $path
+     * @return bool
+     */
     public function getIsHawkManaged($path = null)
     {
         if (empty($path)) {
@@ -471,6 +589,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * @param string $pageUrl
      * @return bool
+     * @throws NoSuchEntityException
      */
     private function isManagedLandingPage($pageUrl)
     {
@@ -499,17 +618,14 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         return $isManaged;
     }
 
-    public function getCategoryStoreId()
-    {
-        $code = $this->getConfigurationData('hawksearch_proxy/proxy/store_code');
-
-        /**
-         * @var Mage_Core_Model_Resource_Store_Collection $store
-         */
-        $store = $this->storeCollectionFactory->create();
-        return $store->addFieldToFilter('code', $code)->getFirstItem()->getId();
-    }
-
+    /**
+     * @param string $name
+     * @param string $url
+     * @param string $xml
+     * @param string $cid
+     * @param bool $clear
+     * @return array
+     */
     private function getLandingPageObject($name, $url, $xml, $cid, $clear = false)
     {
         $custom = '';
@@ -529,6 +645,10 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         ];
     }
 
+    /**
+     * @param string $id
+     * @return string|bool
+     */
     private function getHawkNarrowXml($id)
     {
         $xml = simplexml_load_string(
@@ -549,6 +669,10 @@ RuleType="Group" Operator="All" />'
         return $xml->asXML();
     }
 
+    /**
+     * @param array $hawklist
+     * @return array
+     */
     private function createExistingCustomFieldMap($hawklist)
     {
         $a = [];
@@ -560,6 +684,11 @@ RuleType="Group" Operator="All" />'
         return $a;
     }
 
+    /**
+     * @param array $lpObject
+     * @param array $existingCustom
+     * @return mixed
+     */
     private function clearExistingCustomField($lpObject, $existingCustom)
     {
         if (isset($existingCustom[$lpObject['Custom']])
@@ -576,13 +705,13 @@ RuleType="Group" Operator="All" />'
                 );
                 $otherObject['PageId'] = $existingCustom[$lpObject['Custom']]['pageid'];
                 $resp = $this->getHawkResponse(
-                    \Zend_Http_Client::PUT,
+                    Zend_Http_Client::PUT,
                     self::HAWK_LANDING_PAGE_URL . $otherObject['PageId'],
                     json_encode($otherObject)
                 );
                 $this->validateHawkLandingPageResponse(
                     $resp,
-                    \Zend_Http_Client::PUT,
+                    Zend_Http_Client::PUT,
                     $lpObject['CustomUrl'],
                     json_encode($lpObject)
                 );
@@ -591,6 +720,10 @@ RuleType="Group" Operator="All" />'
         return $lpObject['Custom'];
     }
 
+    /**
+     * @param Store $store
+     * @throws LocalizedException
+     */
     private function syncHawkLandingByStore(Store $store)
     {
         $this->log(sprintf('Starting environment for store %s', $store->getName()));
@@ -647,12 +780,12 @@ RuleType="Group" Operator="All" />'
                     || $this->overwriteFlag
                 ) {
                     $resp = $this->getHawkResponse(
-                        \Zend_Http_Client::DELETE,
+                        Zend_Http_Client::DELETE,
                         self::HAWK_LANDING_PAGE_URL . $hawkList[$left]['pageid']
                     );
                     $this->validateHawkLandingPageResponse(
                         $resp,
-                        \Zend_Http_Client::DELETE,
+                        Zend_Http_Client::DELETE,
                         $hawkList[$left]['hawkurl']
                     );
                     $this->log(
@@ -682,13 +815,13 @@ RuleType="Group" Operator="All" />'
                 );
                 $customVal = $this->clearExistingCustomField($lpObject, $existingCustom);
                 $resp = $this->getHawkResponse(
-                    \Zend_Http_Client::POST,
+                    Zend_Http_Client::POST,
                     self::HAWK_LANDING_PAGE_URL,
                     json_encode($lpObject)
                 );
                 $this->validateHawkLandingPageResponse(
                     $resp,
-                    \Zend_Http_Client::POST,
+                    Zend_Http_Client::POST,
                     $mageList[$right]['hawkurl'],
                     json_encode($lpObject)
                 );
@@ -713,13 +846,13 @@ RuleType="Group" Operator="All" />'
                 $customVal = $this->clearExistingCustomField($lpObject, $existingCustom);
 
                 $resp = $this->getHawkResponse(
-                    \Zend_Http_Client::PUT,
+                    Zend_Http_Client::PUT,
                     self::HAWK_LANDING_PAGE_URL . $hawkList[$left]['pageid'],
                     json_encode($lpObject)
                 );
                 $this->validateHawkLandingPageResponse(
                     $resp,
-                    \Zend_Http_Client::PUT,
+                    Zend_Http_Client::PUT,
                     $hawkList[$left]['hawkurl'],
                     json_encode($lpObject)
                 );
@@ -756,7 +889,7 @@ RuleType="Group" Operator="All" />'
             if ($store->getConfig('hawksearch_proxy/general/enabled') && $store->isActive()) {
                 try {
                     $this->syncHawkLandingByStore($store);
-                } catch (\Exception $e) {
+                } catch (Exception $e) {
                     $errors[] = sprintf("Error syncing category pages for store '%s'", $store->getCode());
                     $errors[] = sprintf("Exception message: %s", $e->getMessage());
                     continue;
@@ -766,10 +899,13 @@ RuleType="Group" Operator="All" />'
         return $errors;
     }
 
+    /**
+     * @return array
+     */
     public function getHawkLandingPages()
     {
         $hawkPages = [];
-        $pages = json_decode($this->getHawkResponse(\Zend_Http_Client::GET, 'LandingPage'));
+        $pages = json_decode($this->getHawkResponse(Zend_Http_Client::GET, 'LandingPage'));
         foreach ($pages as $page) {
             if (empty($page->Custom) && !$this->overwriteFlag) {
                 continue;
@@ -785,6 +921,10 @@ RuleType="Group" Operator="All" />'
         return $hawkPages;
     }
 
+    /**
+     * @return array
+     * @throws LocalizedException
+     */
     public function getMagentoLandingPages()
     {
         $collection = $this->categoryCollectionFactory->create();
@@ -820,7 +960,11 @@ RuleType="Group" Operator="All" />'
         return $cats;
     }
 
-    protected function getRequestPath(\Magento\Catalog\Model\Category $category)
+    /**
+     * @param Category $category
+     * @return string|null
+     */
+    protected function getRequestPath(Category $category)
     {
         if ($category->hasData('request_path') && $category->getRequestPath() != null) {
             return $category->getRequestPath();
@@ -839,7 +983,8 @@ RuleType="Group" Operator="All" />'
     }
 
     /**
-     * @param $message
+     * @param string $message
+     * @throws NoSuchEntityException
      */
     public function log($message)
     {
@@ -848,44 +993,30 @@ RuleType="Group" Operator="All" />'
         }
     }
 
+    /**
+     * @return bool
+     * @throws NoSuchEntityException
+     */
     public function getManageAll()
     {
-        return $this->getConfigurationData('hawksearch_proxy/proxy/manage_all');
+        return !!$this->getConfigurationData('hawksearch_proxy/proxy/manage_all');
     }
 
+    /**
+     * @return bool
+     * @throws NoSuchEntityException
+     */
     public function isLoggingEnabled()
     {
-        return $this->getConfigurationData('hawksearch_proxy/general/logging_enabled');
+        return !!$this->getConfigurationData('hawksearch_proxy/general/logging_enabled');
     }
 
-    public function getAjaxNotice($force = true)
-    {
-        $collection = $this->categoryCollectionFactory->create();
-        $collection->addAttributeToFilter('parent_id', ['neq' => '0']);
-        $collection->addAttributeToFilter('hawk_landing_page', ['eq' => '1']);
-        $collection->addAttributeToFilter('is_active', ['neq' => '0']);
-        $collection->addAttributeToFilter('display_mode', ['neq' => Category::DM_PAGE]);
-        $count = $collection->count();
-
-        $fs = '';
-        if ($force) {
-            $fs = " Check 'force' to remove lock and restart.";
-        }
-        return sprintf('<span style=\"color:red;\">Currently synchronizing %d categories.%s</span>', $count, $fs);
-    }
-
-    public function isSyncLocked()
-    {
-        $this->log('checking for sync lock');
-        $path = $this->getSyncFilePath();
-        $filename = implode(DIRECTORY_SEPARATOR, [$path, self::LOCK_FILE_NAME]);
-        if ($this->file->isFile($filename)) {
-            $this->log('category sync lock file found, returning true');
-            return $this->file->fileGetContents($filename);
-        }
-        return false;
-    }
-
+    /**
+     * @param string $response
+     * @param string $action
+     * @param string $url
+     * @param string|null $request_raw
+     */
     private function validateHawkLandingPageResponse($response, $action, $url, $request_raw = null)
     {
         // valid response
@@ -893,13 +1024,13 @@ RuleType="Group" Operator="All" />'
         if (isset($res['Message'])) {
             // valid action
             switch ($action) {
-                case \Zend_Http_Client::PUT:
+                case Zend_Http_Client::PUT:
                     $act = 'Landing page: Update';
                     break;
-                case \Zend_Http_Client::POST:
+                case Zend_Http_Client::POST:
                     $act = 'Landing page: Create New';
                     break;
-                case \Zend_Http_Client::DELETE:
+                case Zend_Http_Client::DELETE:
                     $act = 'Landing page: Delete';
                     break;
                 default:
@@ -915,6 +1046,11 @@ RuleType="Group" Operator="All" />'
         }
     }
 
+    /**
+     * @return string
+     * @throws FileSystemException
+     * @throws NoSuchEntityException
+     */
     public function getSyncFilePath()
     {
         $this->log('getting sync lock file path');
@@ -935,21 +1071,25 @@ RuleType="Group" Operator="All" />'
         return $fullPath;
     }
 
+    /**
+     * @return bool
+     */
     public function isCategorySyncCronEnabled()
     {
         return $this->scopeConfig->isSetFlag(self::CONFIG_PROXY_CATEGORY_SYNC_CRON_ENABLED);
     }
 
-    public function hasExceptions()
+    /**
+     * @return bool
+     */
+    protected  function hasExceptions()
     {
-        return count($this->_syncingExceptions) > 0 ? true : false;
+        return count($this->_syncingExceptions) > 0;
     }
 
-    public function getException()
-    {
-        return $this->_syncingExceptions;
-    }
-
+    /**
+     * @return string
+     */
     protected function _getEmailExtraHtml()
     {
         if ($this->hasExceptions()) {
@@ -977,53 +1117,23 @@ RuleType="Group" Operator="All" />'
         return '';
     }
 
-    public function getEmailReceiver()
-    {
-        return $this->getConfigurationData('hawksearch_proxy/sync/email_notification');
-    }
-
-    public function sendStatusEmail()
-    {
-        if ($receiver = $this->getEmailReceiver()) {
-            if ($this->hasExceptions()) {
-                $status_text = "with some following exceptions:";
-            } else {
-                $status_text = "without any exception.";
-            }
-
-            $extra_html = $this->_getEmailExtraHtml();
-
-            /**
-             * @var ProxyEmail $mail_helper
-             */
-            $mail_helper = $this->email_helper->create();
-
-            try {
-                $mail_helper->sendEmail(
-                    $receiver,
-                    [
-                    'status_text' => $status_text,
-                    'extra_html' => $extra_html
-                    ]
-                );
-                return true;
-            } catch (\Exception $e) {
-                $this->log('-- Error: ' . $e->getMessage() . ' - File: ' . $e->getFile() . ' on line ' . $e->getLine());
-                return false;
-            }
-        }
-        return true;
-    }
-
+    /**
+     * @return bool
+     * @throws NoSuchEntityException
+     */
     public function getShowTabs()
     {
-        return $this->getConfigurationData(self::CONFIG_PROXY_SHOWTABS);
+        return !!$this->getConfigurationData(self::CONFIG_PROXY_SHOWTABS);
     }
 
+    /**
+     * @param array $skus
+     * @return Collection
+     */
     public function getResourceCollection(array $skus)
     {
         /**
-         * @var \Magento\Catalog\Model\ResourceModel\Product\Collection $collection
+         * @var Collection $collection
          */
         $collection = $this->collectionFactory->create();
         $collection
@@ -1036,6 +1146,10 @@ RuleType="Group" Operator="All" />'
         return $collection;
     }
 
+    /**
+     * @return array
+     * @throws NoSuchEntityException
+     */
     public function getTypeLabelMap()
     {
         $obj = json_decode($this->getConfigurationData(self::CONFIG_PROXY_TYPE_LABEL));
@@ -1048,16 +1162,28 @@ RuleType="Group" Operator="All" />'
         return $map;
     }
 
+    /**
+     * @return bool
+     * @throws NoSuchEntityException
+     */
     public function getShowTypeLabels()
     {
-        return $this->getConfigurationData(self::CONFIG_PROXY_SHOW_TYPE_LABELS);
+        return !!$this->getConfigurationData(self::CONFIG_PROXY_SHOW_TYPE_LABELS);
     }
 
+    /**
+     * @param string $value
+     * @return string
+     */
     public function generateColor($value)
     {
         return sprintf('#%s', substr(sha1($value), 0, 6));
     }
 
+    /**
+     * @param string $rgb
+     * @return string
+     */
     public function generateTextColor($rgb)
     {
         $r = hexdec(substr($rgb, 1, 2));
@@ -1069,6 +1195,10 @@ RuleType="Group" Operator="All" />'
         return '#000';
     }
 
+    /**
+     * @param string $mode
+     * @return bool
+     */
     public function modeActive(string $mode)
     {
         switch ($mode) {

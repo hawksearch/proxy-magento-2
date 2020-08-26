@@ -14,17 +14,17 @@ declare(strict_types=1);
 
 namespace HawkSearch\Proxy\Model;
 
-use HawkSearch\Proxy\Api\Data\SearchResultTemplateItemInterface;
-use Magento\Framework\DataObject;
+use HawkSearch\Proxy\Api\Data\SearchResultBannerInterface;
+use Magento\Framework\Api\AbstractSimpleObject;
 
-class SearchResultTemplateItem extends DataObject implements SearchResultTemplateItemInterface
+class SearchResultBanner extends AbstractSimpleObject implements SearchResultBannerInterface
 {
     /**
      * @inheritDoc
      */
     public function getZone(): ?string
     {
-        return $this->getData(self::ZONE);
+        return $this->_get(self::ZONE);
     }
 
     /**
@@ -40,7 +40,7 @@ class SearchResultTemplateItem extends DataObject implements SearchResultTemplat
      */
     public function getHtml(): ?string
     {
-        return $this->getData(self::HTML);
+        return $this->_get(self::HTML);
     }
 
     /**
@@ -49,5 +49,37 @@ class SearchResultTemplateItem extends DataObject implements SearchResultTemplat
     public function setHtml(string $value)
     {
         return $this->setData(self::HTML, $value);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getTitle(): ?string
+    {
+        return $this->_get(self::Title);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setTitle(string $value)
+    {
+        return $this->setData(self::Title, $value);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getItems(): array
+    {
+        return $this->_get(self::Items) ?? [];
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setItems(array $value)
+    {
+        return $this->setData(self::Items, $value);
     }
 }

@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2013 Hawksearch (www.hawksearch.com) - All Rights Reserved
+ * Copyright (c) 2020 Hawksearch (www.hawksearch.com) - All Rights Reserved
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -17,7 +17,6 @@ use Magento\Catalog\Model\Category;
 use Magento\Catalog\Setup\CategorySetupFactory;
 use Magento\Eav\Model\Entity\Attribute\ScopedAttributeInterface;
 use Magento\Eav\Model\Entity\Attribute\Source\Boolean;
-use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Setup\InstallDataInterface;
 use Magento\Framework\Setup\ModuleContextInterface;
 use Magento\Framework\Setup\ModuleDataSetupInterface;
@@ -47,8 +46,6 @@ class InstallData implements InstallDataInterface
     /**
      * @param ModuleDataSetupInterface $setup
      * @param ModuleContextInterface $context
-     * @throws LocalizedException
-     * @throws \Zend_Validate_Exception
      */
     public function install(ModuleDataSetupInterface $setup, ModuleContextInterface $context)
     {
@@ -60,7 +57,7 @@ class InstallData implements InstallDataInterface
         $attributeSetId = $categorySetup->getDefaultAttributeSetId($entityTypeId);
         //        $categorySetup->removeAttribute(\Magento\Catalog\Model\Category::ENTITY, 'hawk_landing_page');
         $categorySetup->addAttribute(
-            \Magento\Catalog\Model\Category::ENTITY,
+            Category::ENTITY,
             'hawk_landing_page',
             [
                 'type' => 'int',

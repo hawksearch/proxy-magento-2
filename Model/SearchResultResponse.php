@@ -16,16 +16,16 @@ namespace HawkSearch\Proxy\Model;
 
 use HawkSearch\Proxy\Api\Data\SearchResultDataInterface;
 use HawkSearch\Proxy\Api\Data\SearchResultResponseInterface;
-use Magento\Framework\DataObject;
+use Magento\Framework\Api\AbstractSimpleObject;
 
-class SearchResultResponse extends DataObject implements SearchResultResponseInterface
+class SearchResultResponse extends AbstractSimpleObject implements SearchResultResponseInterface
 {
     /**
      * @inheritDoc
      */
     public function getSuccess(): bool
     {
-        return $this->getData(self::SUCCESS);
+        return $this->_get(self::SUCCESS);
     }
 
     /**
@@ -41,7 +41,7 @@ class SearchResultResponse extends DataObject implements SearchResultResponseInt
      */
     public function getResponseData(): SearchResultDataInterface
     {
-        return $this->getData(self::RESPONSE_DATA);
+        return $this->_get(self::RESPONSE_DATA);
     }
 
     /**
@@ -57,7 +57,7 @@ class SearchResultResponse extends DataObject implements SearchResultResponseInt
      */
     public function getLocation(): ?string
     {
-        return $this->getData(self::LOCATION);
+        return $this->_get(self::LOCATION);
     }
 
     /**
@@ -73,7 +73,7 @@ class SearchResultResponse extends DataObject implements SearchResultResponseInt
      */
     public function getDidYouMean(): ?string
     {
-        return $this->getData(self::DID_YOU_MEAN);
+        return $this->_get(self::DID_YOU_MEAN);
     }
 
     /**
@@ -89,7 +89,7 @@ class SearchResultResponse extends DataObject implements SearchResultResponseInt
      */
     public function getTrackingId(): ?string
     {
-        return $this->getData(self::TRACKING_ID);
+        return $this->_get(self::TRACKING_ID);
     }
 
     /**
@@ -105,7 +105,7 @@ class SearchResultResponse extends DataObject implements SearchResultResponseInt
      */
     public function getMetaRobots(): ?string
     {
-        return $this->getData(self::META_ROBOTS);
+        return $this->_get(self::META_ROBOTS);
     }
 
     /**
@@ -121,7 +121,7 @@ class SearchResultResponse extends DataObject implements SearchResultResponseInt
      */
     public function getHeaderTitle(): ?string
     {
-        return $this->getData(self::HEADER_TITLE);
+        return $this->_get(self::HEADER_TITLE);
     }
 
     /**
@@ -137,7 +137,7 @@ class SearchResultResponse extends DataObject implements SearchResultResponseInt
      */
     public function getMetaDescription(): ?string
     {
-        return $this->getData(self::META_DESCRIPTION);
+        return $this->_get(self::META_DESCRIPTION);
     }
 
     /**
@@ -153,7 +153,7 @@ class SearchResultResponse extends DataObject implements SearchResultResponseInt
      */
     public function getMetaKeywords(): ?string
     {
-        return $this->getData(self::META_KEYWORDS);
+        return $this->_get(self::META_KEYWORDS);
     }
 
     /**
@@ -169,7 +169,7 @@ class SearchResultResponse extends DataObject implements SearchResultResponseInt
      */
     public function getRelCanonical(): ?string
     {
-        return $this->getData(self::REL_CANONICAL);
+        return $this->_get(self::REL_CANONICAL);
     }
 
     /**
@@ -185,7 +185,7 @@ class SearchResultResponse extends DataObject implements SearchResultResponseInt
      */
     public function getOriginal(): ?string
     {
-        return $this->getData(self::ORIGINAL);
+        return $this->_get(self::ORIGINAL);
     }
 
     /**
@@ -201,7 +201,7 @@ class SearchResultResponse extends DataObject implements SearchResultResponseInt
      */
     public function getKeyword(): ?string
     {
-        return $this->getData(self::KEYWORD);
+        return $this->_get(self::KEYWORD);
     }
 
     /**
@@ -217,7 +217,7 @@ class SearchResultResponse extends DataObject implements SearchResultResponseInt
      */
     public function getPageLayoutId(): int
     {
-        return $this->getData(self::PAGE_LAYOUT_ID);
+        return $this->_get(self::PAGE_LAYOUT_ID);
     }
 
     /**
@@ -233,7 +233,7 @@ class SearchResultResponse extends DataObject implements SearchResultResponseInt
      */
     public function getSearchDuration(): int
     {
-        return $this->getData(self::SEARCH_DURATION);
+        return $this->_get(self::SEARCH_DURATION);
     }
 
     /**
@@ -249,7 +249,7 @@ class SearchResultResponse extends DataObject implements SearchResultResponseInt
      */
     public function getQueryUsedAllKeywords(): bool
     {
-        return $this->getData(self::QUERY_USED_ALL_KEYWORDS);
+        return $this->_get(self::QUERY_USED_ALL_KEYWORDS);
     }
 
     /**

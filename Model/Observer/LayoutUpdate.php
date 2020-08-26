@@ -1,9 +1,14 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: mageuser
- * Date: 4/6/17
- * Time: 10:05 AM
+ * Copyright (c) 2020 Hawksearch (www.hawksearch.com) - All Rights Reserved
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+ * IN THE SOFTWARE.
  */
 
 namespace HawkSearch\Proxy\Model\Observer;
@@ -11,6 +16,7 @@ namespace HawkSearch\Proxy\Model\Observer;
 use HawkSearch\Proxy\Model\ConfigProvider;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
+use Magento\Framework\View\Layout;
 
 class LayoutUpdate implements ObserverInterface
 {
@@ -33,7 +39,7 @@ class LayoutUpdate implements ObserverInterface
      * @param  Observer $observer
      * @return void
      */
-    public function execute(\Magento\Framework\Event\Observer $observer)
+    public function execute(Observer $observer)
     {
         if ($observer->getFullActionName() == 'catalogsearch_result_index') {
             if ($this->proxyConfigProvider->isSearchManagementEnabled()) {
@@ -47,7 +53,7 @@ class LayoutUpdate implements ObserverInterface
             }
         } elseif ($observer->getFullActionName() == 'hawkproxy_landingPage_view') {
             /**
-             * @var \Magento\Framework\View\Layout $layout
+             * @var Layout $layout
              */
             $layout = $observer->getLayout();
             $layout->getUpdate()->addHandle('catalog_category_view')
