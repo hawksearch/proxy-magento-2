@@ -19,18 +19,95 @@
             <block class="HawkSearch\Proxy\Block\Html"
                    name="hawksearch_proxy_response"
                    template="HawkSearch_Proxy::hawksearch/proxy/html.phtml">
-                <block class="HawkSearch\Proxy\Block\Tabbed"
-                       name="hawksearch_proxy_block_tabbed"
-                       template="HawkSearch_Proxy::hawksearch/proxy/content/tabbed.phtml">
-                    <block class="HawkSearch\Proxy\Block\Tabbed" name="hawksearch_tabbed_items" as="hawksearch_tabbed_items" template="HawkSearch_Proxy::hawksearch/proxy/tabbed/items.phtml">
-                        <block class="Magento\Framework\View\Element\RendererList" name="hawksearch.tabbed.item.renderers" as="item.renderers">
-                            <block class="HawkSearch\Proxy\Block\Tabbed\DefaultRenderer"
-                                   name="hawksearch.tabbed.item.renderers.default"
-                                   as="default"
-                                   template="hawksearch/proxy/tabbed/default.phtml" />
+
+                <container name="hawksearch.html.additional" as="hawksearch_html_additional"
+                           label="Hawksearch Additional Content">
+                    <container htmlId="hawkbannertop" htmlClass="bannerTop"
+                               htmlTag="div"
+                               name="hawksearch_additional_top">
+                        <block class="HawkSearch\Proxy\Block\Banner"
+                               name="hawksearch_banner_top" >
+                            <action method="setZone">
+                                <argument name="zone" xsi:type="string">BannerTop</argument>
+                            </action>
                         </block>
-                    </block>
-                </block>
+                        <block class="HawkSearch\Proxy\Block\Featured"
+                               name="hawksearch_featured_top"
+                               template="HawkSearch_Proxy::product/featured/sidebar.phtml">
+                            <action method="setZone">
+                                <argument name="zone" xsi:type="string">FeaturedTop</argument>
+                            </action>
+                        </block>
+                    </container>
+                    <container htmlId="hawkbannerlefttop" htmlClass="bannerLeftTop"
+                               htmlTag="div"
+                               name="hawksearch_left_top">
+                        <block class="HawkSearch\Proxy\Block\Banner"
+                               name="hawksearch_banner_left_top" >
+                            <action method="setZone">
+                                <argument name="zone" xsi:type="string">BannerLeftTop</argument>
+                            </action>
+                        </block>
+                        <block class="HawkSearch\Proxy\Block\Featured"
+                               name="hawksearch_featured_left_top"
+                               template="HawkSearch_Proxy::product/featured/sidebar.phtml">
+                            <action method="setZone">
+                                <argument name="zone" xsi:type="string">FeaturedLeftTop</argument>
+                            </action>
+                        </block>
+                    </container>
+                    <container htmlId="hawkbannerleftbottom" htmlClass="bannerLeftBottom"
+                               htmlTag="div"
+                               name="hawksearch_left_bottom">
+                        <block class="HawkSearch\Proxy\Block\Banner"
+                               name="hawksearch_banner_left_bottom" >
+                            <action method="setZone">
+                                <argument name="zone" xsi:type="string">BannerLeftBottom</argument>
+                            </action>
+                        </block>
+                        <block class="HawkSearch\Proxy\Block\Featured"
+                               name="hawksearch_featured_left_bottom"
+                               template="HawkSearch_Proxy::product/featured/sidebar.phtml">
+                            <action method="setZone">
+                                <argument name="zone" xsi:type="string">FeaturedLeftBottom</argument>
+                            </action>
+                        </block>
+                    </container>
+                    <container htmlId="hawkbannerbottom" htmlClass="bannerBottom"
+                               htmlTag="div"
+                               name="hawksearch_additional_bottom">
+                        <block class="HawkSearch\Proxy\Block\Banner"
+                               name="hawksearch_banner_bottom" >
+                            <action method="setZone">
+                                <argument name="zone" xsi:type="string">BannerBottom</argument>
+                            </action>
+                        </block>
+                        <block class="HawkSearch\Proxy\Block\Featured"
+                               name="hawksearch_featured_bottom"
+                               template="HawkSearch_Proxy::product/featured/sidebar.phtml">
+                            <action method="setZone">
+                                <argument name="zone" xsi:type="string">FeaturedBottom</argument>
+                            </action>
+                        </block>
+                    </container>
+                    <container htmlId="hawkbannerbottom2" htmlClass="bannerBottom"
+                               htmlTag="div"
+                               name="hawksearch_additional_bottom2">
+                        <block class="HawkSearch\Proxy\Block\Banner"
+                               name="hawksearch_banner_bottom2" >
+                            <action method="setZone">
+                                <argument name="zone" xsi:type="string">BannerBottom2</argument>
+                            </action>
+                        </block>
+                        <block class="HawkSearch\Proxy\Block\Featured"
+                               name="hawksearch_featured_bottom2"
+                               template="HawkSearch_Proxy::product/featured/sidebar.phtml">
+                            <action method="setZone">
+                                <argument name="zone" xsi:type="string">FeaturedBottom2</argument>
+                            </action>
+                        </block>
+                    </container>
+                </container>
             </block>
         </referenceContainer>
     </body>

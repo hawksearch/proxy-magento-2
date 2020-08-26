@@ -40,23 +40,9 @@ $tabs = $block->getTabs();
         $block->getRelated() ?></div>
     <div id="hawkfacets"><?= /* @noEscape */
         $block->getFacets() ?></div>
-    <div id="hawkbannertop"
-         class="bannerTop"> <?= /* @noEscape */
-            $block->getBanner()->getFeaturedTop() ?><?= /* @noEscape */
-        $block->getBanner()->getBannerTop() ?></div>
-    <div id="hawkbannerlefttop" class="bannerLeftTop"><?= /* @noEscape */
-        $block->getBanner()->getBannerLeftTop() ?></div>
-    <div id="hawkbannerleftbottom"
-         class="bannerLeftBottom"><?= /* @noEscape */
-            $block->getBanner()->getBannerLeftBottom() ?></div>
-    <div id="hawkbannerbottom"
-         class="bannerBottom"> <?= /* @noEscape */
-            $block->getBanner()->getFeaturedBottom() ?><?= /* @noEscape */
-        $block->getBanner()->getBannerBottom() ?></div>
-    <div id="hawkbannerbottom2"
-         class="bannerBottom"> <?= /* @noEscape */
-            $block->getBanner()->getBannerBottom2() ?><?= /* @noEscape */
-        $block->getBanner()->getFeaturedBottom2() ?></div>
+
+    <?= $block->getChildHtml('hawksearch_html_additional') ?>
+
     <div id="hawkbreadcrumb"><?= /* @noEscape */
         $block->getBreadCrumb() ?></div>
     <div id="hawktitle"><?= /* @noEscape */

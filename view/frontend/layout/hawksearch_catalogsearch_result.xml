@@ -23,10 +23,45 @@
         </referenceContainer>
         <move element="search.result" destination="hawksearch_hawkitems" />
         <referenceContainer name="sidebar.main">
+            <container htmlId="hawkbannerlefttop" htmlClass="bannerLeftTop"
+                       htmlTag="div"
+                       name="hawksearch_left_top">
+                <block class="HawkSearch\Proxy\Block\Banner"
+                       name="hawksearch_banner_left_top" >
+                    <action method="setZone">
+                        <argument name="zone" xsi:type="string">BannerLeftTop</argument>
+                    </action>
+                </block>
+                <block class="HawkSearch\Proxy\Block\Featured" name="hawksearch_featured_left_top"
+                       template="HawkSearch_Proxy::product/featured/sidebar.phtml">
+                    <action method="setZone">
+                        <argument name="zone" xsi:type="string">FeaturedLeftTop</argument>
+                    </action>
+                </block>
+            </container>
             <block class="HawkSearch\Proxy\Block\Product\Facets"
                    name="hawksearch_facets" as="hawksearch_facets"
-                   template="HawkSearch_Proxy::hawksearch/proxy/left/facets.phtml" />
+                   template="HawkSearch_Proxy::hawksearch/proxy/left/facets.phtml"
+                   after="hawksearch_left_top" before="hawksearch_left_bottom"
+            />
+            <container htmlId="hawkbannerleftbottom" htmlClass="bannerLeftBottom"
+                       htmlTag="div"
+                       name="hawksearch_left_bottom">
+                <block class="HawkSearch\Proxy\Block\Banner"
+                       name="hawksearch_banner_left_bottom" >
+                    <action method="setZone">
+                        <argument name="zone" xsi:type="string">BannerLeftBottom</argument>
+                    </action>
+                </block>
+                <block class="HawkSearch\Proxy\Block\Featured" name="hawksearch_featured_left_bottom"
+                       template="HawkSearch_Proxy::product/featured/sidebar.phtml">
+                    <action method="setZone">
+                        <argument name="zone" xsi:type="string">FeaturedLeftBottom</argument>
+                    </action>
+                </block>
+            </container>
         </referenceContainer>
+
         <referenceBlock name="catalogsearch.leftnav" remove="true" />
         <referenceContainer name="additional" remove="true" />
     </body>

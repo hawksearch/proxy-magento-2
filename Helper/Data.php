@@ -49,6 +49,7 @@ use Magento\Store\Model\StoreManagerInterface;
 use Magento\UrlRewrite\Model\UrlFinderInterface;
 use Magento\UrlRewrite\Service\V1\Data\UrlRewrite;
 use Zend_Http_Client;
+use Magento\Catalog\Model\Attribute\Config as AttributeConfig;
 
 class Data extends AbstractHelper
 {
@@ -181,6 +182,11 @@ class Data extends AbstractHelper
     private $proxyConfigProvider;
 
     /**
+     * @var AttributeConfig
+     */
+    private $attributeConfig;
+
+    /**
      * Data constructor.
      *
      * @param Context $context
@@ -202,6 +208,7 @@ class Data extends AbstractHelper
      * @param UtilFileSystem $utilFileSystem
      * @param InstructionManagerPool $instructionManagerPool
      * @param ConfigProvider $proxyConfigProvider
+     * @param AttributeConfig $attributeConfig
      */
     public function __construct(
         Context $context,
@@ -222,7 +229,8 @@ class Data extends AbstractHelper
         ioFile $fileDirectory,
         UtilFileSystem $utilFileSystem,
         InstructionManagerPool $instructionManagerPool,
-        ConfigProvider $proxyConfigProvider
+        ConfigProvider $proxyConfigProvider,
+        AttributeConfig $attributeConfig
     ) {
         parent::__construct($context);
         $this->storeManager = $storeManager;
@@ -246,6 +254,7 @@ class Data extends AbstractHelper
         $this->utilFileSystem = $utilFileSystem;
         $this->instructionManagerPool = $instructionManagerPool;
         $this->proxyConfigProvider = $proxyConfigProvider;
+        $this->attributeConfig = $attributeConfig;
     }
 
     /**
@@ -463,9 +472,13 @@ class Data extends AbstractHelper
             }
         }
 
+        $catalogAttributes = $this->catalogConfig->getProductAttributes();
+        $featuredSidebarAttributes = $this->attributeConfig->getAttributeNames('hawksearch_featured_item');
+        $featuredSidebarAttributes = array_merge($catalogAttributes, $featuredSidebarAttributes);
+
         $productCollection = $this->collectionFactory->create();
         $collection = $productCollection
-            ->addAttributeToSelect($this->catalogConfig->getProductAttributes())
+            ->addAttributeToSelect($featuredSidebarAttributes)
             ->addAttributeToFilter('sku', ['in' => $skus])
             ->addMinimalPrice()
             ->addFinalPrice()

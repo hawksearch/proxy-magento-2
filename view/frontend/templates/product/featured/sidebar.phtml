@@ -1,0 +1,81 @@
+<?php
+/**
+ * Copyright (c) 2020 Hawksearch (www.hawksearch.com) - All Rights Reserved
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+ * IN THE SOFTWARE.
+ */
+
+/** @var \HawkSearch\Proxy\Block\Featured $block */
+?>
+<div class="block block-hawksearch-featured"
+     data-bind="scope: '<?= /* @noEscape */  $block->getComponentName() ?>'"
+     data-role="hawksearch-featured-products-sidebar-<?= /* @noEscape */  $block->getZone()?>">
+    <!-- ko if: count -->
+    <div class="block-title">
+        <strong id="block-featured-heading" role="heading" aria-level="2"><?= /* @noEscape */ $block->escapeHtml(__('Featured Products')) ?></strong>
+        <span class="counter qty no-display" data-bind="text: countCaption, css: {'no-display': !count}"></span>
+    </div>
+    <div class="block-content no-display" aria-labelledby="block-featured-heading" data-bind="css: {'no-display': !count}">
+        <ol id="hawksearch-featured-items" class="product-items" data-bind="foreach: items">
+            <li class="product-item">
+                <div class="product-item-info">
+                    <a class="product-item-photo" data-bind="attr: { href: product_url, title: product_name }">
+                        <!-- ko template: {name: $data.image.template, data: $data.image} --><!-- /ko -->
+                    </a>
+                </div>
+                <div class="product-item-details">
+                    <strong class="product-item-name">
+                        <a data-bind="attr: { href: product_url }" class="product-item-link">
+                            <span data-bind="text: product_name"></span>
+                        </a>
+                    </strong>
+                    <div data-bind="html: product_price"></div>
+                    <div class="product-item-actions">
+                        <!-- ko if: product_is_saleable_and_visible -->
+                        <div class="actions-primary">
+                            <!-- ko if: product_has_required_options -->
+                            <a href="#"
+                               data-bind="attr: {'data-post': add_to_cart_params}"
+                               class="action tocart primary">
+                                <span><?= $block->escapeHtml(__('Add to Cart')) ?></span>
+                            </a>
+                            <!-- /ko -->
+                            <!-- ko ifnot: product_has_required_options -->
+                            <button type="button"
+                                    class="action tocart primary"
+                                    data-bind="attr: {'data-post': add_to_cart_params}">
+                                <span><?= $block->escapeHtml(__('Add to Cart')) ?></span>
+                            </button>
+                            <!-- /ko -->
+                        </div>
+                        <!-- /ko -->
+                    </div>
+                </div>
+            </li>
+        </ol>
+    </div>
+    <!-- /ko -->
+</div>
+
+<script type="text/x-magento-init">
+    {
+        "[data-role=hawksearch-featured-products-sidebar-<?= /* @noEscape */ $block->getZone()?>]": {
+            "Magento_Ui/js/core/app": {
+                "components": {
+                    "<?= /* @noEscape */  $block->getComponentName() ?>": {
+                        "component": "HawkSearch_Proxy/js/view/featured-products",
+                        "items": <?= /* @noEscape */ $this->helper(Magento\Framework\Json\Helper\Data::class)->jsonEncode($block->getItems()) ?>,
+                        "count": <?= /* @noEscape */ count($block->getItems()) ?>,
+                        "countCaption": "<?= /* @noEscape */ $block->getCounterLabel(count($block->getItems())) ?>"
+                    }
+                }
+            }
+        }
+    }
+</script>

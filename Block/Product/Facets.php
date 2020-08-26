@@ -16,7 +16,6 @@ namespace HawkSearch\Proxy\Block\Product;
 use HawkSearch\Connector\Gateway\InstructionException;
 use HawkSearch\Proxy\Block\Banner;
 use HawkSearch\Proxy\Helper\Data as ProxyHelper;
-use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NotFoundException;
 use Magento\Framework\View\Element\Template;
 
@@ -51,15 +50,6 @@ class Facets extends Template
     }
 
     /**
-     * @return string
-     * @throws LocalizedException
-     */
-    public function getFeaturedLeftTop()
-    {
-        return $this->getFeaturedZone("FeaturedLeftTop");
-    }
-
-    /**
      * @return string|null
      * @throws InstructionException
      * @throws NotFoundException
@@ -67,32 +57,5 @@ class Facets extends Template
     public function getFacets()
     {
         return $this->hawkHelper->getFacets();
-    }
-
-    /**
-     * @return string
-     * @throws LocalizedException
-     */
-    public function getFeaturedLeftBottom()
-    {
-        return $this->getFeaturedZone("FeaturedLeftBottom");
-    }
-
-    /**
-     * @param $zone
-     * @return string
-     * @throws LocalizedException
-     */
-    protected function getFeaturedZone($zone)
-    {
-        $layout = $this->getLayout();
-        $block = $layout->createBlock(ListFeatured::class);
-        $block->setZone($zone);
-        $productCollection = $block->getLoadedProductCollection();
-        if ($productCollection && $productCollection->count() > 0) {
-            $block->setTemplate('HawkSearch_Proxy::hawksearch/proxy/left/featured.phtml');
-            return $block->toHtml();
-        }
-        return "";
     }
 }

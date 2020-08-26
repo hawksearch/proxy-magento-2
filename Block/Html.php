@@ -18,7 +18,6 @@ use HawkSearch\Proxy\Helper\Data as ProxyHelper;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NotFoundException;
 use Magento\Framework\View\Element\Template;
-use HawkSearch\Proxy\Block\Product\ListFeatured;
 
 /**
  *  Html block
@@ -58,21 +57,12 @@ class Html extends Template
     }
 
     /**
-     * @return Banner
-     */
-    public function getBanner()
-    {
-        return $this->bannerFactory->create();
-    }
-
-    /**
      * @return string|null
      * @throws InstructionException
      * @throws NotFoundException
      */
     public function getFacets()
     {
-
         return $this->helper->getResultData()->getResponseData()->getFacets();
     }
 
@@ -212,42 +202,6 @@ class Html extends Template
         } else {
             return $layout->getBlock('hawksearch_hawkitems')->getChildHtml();
         }
-    }
-
-    /**
-     * @param $zone
-     * @return string
-     * @throws LocalizedException
-     */
-    public function getFeaturedZone($zone)
-    {
-        $layout = $this->getLayout();
-        $block = $layout->createBlock(ListFeatured::class);
-        $block->setZone($zone);
-        $productCollection = $block->getLoadedProductCollection();
-        if ($productCollection->count() > 0) {
-            $block->setTemplate('Magento_Catalog::product/list.phtml');
-            return $block->toHtml();
-        }
-        return "";
-    }
-
-    /**
-     * @param $zone
-     * @return string
-     * @throws LocalizedException
-     */
-    public function getFeaturedLeftZone($zone)
-    {
-        $layout = $this->getLayout();
-        $block = $layout->createBlock(ListFeatured::class);
-        $block->setZone($zone);
-        $productCollection = $block->getLoadedProductCollection();
-        if ($productCollection->count() > 0) {
-            $block->setTemplate('HawkSearch_Proxy::hawksearch/proxy/left/featured.phtml');
-            return $block->toHtml();
-        }
-        return "";
     }
 
     /**

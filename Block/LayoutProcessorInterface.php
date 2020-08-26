@@ -10,11 +10,20 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
+namespace HawkSearch\Proxy\Block;
 
-use HawkSearch\Proxy\Block\Product\Facets;
-
-/** @var $block Facets */
-?>
-<div id="hawkfacets">
-    <?= /* @noEscape */ $block->getFacets(); ?>
-</div>
+/**
+ * Layout processor interface.
+ *
+ * Can be used to provide a custom logic for JS layout preparation.
+ */
+interface LayoutProcessorInterface
+{
+    /**
+     * Process js Layout of block
+     *
+     * @param array $jsLayout
+     * @return array
+     */
+    public function process($jsLayout);
+}

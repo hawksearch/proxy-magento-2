@@ -12,13 +12,11 @@
  */
 namespace HawkSearch\Proxy\Block;
 
+use HawkSearch\Connector\Gateway\InstructionException;
 use HawkSearch\Proxy\Helper\Data as ProxyHelper;
+use Magento\Framework\Exception\NotFoundException;
 use Magento\Framework\View\Element\Template;
 
-/**
- * @method getBannerLeftBottom() string|null
- * @method getBannerLeftTop() string|null
- */
 class Banner extends Template
 {
     /**
@@ -41,6 +39,10 @@ class Banner extends Template
         parent::__construct($context, $data);
     }
 
+    /**
+     * @throws InstructionException
+     * @throws NotFoundException
+     */
     protected function _construct()
     {
         $resultData = $this->helper->getResultData()->getResponseData();
@@ -55,4 +57,58 @@ class Banner extends Template
             }
         }
     }
+
+    /**
+     * @param string $zone
+     */
+    public function setZone(string $zone)
+    {
+        $this->setData('zone', $zone);
+    }
+
+    /**
+     * @return string
+     */
+    public function getZone()
+    {
+        return $this->getData('zone');
+    }
+
+    /**
+     * @inheritDoc
+     */
+    protected function _toHtml()
+    {
+        if (false != $this->getTemplate()) {
+            return parent::_toHtml();
+        }
+
+        $html = '';
+        if ($this->getZone()) {
+            $html = $this->getZoneHtml($this->getZone());
+        }
+
+        return $html;
+    }
+
+    /**
+     * @param $zone
+     * @return string|null
+     * @throws InstructionException
+     * @throws NotFoundException
+     */
+    protected function getZoneHtml($zone)
+    {
+        $html = '';
+        $resultData = $this->helper->getResultData()->getResponseData();
+        foreach ($resultData->getMerchandising()->getItems() as $banner) {
+            if ($banner->getZone() != $zone) {
+                continue;
+            }
+            $html = $banner->getHtml();
+            break;
+        }
+        return $html;
+    }
+
 }
