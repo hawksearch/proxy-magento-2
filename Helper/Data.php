@@ -21,6 +21,7 @@ use HawkSearch\Proxy\Api\Data\SearchResultResponseInterface;
 use HawkSearch\Proxy\Model\ConfigProvider;
 use HawkSearch\Proxy\Model\ProxyEmailFactory;
 use HawkSearch\Proxy\Model\SearchResultBanner;
+use Magento\Catalog\Model\Attribute\Config as AttributeConfig;
 use Magento\Catalog\Model\Category;
 use Magento\Catalog\Model\Config;
 use Magento\Catalog\Model\ResourceModel\Category\CollectionFactory as CategoryCollectionFactory;
@@ -32,7 +33,6 @@ use Magento\Framework\App\CacheInterface as Cache;
 use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\App\Helper\Context;
 use Magento\Framework\Escaper;
-use Magento\Framework\Exception\FileSystemException;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Exception\NotFoundException;
@@ -49,22 +49,20 @@ use Magento\Store\Model\StoreManagerInterface;
 use Magento\UrlRewrite\Model\UrlFinderInterface;
 use Magento\UrlRewrite\Service\V1\Data\UrlRewrite;
 use Zend_Http_Client;
-use Magento\Catalog\Model\Attribute\Config as AttributeConfig;
 
 class Data extends AbstractHelper
 {
     /**#@+
      * Config xml path constants
      */
-    const CONFIG_PROXY_CATEGORY_SYNC_CRON_ENABLED = 'hawksearch_proxy/sync/enabled';
-    const CONFIG_PROXY_SHOWTABS = 'hawksearch_proxy/proxy/show_tabs';
-    const CONFIG_PROXY_TYPE_LABEL = 'hawksearch_proxy/proxy/type_label';
-    const CONFIG_PROXY_SHOW_TYPE_LABELS = 'hawksearch_proxy/proxy/show_type_labels';
+    public const CONFIG_PROXY_CATEGORY_SYNC_CRON_ENABLED = 'hawksearch_proxy/sync/enabled';
+    public const CONFIG_PROXY_SHOWTABS = 'hawksearch_proxy/proxy/show_tabs';
+    public const CONFIG_PROXY_TYPE_LABEL = 'hawksearch_proxy/proxy/type_label';
+    public const CONFIG_PROXY_SHOW_TYPE_LABELS = 'hawksearch_proxy/proxy/show_type_labels';
     /**#@-*/
 
-    const HAWK_LANDING_PAGE_URL = 'LandingPage/';
-    const LP_CACHE_KEY = 'hawk_landing_pages';
-    const LOCK_FILE_NAME = 'hawkcategorysync.lock';
+    public const HAWK_LANDING_PAGE_URL = 'LandingPage/';
+    public const LP_CACHE_KEY = 'hawk_landing_pages';
 
     /**
      * @var array
@@ -238,10 +236,8 @@ class Data extends AbstractHelper
         $this->collectionFactory = $collectionFactory;
         $this->session = $session;
         $this->catalogConfig = $catalogConfig;
-
         $this->overwriteFlag = false;
         $this->email_helper = $email_helper;
-
         $this->categoryCollectionFactory = $categoryCollectionFactory;
         $this->emulation = $emulation;
         $this->storeCollectionFactory = $storeCollectionFactory;
@@ -332,8 +328,12 @@ class Data extends AbstractHelper
         $productCollection = $this->getProductCollection();
         if ($productCollection instanceof Collection) {
             foreach ($productCollection as $item) {
-                $obj[] = ['url' => $item->getProductUrl(),
-                    'tid' => $this->hawkData->getTrackingId(), 'sku' => $item->getSku(), 'i' => $counter++];
+                $obj[] = [
+                    'url' => $item->getProductUrl(),
+                    'tid' => $this->hawkData->getTrackingId(),
+                    'sku' => $item->getSku(),
+                    'i' => $counter++
+                ];
             }
             return sprintf(
                 '<div id="hawktrackingdata" style="display:none;" data-tracking="%s"></div>',
@@ -776,7 +776,7 @@ RuleType="Group" Operator="All" />'
             $customVal = null;
             if ($sc < 0) {
                 //Hawk has page Magento doesn't want managed, delete, increment left
-                if (substr($hawkList[$left]['custom'], 0, strlen('__mage_catid_'))== '__mage_catid_'
+                if (substr($hawkList[$left]['custom'], 0, strlen('__mage_catid_')) == '__mage_catid_'
                     || $this->overwriteFlag
                 ) {
                     $resp = $this->getHawkResponse(
@@ -971,9 +971,9 @@ RuleType="Group" Operator="All" />'
         }
         $rewrite = $this->urlFinder->findOneByData(
             [
-            UrlRewrite::ENTITY_ID => $category->getId(),
-            UrlRewrite::ENTITY_TYPE => CategoryUrlRewriteGenerator::ENTITY_TYPE,
-            UrlRewrite::STORE_ID => $category->getStoreId(),
+                UrlRewrite::ENTITY_ID => $category->getId(),
+                UrlRewrite::ENTITY_TYPE => CategoryUrlRewriteGenerator::ENTITY_TYPE,
+                UrlRewrite::STORE_ID => $category->getStoreId(),
             ]
         );
         if ($rewrite) {
@@ -1047,31 +1047,6 @@ RuleType="Group" Operator="All" />'
     }
 
     /**
-     * @return string
-     * @throws FileSystemException
-     * @throws NoSuchEntityException
-     */
-    public function getSyncFilePath()
-    {
-        $this->log('getting sync lock file path');
-        $relPath = \HawkSearch\Datafeed\Model\ConfigProvider::DEFAULT_FEED_PATH;
-
-        $mediaRoot = $this->filesystem->getDirectoryWrite('media')->getAbsolutePath();
-
-        if (strpos(strrev($mediaRoot), '/') !== 0) {
-            $fullPath = implode(DIRECTORY_SEPARATOR, [$mediaRoot, $relPath]);
-        } else {
-            $fullPath = $mediaRoot . $relPath;
-        }
-
-        if (!$this->fileDirectory->fileExists($fullPath)) {
-            $this->fileDirectory->mkdir($fullPath, 0777, true);
-        }
-
-        return $fullPath;
-    }
-
-    /**
      * @return bool
      */
     public function isCategorySyncCronEnabled()
@@ -1082,7 +1057,7 @@ RuleType="Group" Operator="All" />'
     /**
      * @return bool
      */
-    protected  function hasExceptions()
+    protected function hasExceptions()
     {
         return count($this->_syncingExceptions) > 0;
     }

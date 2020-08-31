@@ -16,7 +16,7 @@ declare(strict_types=1);
 namespace HawkSearch\Proxy\Gateway\Http\Uri;
 
 use HawkSearch\Connector\Gateway\Http\Uri\UriBuilderInterface;
-use HawkSearch\Connector\Model\ConfigProvider as ConnectorConfigProvider;
+use HawkSearch\Connector\Model\Config\ApiSettings as ApiSettingsProvider;
 
 class SearchUriBuilder implements UriBuilderInterface
 {
@@ -26,18 +26,18 @@ class SearchUriBuilder implements UriBuilderInterface
     const PATH_SITES = 'sites';
 
     /**
-     * @var ConnectorConfigProvider
+     * @var ApiSettingsProvider
      */
-    private $connectorConfigProvider;
+    private $apiSettingsProvider;
 
     /**
      * SearchUriBuilder constructor.
-     * @param ConnectorConfigProvider $connectorConfigProvider
+     * @param ApiSettingsProvider $apiSettingsProvider
      */
     public function __construct(
-        ConnectorConfigProvider $connectorConfigProvider
+        ApiSettingsProvider $apiSettingsProvider
     ) {
-        $this->connectorConfigProvider = $connectorConfigProvider;
+        $this->apiSettingsProvider = $apiSettingsProvider;
     }
 
     /**
@@ -78,7 +78,7 @@ class SearchUriBuilder implements UriBuilderInterface
             $pathStart[] = array_shift($pathParts);
         }
 
-        array_unshift($pathParts, static::PATH_SITES, $this->connectorConfigProvider->getEngineName());
+        array_unshift($pathParts, static::PATH_SITES, $this->apiSettingsProvider->getEngineName());
         $pathParts = array_merge($pathStart, $pathParts);
 
         return implode('/', $pathParts);
