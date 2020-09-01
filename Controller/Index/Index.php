@@ -19,6 +19,8 @@ use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\App\ResponseInterface;
+use Magento\Framework\Controller\Result\Json;
+use Magento\Framework\Controller\Result\JsonFactory;
 use Magento\Framework\Controller\Result\Raw;
 use Magento\Framework\Controller\ResultInterface;
 
@@ -46,16 +48,23 @@ class Index extends Action
     private $proxyConfigProvider;
 
     /**
+     * @var JsonFactory
+     */
+    private $resultJsonFactory;
+
+    /**
      * Index constructor.
      * @param Context $context
      * @param Session $session
      * @param Raw $result
+     * @param JsonFactory $resultJsonFactory
      * @param ConfigProvider $proxyConfigProvider
      */
     public function __construct(
         Context $context,
         Session $session,
         Raw $result,
+        JsonFactory $resultJsonFactory,
         ConfigProvider $proxyConfigProvider
     ) {
         parent::__construct($context);
@@ -63,6 +72,7 @@ class Index extends Action
         $this->session = $session;
         $this->request = $context->getRequest();
         $this->proxyConfigProvider = $proxyConfigProvider;
+        $this->resultJsonFactory = $resultJsonFactory;
     }
 
     /**
@@ -85,12 +95,14 @@ class Index extends Action
             }
             $html = $block->toHtml();
         }
-        $params = $this->getRequest()->getParams();
-        $obj = ['Success' => 'true', 'html' => $html, 'location' => ''];
+        $result = [
+            'success' => 'true',
+            'html' => $html,
+            'location' => ''
+        ];
 
-        $this->result->setHeader('Content-Type', 'application/javascript');
-        $this->result->setContents($params['callback'] . '(' . json_encode($obj) . ')');
-
-        return $this->result;
+        /** @var Json $resultJson */
+        $resultJson = $this->resultJsonFactory->create();
+        return $resultJson->setData($result);
     }
 }
