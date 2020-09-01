@@ -76,12 +76,15 @@ class SearchParametersBuilder implements BuilderInterface
      */
     public function build(array $buildSubject)
     {
+        // define default params' values
         $params = [
             'output' => 'custom',
             'hawkitemlist' => 'json',
             'hawkfeatured' => 'json',
             'lpurl' => '', //TODO
         ];
+
+        $params = array_merge($params, $buildSubject);
 
         if ($this->proxyConfigProvider->showTabs()) {
             $params['hawktabs'] = 'html';
@@ -98,7 +101,8 @@ class SearchParametersBuilder implements BuilderInterface
         if (isset($buildSubject['q'])) {
             $params['q'] = $buildSubject['q'];
         }
-        $this->manageLandingPageParam($params, $buildSubject);
+        $this->manageLandingPageParam($params, $buildSubject)
+            ->sanitizeParams($params);
 
         return $params;
     }
@@ -107,6 +111,7 @@ class SearchParametersBuilder implements BuilderInterface
      * Modify $params array and add `lpurl` param conditionally
      * @param array $params
      * @param array $buildSubject
+     * @return SearchParametersBuilder
      */
     private function manageLandingPageParam(&$params, $buildSubject)
     {
@@ -149,5 +154,20 @@ class SearchParametersBuilder implements BuilderInterface
         ) {
             unset($params['lpurl']);
         }
+
+        return $this;
+    }
+
+    /**
+     * Remove unused parameters from the API URL query params
+     * @param $params
+     * @return SearchParametersBuilder
+     */
+    private function sanitizeParams(&$params)
+    {
+        unset($params['ajax']);
+        unset($params['json']);
+
+        return $this;
     }
 }

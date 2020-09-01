@@ -2630,7 +2630,7 @@
 
                     // notice we use global jQuery to be able to track global events for ajax calls
                     // used by miniprofiler and possibly other libraries
-                    window.jQuery.ajax({ "type": "GET", "data": "", "async": "true", "contentType": "application/json; charset=utf-8", "url": full, "dataType": "jsonp", "success": function (json) { HawkSearch.processFacets(hash, json, queryGuid); } });
+                    window.jQuery.ajax({ "type": "GET", "data": "", "async": "true", "contentType": "application/json; charset=utf-8", "url": full, "dataType": "json", "success": function (json) { HawkSearch.processFacets(hash, json, queryGuid); } });
                 };
             };
 
