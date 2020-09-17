@@ -13,7 +13,7 @@
 namespace HawkSearch\Proxy\Controller\Index;
 
 use HawkSearch\Proxy\Block\Html;
-use HawkSearch\Proxy\Model\ConfigProvider;
+use HawkSearch\Proxy\Model\Config\Proxy as ProxyConfigProvider;
 use Magento\Catalog\Model\Session;
 use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
@@ -41,7 +41,7 @@ class Index extends Action
     private $request;
 
     /**
-     * @var ConfigProvider
+     * @var ProxyConfigProvider
      */
     private $proxyConfigProvider;
 
@@ -50,13 +50,13 @@ class Index extends Action
      * @param Context $context
      * @param Session $session
      * @param Raw $result
-     * @param ConfigProvider $proxyConfigProvider
+     * @param ProxyConfigProvider $proxyConfigProvider
      */
     public function __construct(
         Context $context,
         Session $session,
         Raw $result,
-        ConfigProvider $proxyConfigProvider
+        ProxyConfigProvider $proxyConfigProvider
     ) {
         parent::__construct($context);
         $this->result = $result;

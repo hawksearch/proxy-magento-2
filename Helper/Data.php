@@ -17,8 +17,12 @@ use Composer\Util\Filesystem as UtilFileSystem;
 use Exception;
 use HawkSearch\Connector\Gateway\Instruction\InstructionManagerPool;
 use HawkSearch\Connector\Gateway\InstructionException;
+use HawkSearch\Connector\Helper\Url as UrlUtility;
+use HawkSearch\Connector\Model\Config\ApiSettings;
 use HawkSearch\Proxy\Api\Data\SearchResultResponseInterface;
-use HawkSearch\Proxy\Model\ConfigProvider;
+use HawkSearch\Proxy\Gateway\Http\Uri\SearchUriBuilder;
+use HawkSearch\Proxy\Model\Config\General as GeneralConfigProvider;
+use HawkSearch\Proxy\Model\Config\Proxy as ProxyConfigProvider;
 use HawkSearch\Proxy\Model\ProxyEmailFactory;
 use HawkSearch\Proxy\Model\SearchResultBanner;
 use Magento\Catalog\Model\Attribute\Config as AttributeConfig;
@@ -175,7 +179,7 @@ class Data extends AbstractHelper
     private $instructionManagerPool;
 
     /**
-     * @var ConfigProvider
+     * @var ProxyConfigProvider
      */
     private $proxyConfigProvider;
 
@@ -183,6 +187,26 @@ class Data extends AbstractHelper
      * @var AttributeConfig
      */
     private $attributeConfig;
+
+    /**
+     * @var GeneralConfigProvider
+     */
+    private $generalConfigProvider;
+
+    /**
+     * @var ApiSettings
+     */
+    private $apiSetingsConfigProvider;
+
+    /**
+     * @var SearchUriBuilder
+     */
+    private $searchUriBuilder;
+
+    /**
+     * @var UrlUtility
+     */
+    private $urlUtility;
 
     /**
      * Data constructor.
@@ -205,8 +229,12 @@ class Data extends AbstractHelper
      * @param ioFile $fileDirectory
      * @param UtilFileSystem $utilFileSystem
      * @param InstructionManagerPool $instructionManagerPool
-     * @param ConfigProvider $proxyConfigProvider
+     * @param ProxyConfigProvider $proxyConfigProvider
+     * @param ApiSettings $apiSettingsConfigProvider
+     * @param GeneralConfigProvider $generalConfigProvider
      * @param AttributeConfig $attributeConfig
+     * @param SearchUriBuilder $searchUriBuilder
+     * @param UrlUtility $urlUtility
      */
     public function __construct(
         Context $context,
@@ -227,8 +255,12 @@ class Data extends AbstractHelper
         ioFile $fileDirectory,
         UtilFileSystem $utilFileSystem,
         InstructionManagerPool $instructionManagerPool,
-        ConfigProvider $proxyConfigProvider,
-        AttributeConfig $attributeConfig
+        ProxyConfigProvider $proxyConfigProvider,
+        ApiSettings $apiSettingsConfigProvider,
+        GeneralConfigProvider $generalConfigProvider,
+        AttributeConfig $attributeConfig,
+        SearchUriBuilder $searchUriBuilder,
+        UrlUtility $urlUtility
     ) {
         parent::__construct($context);
         $this->storeManager = $storeManager;
@@ -250,7 +282,11 @@ class Data extends AbstractHelper
         $this->utilFileSystem = $utilFileSystem;
         $this->instructionManagerPool = $instructionManagerPool;
         $this->proxyConfigProvider = $proxyConfigProvider;
+        $this->apiSetingsConfigProvider = $apiSettingsConfigProvider;
+        $this->generalConfigProvider = $generalConfigProvider;
         $this->attributeConfig = $attributeConfig;
+        $this->searchUriBuilder = $searchUriBuilder;
+        $this->urlUtility = $urlUtility;
     }
 
     /**
@@ -295,8 +331,26 @@ class Data extends AbstractHelper
      */
     public function getApiUrl()
     {
-        $apiUrl = rtrim($this->proxyConfigProvider->getHawkUrlHost(), '/');
+        $apiUrl = rtrim($this->apiSetingsConfigProvider->getApiUrl(), '/');
         return $apiUrl . '/api/v3/';
+    }
+
+    /**
+     * @param string $path
+     * @param array $queryParams
+     * @return string
+     */
+    public function getSearchUrl(string $path = '', array $queryParams = [])
+    {
+        $url = $this->searchUriBuilder->build($this->apiSetingsConfigProvider->getApiUrl(), $path);
+
+        if ($queryParams) {
+            $url = $this->urlUtility->getUriWithQuery(
+                $url,
+                $queryParams
+            )->__toString();
+        }
+        return $url;
     }
 
     /**
@@ -519,7 +573,7 @@ class Data extends AbstractHelper
             if (isset($data)) {
                 $client->setRawData($data, 'application/json');
             }
-            $client->setHeaders('X-HawkSearch-ApiKey', $this->getApiKey());
+            $client->setHeaders('X-HawkSearch-ApiKey', $this->apiSetingsConfigProvider->getApiKey());
             $client->setHeaders('Accept', 'application/json');
             $this->log(sprintf('fetching request. URL: %s, Method: %s', $client->getUri(), $method));
             $response = $client->request();
@@ -577,7 +631,7 @@ class Data extends AbstractHelper
         $path = '/' . rtrim(ltrim($path, '/'), '/');
 
         if (in_array($path, ['/catalogsearch/result', '/hawkproxy'])
-            && $this->proxyConfigProvider->isSearchManagementEnabled()
+            && $this->proxyConfigProvider->isManageSearch()
         ) {
             return true;
         }
@@ -886,7 +940,7 @@ RuleType="Group" Operator="All" />'
             /**
              * @var Store $store
              */
-            if ($store->getConfig('hawksearch_proxy/general/enabled') && $store->isActive()) {
+            if ($this->generalConfigProvider->isEnabled($store) && $store->isActive()) {
                 try {
                     $this->syncHawkLandingByStore($store);
                 } catch (Exception $e) {
@@ -932,7 +986,7 @@ RuleType="Group" Operator="All" />'
         $collection->addAttributeToFilter('is_active', ['eq' => '1']);
         $collection->addAttributeToSort('entity_id')->addAttributeToSort('parent_id')->addAttributeToSort('position');
         $collection->addAttributeToFilter('level', ['gteq' => '2']);
-        if (!$this->getManageAll()) {
+        if (!$this->proxyConfigProvider->isManageAllCategories()) {
             $collection->addAttributeToFilter('hawk_landing_page', ['eq' => '1']);
         }
 
@@ -988,27 +1042,9 @@ RuleType="Group" Operator="All" />'
      */
     public function log($message)
     {
-        if ($this->isLoggingEnabled()) {
+        if ($this->generalConfigProvider->isLoggingEnabled()) {
             $this->_logger->addDebug($message);
         }
-    }
-
-    /**
-     * @return bool
-     * @throws NoSuchEntityException
-     */
-    public function getManageAll()
-    {
-        return !!$this->getConfigurationData('hawksearch_proxy/proxy/manage_all');
-    }
-
-    /**
-     * @return bool
-     * @throws NoSuchEntityException
-     */
-    public function isLoggingEnabled()
-    {
-        return !!$this->getConfigurationData('hawksearch_proxy/general/logging_enabled');
     }
 
     /**
@@ -1180,9 +1216,9 @@ RuleType="Group" Operator="All" />'
             case 'proxy':
                 return true;
             case 'catalogsearch':
-                return $this->proxyConfigProvider->isSearchManagementEnabled();
+                return $this->proxyConfigProvider->isManageSearch();
             case 'category':
-                return $this->proxyConfigProvider->isCategoriesManagementEnabled();
+                return $this->proxyConfigProvider->isManageCategories();
         }
         return false;
     }

@@ -13,9 +13,12 @@
 
 namespace HawkSearch\Proxy\ViewModel;
 
-use HawkSearch\Proxy\Model\ConfigProvider as ProxyConfigProvider;
+use HawkSearch\Connector\Model\Config\ApiSettings;
+use HawkSearch\Proxy\Helper\Data as ProxyHelper;
+use HawkSearch\Proxy\Model\Config\Proxy as ProxyConfigProvider;
 use Magento\Framework\UrlInterface;
 use Magento\Framework\View\Element\Block\ArgumentInterface;
+
 
 class Config implements ArgumentInterface
 {
@@ -30,16 +33,32 @@ class Config implements ArgumentInterface
     private $urlBuilder;
 
     /**
+     * @var ProxyHelper
+     */
+    private $proxyHelper;
+
+    /**
+     * @var ApiSettings
+     */
+    private $apiSettingsConfigProvider;
+
+    /**
      * Footer constructor.
      * @param ProxyConfigProvider $proxyConfigProvider
      * @param UrlInterface $urlBuilder
+     * @param ProxyHelper $proxyHelper
+     * @param ApiSettings $apiSettingsConfigProvider
      */
     public function __construct(
         ProxyConfigProvider $proxyConfigProvider,
-        UrlInterface $urlBuilder
+        UrlInterface $urlBuilder,
+        ProxyHelper $proxyHelper,
+        ApiSettings $apiSettingsConfigProvider
     ) {
         $this->proxyConfigProvider = $proxyConfigProvider;
         $this->urlBuilder = $urlBuilder;
+        $this->proxyHelper = $proxyHelper;
+        $this->apiSettingsConfigProvider = $apiSettingsConfigProvider;
     }
 
     /**
@@ -51,11 +70,12 @@ class Config implements ArgumentInterface
     }
 
     /**
+     * @param string $path
      * @return string|null
      */
-    public function getHawkUrl()
+    public function getHawkUrl($path = '')
     {
-        return $this->proxyConfigProvider->getHawkUrl();
+        return $this->proxyHelper->getSearchUrl($path);
     }
 
     /**
@@ -63,7 +83,7 @@ class Config implements ArgumentInterface
      */
     public function getTrackingUrl()
     {
-        return $this->proxyConfigProvider->getTrackingUrl();
+        return $this->apiSettingsConfigProvider->getTrackingUrl();
     }
 
     /**
@@ -71,7 +91,7 @@ class Config implements ArgumentInterface
      */
     public function getRecommendedUrl()
     {
-        return $this->proxyConfigProvider->getRecommendedUrl();
+        return $this->apiSettingsConfigProvider->getRecommendationUrl();
     }
 
     /**
@@ -79,7 +99,7 @@ class Config implements ArgumentInterface
      */
     public function getTrackingKey()
     {
-        return $this->proxyConfigProvider->getOrderTrackingKey();
+        return $this->apiSettingsConfigProvider->getOrderTrackingKey();
     }
 
     /**
@@ -109,7 +129,7 @@ class Config implements ArgumentInterface
     /**
      * @return bool
      */
-    public function isHawkCssIncluded() : ?bool
+    public function isHawkCssIncluded(): ?bool
     {
         return $this->proxyConfigProvider->isHawkCssIncluded();
     }
