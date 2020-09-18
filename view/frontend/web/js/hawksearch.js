@@ -3105,10 +3105,10 @@
                             while (divNode.childNodes.length > 0)
                                 divNode.removeChild(divNode.childNodes[0]);
 
-                            var categories = autoSuggestResult.Categories;
-                            var popular = autoSuggestResult.Popular;
-                            var products = autoSuggestResult.Products;
-                            var content = autoSuggestResult.Content;
+                            var categories = autoSuggestResult.Categories || [];
+                            var popular = autoSuggestResult.Popular || [];
+                            var products = autoSuggestResult.Products || [];
+                            var content = autoSuggestResult.Content || [];
 
                             showTerms(suggestDiv, popular, "Popular Searches", HawkSearch.LilBro.Schema.AutoCompleteClick.AutoCompleteType.popular);
                             showTerms(suggestDiv, categories, "Top Categories", HawkSearch.LilBro.Schema.AutoCompleteClick.AutoCompleteType.category);
