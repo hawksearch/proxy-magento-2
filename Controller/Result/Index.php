@@ -14,7 +14,7 @@
 namespace HawkSearch\Proxy\Controller\Result;
 
 use HawkSearch\Proxy\Helper\Data as ProxyHelper;
-use HawkSearch\Proxy\Model\ConfigProvider;
+use HawkSearch\Proxy\Model\Config\Proxy as ProxyConfigProvider;
 use Magento\Catalog\Model\Layer\Resolver;
 use Magento\Catalog\Model\Session;
 use Magento\CatalogSearch\Controller\Result\Index as CatalogSearchResultIndex;
@@ -48,7 +48,7 @@ class Index extends CatalogSearchResultIndex
     private $proxyHelper;
 
     /**
-     * @var ConfigProvider
+     * @var ProxyConfigProvider
      */
     private $proxyConfigProvider;
 
@@ -61,7 +61,7 @@ class Index extends CatalogSearchResultIndex
      * @param Resolver $layerResolver
      * @param CatalogSearchHelper $catalogSearchHelper
      * @param ProxyHelper $proxyHelper
-     * @param ConfigProvider $proxyConfigProvider
+     * @param ProxyConfigProvider $proxyConfigProvider
      */
     public function __construct(
         Context $context,
@@ -71,7 +71,7 @@ class Index extends CatalogSearchResultIndex
         Resolver $layerResolver,
         CatalogSearchHelper $catalogSearchHelper,
         ProxyHelper $proxyHelper,
-        ConfigProvider $proxyConfigProvider
+        ProxyConfigProvider $proxyConfigProvider
     )
     {
         parent::__construct($context, $catalogSession, $storeManager, $queryFactory, $layerResolver);
@@ -88,7 +88,7 @@ class Index extends CatalogSearchResultIndex
      */
     public function execute()
     {
-        if (!$this->proxyConfigProvider->isSearchManagementEnabled()) {
+        if (!$this->proxyConfigProvider->isManageSearch()) {
             parent::execute();
             return;
         }

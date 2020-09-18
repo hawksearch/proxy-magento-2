@@ -13,7 +13,7 @@
 
 namespace HawkSearch\Proxy\Controller;
 
-use HawkSearch\Proxy\Model\ConfigProvider;
+use HawkSearch\Proxy\Model\Config\Proxy as ProxyConfigProvider;
 use Magento\Framework\App\Action\Forward;
 use Magento\Framework\App\ActionFactory;
 use Magento\Framework\App\RequestInterface;
@@ -27,17 +27,17 @@ class SearchRouter implements RouterInterface
     protected $actionFactory;
 
     /**
-     * @var ConfigProvider
+     * @var ProxyConfigProvider
      */
     private $proxyConfigProvider;
 
     /**
      * @param ActionFactory $actionFactory
-     * @param ConfigProvider $proxyConfigProvider
+     * @param ProxyConfigProvider $proxyConfigProvider
      */
     public function __construct(
         ActionFactory $actionFactory,
-        ConfigProvider $proxyConfigProvider
+        ProxyConfigProvider $proxyConfigProvider
     )
     {
         $this->actionFactory = $actionFactory;

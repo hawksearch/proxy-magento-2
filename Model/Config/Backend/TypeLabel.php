@@ -14,7 +14,6 @@
 namespace HawkSearch\Proxy\Model\Config\Backend;
 
 use HawkSearch\Proxy\Helper\Data as ProxyHelper;
-use HawkSearch\Proxy\Model\ConfigProvider as ProxyConfigProvider;
 use Magento\Config\Model\Config\Backend\Serialized\ArraySerialized;
 use Magento\Framework\App\Cache\TypeListInterface;
 use Magento\Framework\App\Config\ScopeConfigInterface;
@@ -34,18 +33,12 @@ class TypeLabel extends ArraySerialized
     private $proxyHelper;
 
     /**
-     * @var ProxyConfigProvider
-     */
-    private $proxyConfigProvider;
-
-    /**
      * TypeLabel constructor.
      * @param ProxyHelper $proxyHelper
      * @param Context $context
      * @param Registry $registry
      * @param ScopeConfigInterface $config
      * @param TypeListInterface $cacheTypeList
-     * @param ProxyConfigProvider $proxyConfigProvider
      * @param AbstractResource|null $resource
      * @param AbstractDb|null $resourceCollection
      * @param array $data
@@ -57,7 +50,6 @@ class TypeLabel extends ArraySerialized
         Registry $registry,
         ScopeConfigInterface $config,
         TypeListInterface $cacheTypeList,
-        ProxyConfigProvider $proxyConfigProvider,
         AbstractResource $resource = null,
         AbstractDb $resourceCollection = null,
         array $data = [],
@@ -74,7 +66,6 @@ class TypeLabel extends ArraySerialized
             $serializer
         );
         $this->proxyHelper = $proxyHelper;
-        $this->proxyConfigProvider = $proxyConfigProvider;
     }
 
     /**
@@ -88,8 +79,10 @@ class TypeLabel extends ArraySerialized
 
             $client = new Zend_Http_Client();
             $client->setUri(
-                $this->proxyConfigProvider->getHawkUrl() . '/?'
-                . http_build_query(['q' => '', 'hawktabs' => 'json', 'it' => 'all', 'output' => 'custom'])
+                $this->proxyHelper->getSearchUrl(
+                    '',
+                    ['q' => '', 'hawktabs' => 'json', 'it' => 'all', 'output' => 'custom']
+                ),
             );
             $response = $client->request();
             if ($response->getStatus() != 200) {

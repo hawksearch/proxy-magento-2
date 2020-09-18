@@ -17,7 +17,7 @@ namespace HawkSearch\Proxy\Gateway\Request;
 use HawkSearch\Connector\Gateway\Request\BuilderInterface;
 use HawkSearch\Connector\Model\ConfigProvider as ConnectorConfigProvider;
 use HawkSearch\Proxy\Helper\Data;
-use HawkSearch\Proxy\Model\ConfigProvider as ProxyConfigProvider;
+use HawkSearch\Proxy\Model\Config\Proxy as ProxyConfigProvider;
 use Magento\Catalog\Model\Session as CatalogSession;
 use Magento\Framework\App\RequestInterface;
 
@@ -126,7 +126,7 @@ class SearchParametersBuilder implements BuilderInterface
                 }
                 break;
             case 'catalog_category':
-                if ($this->proxyConfigProvider->isCategoriesManagementEnabled()) {
+                if ($this->proxyConfigProvider->isManageCategories()) {
                     $params['lpurl'] = empty($buildSubject['lpurl'])
                         ? $this->httpRequest->getAlias('rewrite_request_path')
                         : $buildSubject['lpurl'];

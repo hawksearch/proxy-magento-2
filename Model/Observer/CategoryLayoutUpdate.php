@@ -13,7 +13,7 @@
 
 namespace HawkSearch\Proxy\Model\Observer;
 
-use HawkSearch\Proxy\Model\ConfigProvider as ProxyConfigProvider;
+use HawkSearch\Proxy\Model\Config\Proxy as ProxyConfigProvider;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Framework\View\Layout;
@@ -41,7 +41,7 @@ class CategoryLayoutUpdate implements ObserverInterface
      */
     public function execute(Observer $observer)
     {
-        if ($this->proxyConfigProvider->isCategoriesManagementEnabled()) {
+        if ($this->proxyConfigProvider->isManageCategories()) {
             if ($observer->getFullActionName() == 'catalog_category_view') {
                 /**
                  * @var Layout $layout

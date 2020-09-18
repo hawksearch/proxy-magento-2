@@ -14,10 +14,9 @@
 namespace HawkSearch\Proxy\Controller;
 
 use HawkSearch\Proxy\Helper\Data;
-use HawkSearch\Proxy\Model\ConfigProvider;
+use HawkSearch\Proxy\Model\Config\Proxy as ProxyConfigProvider;
 use Magento\Framework\App\Action\Forward;
 use Magento\Framework\App\ActionFactory;
-use Magento\Framework\App\ActionInterface;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\App\RouterInterface;
 
@@ -34,19 +33,19 @@ class LandingPageRouter implements RouterInterface
     private $helper;
 
     /**
-     * @var ConfigProvider
+     * @var ProxyConfigProvider
      */
     private $proxyConfigProvider;
 
     /**
      * @param ActionFactory $actionFactory
      * @param Data $helper
-     * @param ConfigProvider $proxyConfigProvider
+     * @param ProxyConfigProvider $proxyConfigProvider
      */
     public function __construct(
         ActionFactory $actionFactory,
         Data $helper,
-        ConfigProvider $proxyConfigProvider
+        ProxyConfigProvider $proxyConfigProvider
     )
     {
         $this->actionFactory = $actionFactory;

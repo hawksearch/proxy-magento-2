@@ -14,8 +14,9 @@ declare(strict_types=1);
 
 namespace HawkSearch\Proxy\ViewModel\OnePage;
 
+use HawkSearch\Connector\Helper\Url as UrlUtility;
+use HawkSearch\Connector\Model\Config\ApiSettings;
 use HawkSearch\Proxy\Logger\ProxyLogger;
-use HawkSearch\Proxy\Model\ConfigProvider;
 use Magento\Catalog\Model\Session as CatalogSession;
 use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Framework\View\Element\Block\ArgumentInterface;
@@ -33,32 +34,40 @@ class Tracking implements ArgumentInterface
     private $checkoutSession;
 
     /**
-     * @var ConfigProvider
-     */
-    private $configProvider;
-
-    /**
      * @var ProxyLogger
      */
     private $logger;
 
     /**
+     * @var UrlUtility
+     */
+    private $urlUtility;
+
+    /**
+     * @var ApiSettings
+     */
+    private $apiSettingsConfigProvider;
+
+    /**
      * Tracking constructor.
      * @param CheckoutSession $checkoutSession
      * @param CatalogSession $session
-     * @param ConfigProvider $configProvider
      * @param ProxyLogger $logger
+     * @param UrlUtility $urlUtility
+     * @param ApiSettings $apiSettingsConfigProvider
      */
     public function __construct(
         CheckoutSession $checkoutSession,
         CatalogSession $session,
-        ConfigProvider $configProvider,
-        ProxyLogger $logger
+        ProxyLogger $logger,
+        UrlUtility $urlUtility,
+        ApiSettings $apiSettingsConfigProvider
     ) {
         $this->catalogSession = $session;
         $this->checkoutSession = $checkoutSession;
-        $this->configProvider = $configProvider;
         $this->logger = $logger;
+        $this->urlUtility = $urlUtility;
+        $this->apiSettingsConfigProvider = $apiSettingsConfigProvider;
     }
 
     /**
@@ -75,13 +84,22 @@ class Tracking implements ArgumentInterface
             )
         );
         $order = $this->checkoutSession->getLastRealOrder();
-        return $this->configProvider->getTrackingPixelUrl() . http_build_query(
+
+        $url = $this->urlUtility->getUriWithPath(
+            $this->apiSettingsConfigProvider->getApiUrl(),
+            'sites/_hawk/hawkconversion.aspx'
+        )->__toString();
+
+        $url = $this->urlUtility->getUriWithQuery(
+            $url,
             [
-                'd' => $this->configProvider->getOrderTrackingKey(),
+                'd' => $this->apiSettingsConfigProvider->getOrderTrackingKey(),
                 'hawksessionid' => $sid,
                 'orderno' => $order->getIncrementId(),
                 'total' => $order->getGrandTotal()
             ]
-        );
+        )->__toString();
+
+        return $url;
     }
 }

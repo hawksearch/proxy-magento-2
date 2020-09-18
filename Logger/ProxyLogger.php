@@ -15,29 +15,29 @@ declare(strict_types=1);
 namespace HawkSearch\Proxy\Logger;
 
 use Magento\Framework\Logger\Monolog;
-use HawkSearch\Proxy\Model\ConfigProvider;
+use HawkSearch\Proxy\Model\Config\General as GeneralConfigProvider;
 
 class ProxyLogger extends Monolog
 {
     /**
-     * @var ConfigProvider
+     * @var GeneralConfigProvider
      */
-    private $configProvider;
+    private $generalConfigProvider;
 
     /**
      * ProxyLogger constructor.
-     * @param ConfigProvider $configProvider
+     * @param GeneralConfigProvider $generalConfigProvider
      * @param $name
      * @param array $handlers
      * @param array $processors
      */
     public function __construct(
-        ConfigProvider $configProvider,
+        GeneralConfigProvider $generalConfigProvider,
         $name,
         array $handlers = [],
         array $processors = []
     ) {
-        $this->configProvider = $configProvider;
+        $this->generalConfigProvider = $generalConfigProvider;
         parent::__construct(
             $name,
             $handlers,
@@ -52,7 +52,7 @@ class ProxyLogger extends Monolog
      */
     public function debug($message, array $context = []) : bool
     {
-        if ($this->configProvider->isLoggingEnabled()) {
+        if ($this->generalConfigProvider->isLoggingEnabled()) {
             return parent::debug($message, $context);
         } else {
             return false;
