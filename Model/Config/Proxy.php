@@ -39,6 +39,8 @@ class Proxy extends ConfigProvider
     const CONFIG_ENABLE_CUSTOM_SEARCH_ROUTE = 'enable_custom_search_route';
     const CONFIG_CUSTOM_SEARCH_ROUTE = 'custom_search_route';
     const CONFIG_ALLOW_FULLTEXT = 'allow_fulltext';
+    const CONFIG_TYPE_LABEL = 'type_label';
+    const CONFIG_SHOW_TYPE_LABELS = 'show_type_labels';
     /**#@-*/
 
     /**
@@ -190,5 +192,23 @@ class Proxy extends ConfigProvider
     public function allowFulltext($store = null): bool
     {
         return !!$this->getConfig(self::CONFIG_ALLOW_FULLTEXT, $store);
+    }
+
+    /**
+     * @param StoreInterface|int|null $store
+     * @return string|null
+     */
+    public function getTypeLabel($store = null): ?string
+    {
+        return $this->getConfig(self::CONFIG_TYPE_LABEL, $store);
+    }
+
+    /**
+     * @param StoreInterface|int|null $store
+     * @return bool
+     */
+    public function showTypeLabels($store = null): bool
+    {
+        return !!$this->getConfig(self::CONFIG_SHOW_TYPE_LABELS, $store);
     }
 }

@@ -15,6 +15,7 @@ namespace HawkSearch\Proxy\Block\Product;
 
 use HawkSearch\Connector\Gateway\InstructionException;
 use HawkSearch\Proxy\Helper\Data as ProxyHelper;
+use HawkSearch\Proxy\Model\Config\Proxy as ProxyConfigProvider;
 use Magento\Catalog\Api\CategoryRepositoryInterface;
 use Magento\Catalog\Block\Product\Context;
 use Magento\Catalog\Model\Layer\Resolver;
@@ -69,6 +70,11 @@ class ListProduct extends \Magento\Catalog\Block\Product\ListProduct
     private $mode;
 
     /**
+     * @var ProxyConfigProvider
+     */
+    private $proxyConfigProvider;
+
+    /**
      * ListProduct constructor.
      * @param Context $context
      * @param PostHelper $postDataHelper
@@ -78,6 +84,7 @@ class ListProduct extends \Magento\Catalog\Block\Product\ListProduct
      * @param PricingHelper $pricingHelper
      * @param ProxyHelper $hawkHelper
      * @param Http $response
+     * @param ProxyConfigProvider $proxyConfigProvider
      * @param string $mode
      * @param array $data
      */
@@ -90,6 +97,7 @@ class ListProduct extends \Magento\Catalog\Block\Product\ListProduct
         PricingHelper $pricingHelper,
         ProxyHelper $hawkHelper,
         Http $response,
+        ProxyConfigProvider $proxyConfigProvider,
         string $mode = 'proxy',
         array $data = []
     ) {
@@ -98,6 +106,7 @@ class ListProduct extends \Magento\Catalog\Block\Product\ListProduct
         $this->response = $response;
         parent::__construct($context, $postDataHelper, $layerResolver, $categoryRepository, $urlHelper, $data);
         $this->mode = $mode;
+        $this->proxyConfigProvider = $proxyConfigProvider;
     }
 
     /**
@@ -133,7 +142,7 @@ class ListProduct extends \Magento\Catalog\Block\Product\ListProduct
                     ) . '</div>';
             }
             $this->topSeen = true;
-            if ($this->hawkHelper->getShowTabs()) {
+            if ($this->proxyConfigProvider->showTabs()) {
                 return sprintf(
                     '<div id="hawktabs">%s</div><div id="hawktoppager">%s</div>',
                     $this->hawkHelper->getResultData()->getResponseData()->getTabs(),

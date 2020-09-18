@@ -47,7 +47,6 @@ use Magento\Framework\Logger\Monolog;
 use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Store\Model\App\Emulation;
 use Magento\Store\Model\ResourceModel\Store\CollectionFactory as StoreCollectionFactory;
-use Magento\Store\Model\ScopeInterface;
 use Magento\Store\Model\Store;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\UrlRewrite\Model\UrlFinderInterface;
@@ -56,15 +55,6 @@ use Zend_Http_Client;
 
 class Data extends AbstractHelper
 {
-    /**#@+
-     * Config xml path constants
-     */
-    public const CONFIG_PROXY_CATEGORY_SYNC_CRON_ENABLED = 'hawksearch_proxy/sync/enabled';
-    public const CONFIG_PROXY_SHOWTABS = 'hawksearch_proxy/proxy/show_tabs';
-    public const CONFIG_PROXY_TYPE_LABEL = 'hawksearch_proxy/proxy/type_label';
-    public const CONFIG_PROXY_SHOW_TYPE_LABELS = 'hawksearch_proxy/proxy/show_type_labels';
-    /**#@-*/
-
     public const HAWK_LANDING_PAGE_URL = 'LandingPage/';
     public const LP_CACHE_KEY = 'hawk_landing_pages';
 
@@ -290,18 +280,6 @@ class Data extends AbstractHelper
     }
 
     /**
-     * @param string $data
-     * @return mixed
-     * @throws NoSuchEntityException
-     */
-    public function getConfigurationData($data)
-    {
-        $storeScope = ScopeInterface::SCOPE_STORE;
-
-        return $this->scopeConfig->getValue($data, $storeScope, $this->storeManager->getStore()->getCode());
-    }
-
-    /**
      * @throws InstructionException
      * @throws NotFoundException
      */
@@ -408,15 +386,6 @@ class Data extends AbstractHelper
             $this->fetchResponse();
         }
         return $this->hawkData->getResponseData()->getFacets();
-    }
-
-    /**
-     * @return string|null
-     * @throws NoSuchEntityException
-     */
-    public function getApiKey()
-    {
-        return $this->getConfigurationData('hawksearch_proxy/proxy/hawksearch_api_key');
     }
 
     /**
@@ -1085,14 +1054,6 @@ RuleType="Group" Operator="All" />'
     /**
      * @return bool
      */
-    public function isCategorySyncCronEnabled()
-    {
-        return $this->scopeConfig->isSetFlag(self::CONFIG_PROXY_CATEGORY_SYNC_CRON_ENABLED);
-    }
-
-    /**
-     * @return bool
-     */
     protected function hasExceptions()
     {
         return count($this->_syncingExceptions) > 0;
@@ -1129,15 +1090,6 @@ RuleType="Group" Operator="All" />'
     }
 
     /**
-     * @return bool
-     * @throws NoSuchEntityException
-     */
-    public function getShowTabs()
-    {
-        return !!$this->getConfigurationData(self::CONFIG_PROXY_SHOWTABS);
-    }
-
-    /**
      * @param array $skus
      * @return Collection
      */
@@ -1163,7 +1115,7 @@ RuleType="Group" Operator="All" />'
      */
     public function getTypeLabelMap()
     {
-        $obj = json_decode($this->getConfigurationData(self::CONFIG_PROXY_TYPE_LABEL));
+        $obj = $this->serializer->unserialize($this->proxyConfigProvider->getTypeLabel());
         $map = [];
         if (is_object($obj)) {
             foreach ($obj as $key => $item) {
@@ -1171,15 +1123,6 @@ RuleType="Group" Operator="All" />'
             }
         }
         return $map;
-    }
-
-    /**
-     * @return bool
-     * @throws NoSuchEntityException
-     */
-    public function getShowTypeLabels()
-    {
-        return !!$this->getConfigurationData(self::CONFIG_PROXY_SHOW_TYPE_LABELS);
     }
 
     /**

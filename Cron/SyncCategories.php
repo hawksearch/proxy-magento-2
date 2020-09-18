@@ -14,6 +14,7 @@
 namespace HawkSearch\Proxy\Cron;
 
 use HawkSearch\Proxy\Helper\Data;
+use HawkSearch\Proxy\Model\Config\Sync as SyncConfigProvider;
 use HawkSearch\Proxy\Model\ProxyEmail;
 use HawkSearch\Proxy\Model\Task\Exception\TaskException;
 use HawkSearch\Proxy\Model\Task\Exception\TaskLockException;
@@ -40,18 +41,22 @@ class SyncCategories
      * @param ProxyEmail $email
      * @param Task $task
      * @param TaskOptionsFactory $taskOptionsFactory
+     * @param SyncConfigProvider $syncConfigProvider
      */
     public function __construct(
         Data $helper,
         ProxyEmail $email,
         Task $task,
-        TaskOptionsFactory $taskOptionsFactory
+        TaskOptionsFactory $taskOptionsFactory,
+        SyncConfigProvider $syncConfigProvider
     )
     {
         $this->helper = $helper;
         $this->email = $email;
         $this->task = $task;
         $this->taskOptionsFactory = $taskOptionsFactory;
+        $this->taskOptionsFactory = $taskOptionsFactory;
+        $this->syncConfigProvider = $syncConfigProvider;
     }
 
     /**
@@ -59,7 +64,7 @@ class SyncCategories
      */
     public function execute()
     {
-        if (!$this->helper->isCategorySyncCronEnabled()) {
+        if (!$this->syncConfigProvider->isEnabled()) {
             return;
         }
 

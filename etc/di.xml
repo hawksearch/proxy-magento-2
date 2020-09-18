@@ -154,5 +154,11 @@
             <argument name="configGroup" xsi:type="string">proxy</argument>
         </arguments>
     </type>
+    <type name="HawkSearch\Proxy\Model\Config\Sync">
+        <arguments>
+            <argument name="configRootPath" xsi:type="string">hawksearch_proxy</argument>
+            <argument name="configGroup" xsi:type="string">sync</argument>
+        </arguments>
+    </type>
     <!-- END Configs -->
 </config>
