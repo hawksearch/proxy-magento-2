@@ -16,6 +16,7 @@ namespace HawkSearch\Proxy\Block;
 use HawkSearch\Connector\Gateway\InstructionException;
 use HawkSearch\Proxy\Api\Data\SearchResultContentItemInterface;
 use HawkSearch\Proxy\Helper\Data as ProxyHelper;
+use HawkSearch\Proxy\Model\Config\Proxy as ProxyConfigProvider;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Exception\NotFoundException;
 use Magento\Framework\View\Element\Template;
@@ -38,20 +39,28 @@ class Tabbed extends Html
     public static $increment = 1;
 
     /**
+     * @var ProxyConfigProvider
+     */
+    private $proxyConfigProvider;
+
+    /**
      * Tabbed constructor.
      * @param Template\Context $context
      * @param ProxyHelper $helper
      * @param BannerFactory $bannerFactory
+     * @param ProxyConfigProvider $proxyConfigProvider
      * @param array $data
      */
     public function __construct(
         Template\Context $context,
         ProxyHelper $helper,
         BannerFactory $bannerFactory,
+        ProxyConfigProvider $proxyConfigProvider,
         array $data = []
     ) {
         parent::__construct($context, $helper, $bannerFactory, $data);
         $this->helper = $helper;
+        $this->proxyConfigProvider = $proxyConfigProvider;
     }
 
     /**
@@ -83,7 +92,7 @@ class Tabbed extends Html
     {
         $rendererList = $this->getChildBlock('item.renderers');
         $type = 'default';
-        if ($this->helper->getShowTypeLabels()
+        if ($this->proxyConfigProvider->showTypeLabels()
             && $this->getRequest()->getParam('it') != 'all' && isset($item->getCustom()['it'])) {
             $type = strstr($item->getCustom()['it'], '|^|', true);
         }
@@ -110,7 +119,7 @@ class Tabbed extends Html
      */
     public function getTypeLabel($item)
     {
-        if (!$this->helper->getShowTypeLabels() || !isset($item->getCustom()['it'])) {
+        if (!$this->proxyConfigProvider->showTypeLabels() || !isset($item->getCustom()['it'])) {
             return '';
         }
         if (!$this->labelMap) {

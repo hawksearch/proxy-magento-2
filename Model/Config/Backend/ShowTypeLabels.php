@@ -13,6 +13,7 @@
 
 namespace HawkSearch\Proxy\Model\Config\Backend;
 
+use HawkSearch\Connector\Model\Config\ApiSettings as ApiSettingsProvider;
 use HawkSearch\Proxy\Helper\Data;
 use Magento\Framework\App\Cache\TypeListInterface;
 use Magento\Framework\App\Config\ScopeConfigInterface;
@@ -33,12 +34,18 @@ class ShowTypeLabels extends Value
     private $helper;
 
     /**
+     * @var ApiSettingsProvider
+     */
+    private $apiSettingsProvider;
+
+    /**
      * ShowTypeLabels constructor.
      * @param Data $helper
      * @param Context $context
      * @param Registry $registry
      * @param ScopeConfigInterface $config
      * @param TypeListInterface $cacheTypeList
+     * @param ApiSettingsProvider $apiSettingsProvider
      * @param AbstractResource|null $resource
      * @param AbstractDb|null $resourceCollection
      * @param array $data
@@ -49,12 +56,14 @@ class ShowTypeLabels extends Value
         Registry $registry,
         ScopeConfigInterface $config,
         TypeListInterface $cacheTypeList,
+        ApiSettingsProvider $apiSettingsProvider,
         AbstractResource $resource = null,
         AbstractDb $resourceCollection = null,
         array $data = []
     ) {
         parent::__construct($context, $registry, $config, $cacheTypeList, $resource, $resourceCollection, $data);
         $this->helper = $helper;
+        $this->apiSettingsProvider = $apiSettingsProvider;
     }
 
     /**
@@ -153,7 +162,7 @@ class ShowTypeLabels extends Value
         $client = new Zend_Http_Client();
         $client->setUri($this->helper->getApiUrl() . $path . '?' . http_build_query($args));
         $client->setMethod(Zend_Http_Client::GET);
-        $client->setHeaders('X-HawkSearch-ApiKey', $this->helper->getApiKey());
+        $client->setHeaders('X-HawkSearch-ApiKey', $this->apiSettingsProvider->getApiKey());
         $client->setHeaders('Accept', 'application/json');
 
         $response = $client->request();
@@ -172,7 +181,7 @@ class ShowTypeLabels extends Value
         $client = new Zend_Http_Client();
         $client->setUri($this->helper->getApiUrl() . $path . '?');
         $client->setMethod(Zend_Http_Client::PUT);
-        $client->setHeaders('X-HawkSearch-ApiKey', $this->helper->getApiKey());
+        $client->setHeaders('X-HawkSearch-ApiKey', $this->apiSettingsProvider->getApiKey());
         $client->setHeaders('Accept', 'application/json');
         $client->setHeaders('Content-Type', 'application/json');
         $client->setRawData($body);

@@ -17,7 +17,7 @@ namespace HawkSearch\Proxy\Gateway\Request;
 use HawkSearch\Connector\Gateway\Request\BuilderInterface;
 use HawkSearch\Connector\Model\ConfigProvider as ConnectorConfigProvider;
 use HawkSearch\Proxy\Helper\Data;
-use HawkSearch\Proxy\Model\ConfigProvider as ProxyConfigProvider;
+use HawkSearch\Proxy\Model\Config\Proxy as ProxyConfigProvider;
 use Magento\Catalog\Model\Session as CatalogSession;
 use Magento\Framework\App\RequestInterface;
 
@@ -76,12 +76,15 @@ class SearchParametersBuilder implements BuilderInterface
      */
     public function build(array $buildSubject)
     {
+        // define default params' values
         $params = [
             'output' => 'custom',
             'hawkitemlist' => 'json',
             'hawkfeatured' => 'json',
             'lpurl' => '', //TODO
         ];
+
+        $params = array_merge($params, $buildSubject);
 
         if ($this->proxyConfigProvider->showTabs()) {
             $params['hawktabs'] = 'html';
@@ -98,7 +101,8 @@ class SearchParametersBuilder implements BuilderInterface
         if (isset($buildSubject['q'])) {
             $params['q'] = $buildSubject['q'];
         }
-        $this->manageLandingPageParam($params, $buildSubject);
+        $this->manageLandingPageParam($params, $buildSubject)
+            ->sanitizeParams($params);
 
         return $params;
     }
@@ -107,6 +111,7 @@ class SearchParametersBuilder implements BuilderInterface
      * Modify $params array and add `lpurl` param conditionally
      * @param array $params
      * @param array $buildSubject
+     * @return SearchParametersBuilder
      */
     private function manageLandingPageParam(&$params, $buildSubject)
     {
@@ -121,7 +126,7 @@ class SearchParametersBuilder implements BuilderInterface
                 }
                 break;
             case 'catalog_category':
-                if ($this->proxyConfigProvider->isCategoriesManagementEnabled()) {
+                if ($this->proxyConfigProvider->isManageCategories()) {
                     $params['lpurl'] = empty($buildSubject['lpurl'])
                         ? $this->httpRequest->getAlias('rewrite_request_path')
                         : $buildSubject['lpurl'];
@@ -149,5 +154,20 @@ class SearchParametersBuilder implements BuilderInterface
         ) {
             unset($params['lpurl']);
         }
+
+        return $this;
+    }
+
+    /**
+     * Remove unused parameters from the API URL query params
+     * @param $params
+     * @return SearchParametersBuilder
+     */
+    private function sanitizeParams(&$params)
+    {
+        unset($params['ajax']);
+        unset($params['json']);
+
+        return $this;
     }
 }
