@@ -65,9 +65,15 @@
                        type="select" showInDefault="0" showInWebsite="0" showInStore="1" sortOrder="46">
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <label>Enable HawkSearch Landing pages</label>
-                    <depends>
-                        <field id="manage_categories">1</field>
-                    </depends>
+                </field>
+                <field id="hawk_landing_pages_cache" translate="label comment"
+                       type="text" showInDefault="0" showInWebsite="0" showInStore="1" sortOrder="46">
+                    <label>HawkSearch Landing pages cache</label>
+                    <comment>
+                        Cache lifetime in seconds. Values below 300 are not recommended.
+                        Increase cache lifetime if Landing Pages API is requested too often.
+                    </comment>
+                    <validate>integer</validate>
                 </field>
                 <field id="manage_search"
                        translate="label comment"

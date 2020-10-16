@@ -574,7 +574,11 @@ class Data extends AbstractHelper
         } else {
             $landingPages = json_decode($this->getHawkResponse(Zend_Http_Client::GET, 'LandingPage/Urls'));
             sort($landingPages, SORT_STRING);
-            $this->cache->save($this->serializer->serialize($landingPages), $this->getLPCacheKey(), [], 300);
+            $this->cache->save(
+                $this->serializer->serialize($landingPages),
+                $this->getLPCacheKey(), [],
+                $this->proxyConfigProvider->getLandingPagesCache()
+            );
         }
         return $landingPages;
     }

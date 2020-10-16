@@ -28,6 +28,7 @@ class Proxy extends ConfigProvider
     const CONFIG_MANAGE_CATEGORIES = 'manage_categories';
     const CONFIG_MANAGE_ALL = 'manage_all';
     const CONFIG_ENABLE_HAWK_LANDING_PAGES = 'enable_hawk_landing_pages';
+    const CONFIG_HAWK_LANDING_PAGES_CACHE = 'hawk_landing_pages_cache';
     const CONFIG_MANAGE_SEARCH = 'manage_search';
     const CONFIG_HAWKSEARCH_INCLUDE_CSS = 'hawksearch_include_css';
     const CONFIG_SEARCH_BOX_IDS = 'search_box_ids';
@@ -183,6 +184,15 @@ class Proxy extends ConfigProvider
     {
         return $this->generalConfigProvider->isEnabled()
             && $this->getConfig(self::CONFIG_ENABLE_HAWK_LANDING_PAGES, $store);
+    }
+
+    /**
+     * @param StoreInterface|int|null $store
+     * @return int
+     */
+    public function getLandingPagesCache($store = null): int
+    {
+        return (int)$this->getConfig(self::CONFIG_HAWK_LANDING_PAGES_CACHE, $store);
     }
 
     /**
