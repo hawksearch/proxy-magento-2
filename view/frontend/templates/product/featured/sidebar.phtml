@@ -13,6 +13,7 @@
 
 /** @var \HawkSearch\Proxy\Block\Featured $block */
 ?>
+<?php if ($block->getItems()): ?>
 <div class="block block-hawksearch-featured"
      data-bind="scope: '<?= /* @noEscape */  $block->getComponentName() ?>'"
      data-role="hawksearch-featured-products-sidebar-<?= /* @noEscape */  $block->getZone()?>">
@@ -79,3 +80,4 @@
         }
     }
 </script>
+<?php endif; ?>

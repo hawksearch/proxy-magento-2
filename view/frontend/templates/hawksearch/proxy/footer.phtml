@@ -28,6 +28,7 @@ if (!$configViewModel) {
         HawkSearch.TrackingUrl = '<?= /* @noEscape */ $configViewModel->getTrackingUrl(); ?>';
         HawkSearch.RecommenderUrl = '<?= /* @noEscape */ $configViewModel->getRecommendedUrl(); ?>';
         HawkSearch.ClientGuid = '<?= /* @noEscape */ $configViewModel->getTrackingKey(); ?>';
+        HawkSearch.loadjQuery = false;
         if ('http:' == document.location.protocol) {
             HawkSearch.BaseUrl = HawkSearch.BaseUrl.replace('https://', 'http://');
             HawkSearch.HawkUrl = HawkSearch.HawkUrl.replace('https://', 'http://');

@@ -10,6 +10,106 @@
  * IN THE SOFTWARE.
  */
 
+HawkSearch.Dictionary = (function () {
+    function Dictionary() {
+        if (!(this instanceof Dictionary))
+            return new Dictionary();
+    }
+
+    Dictionary.prototype.count = function () {
+        var key,
+            count = 0;
+
+        for (key in this) {
+            if (this.hasOwnProperty(key))
+                count += 1;
+        }
+        return count;
+    };
+
+    Dictionary.prototype.keys = function () {
+        var key,
+            keys = [];
+
+        for (key in this) {
+            if (this.hasOwnProperty(key))
+                keys.push(key);
+        }
+        return keys;
+    };
+
+    Dictionary.prototype.values = function () {
+        var key,
+            values = [];
+
+        for (key in this) {
+            if (this.hasOwnProperty(key))
+                values.push(this[key]);
+        }
+        return values;
+    };
+
+    Dictionary.prototype.keyValuePairs = function () {
+        var key,
+            keyValuePairs = [];
+
+        for (key in this) {
+            if (this.hasOwnProperty(key))
+                keyValuePairs.push({
+                    Key: key,
+                    Value: this[key]
+                });
+        }
+        return keyValuePairs;
+    };
+
+    Dictionary.prototype.add = function (key, value) {
+        this[key] = value;
+    }
+
+    Dictionary.prototype.clear = function () {
+        var key,
+            dummy;
+
+        for (key in this) {
+            if (this.hasOwnProperty(key))
+                dummy = delete this[key];
+        }
+    }
+
+    Dictionary.prototype.containsKey = function (key) {
+        return this.hasOwnProperty(key);
+    }
+
+    Dictionary.prototype.containsValue = function (value) {
+        var key;
+
+        for (key in this) {
+            if (this.hasOwnProperty(key) && this[key] === value)
+                return true;
+        }
+        return false;
+    }
+
+    Dictionary.prototype.remove = function (key) {
+        var dummy;
+
+        if (this.hasOwnProperty(key)) {
+            dummy = delete this[key];
+            return true;
+        } else
+            return false;
+    }
+
+    return Dictionary;
+}());
+
+HawkSearch.ContextObj = function () {
+};
+HawkSearch.ContextObj.prototype = new HawkSearch.Dictionary();
+HawkSearch.ContextObj.prototype.Custom = new HawkSearch.Dictionary();
+HawkSearch.Context = new HawkSearch.ContextObj();
+
 (function (HawkSearchLoader, undefined) {
     var jQuery;
 
@@ -2632,7 +2732,17 @@
 
                     // notice we use global jQuery to be able to track global events for ajax calls
                     // used by miniprofiler and possibly other libraries
-                    window.jQuery.ajax({ "type": "GET", "data": "", "async": "true", "contentType": "application/json; charset=utf-8", "url": full, "dataType": "json", "success": function (json) { HawkSearch.processFacets(hash, json, queryGuid); } });
+                    window.jQuery.ajax({
+                        "type": "GET",
+                        "data": "",
+                        "async": "true",
+                        "contentType": "application/json; charset=utf-8",
+                        "url": full,
+                        "dataType": "json",
+                        "success": function (json) {
+                            HawkSearch.processFacets(hash, json, queryGuid);
+                        }
+                    });
                 };
             };
 
@@ -2697,6 +2807,9 @@
                 HawkSearch.copyValue(objs, '#hawkaid');
                 HawkSearch.copyValue(objs, '#hawkp');
 
+                HawkSearch.triggerUpdateMultipleWishlist(json.multiple_wishlist)
+                HawkSearch.triggerUpdateRequisitionList()
+
                 HawkSearch.copyCustomBanners(objs);
 
                 if (queryGuid !== undefined) {
@@ -2738,6 +2851,51 @@
                 }
 
             };
+
+            /**
+             * Update Multiple wishlist widget on PLP after ajax content reloading
+             */
+            HawkSearch.triggerUpdateMultipleWishlist = function(widgetData) {
+                $('.popup-tmpl').remove();
+                $('.split-btn-tmpl').remove();
+                $('#form-tmpl-multiple').replaceWith(widgetData);
+
+                var wishlistWidget;
+                wishlistWidget = $('body').data('mageMultipleWishlist');
+
+                if (wishlistWidget !== undefined) {
+                    wishlistWidget.destroy();
+                }
+                var uiRegistry = require('uiRegistry');
+                if (uiRegistry !== undefined) {
+                    uiRegistry.remove('multipleWishlist');
+                }
+
+                $('.page-wrapper').trigger('contentUpdated');
+            }
+
+            /**
+             * Update Requisition list widget on PLP after ajax content reloading
+             */
+            HawkSearch.triggerUpdateRequisitionList = function() {
+                var uiRegistry = require('uiRegistry');
+                if (uiRegistry !== undefined) {
+                    $(uiRegistry.filter({
+                        "component": "Magento_RequisitionList/js/requisition/action/product/add"
+                    })).each(function () {
+                        uiRegistry.remove(this.index);
+                    });
+
+                    $(uiRegistry.filter({
+                        "component": "Magento_RequisitionList/js/requisition/list/edit"
+                    })).each(function () {
+                        uiRegistry.remove(this.index);
+                    });
+                }
+
+                $('.page-wrapper').trigger('contentUpdated');
+                $('.block-requisition-list.social-button').applyBindings();
+            }
 
             HawkSearch.clearAllFacets = function () {
                 var keyword = $("#hdnhawkkeyword").val();
@@ -3946,6 +4104,8 @@
 
         // END Namespaced HawkSearch block.
 
+        loadJQueryPlugins($);
+
         window.onpopstate = function () {
             log("onhashchagne event handler");
             HawkSearch.refreshResults(true);
@@ -4147,250 +4307,12 @@
             HawkSearch.BindBackToTop();
 
         });
+    }
 
-
-
-        $.expr[':'].containsNoCase = function (a, i, m) {
-            var regex = /(.*?)\s\(\d+?\)/;
-            var textNode = a.textContent || a.innerText || "";
-            var matches = textNode.match(regex);
-            if (matches == null) {
-                return null;
-            }
-
-            return (matches[1]).toUpperCase().indexOf(m[3].toUpperCase()) >= 0;
-        };
-
-        $.fn.filterThatList = function (options) {
-            // if there are no passed options create an empty options object
-            if (options === undefined || options === null) {
-                options = {};
-            }
-            ;
-
-            // set up default options
-            var defaults = {
-                searchTarget: $(this) // the search input
-            };
-
-            return this.each(function () {
-                // merge passed options with default options to create settings
-                var settings = $.extend(defaults, options);
-
-                settings.searchTarget.change(function () {
-                    // get the value of the input which is used to filter against
-                    var filter = $(this).val();
-                    var searchList = settings.list;
-                    var isNestedFacet = settings.list.hasClass("hawk-nestedfacet");
-                    //when nested facet prepare flat facet
-                    if (isNestedFacet) {
-                        var flatUlId = settings.list.attr("id") + "_flat";
-                        if ($("#" + flatUlId).length == 0) {
-                            var searchList = $(settings.list[0].cloneNode(false));
-                            searchList.removeClass("hawk-navTruncateList");
-                            searchList.addClass("hawk-scrollList");
-                            searchList.attr("id", flatUlId);
-                            searchList.appendTo(settings.list.parent());
-
-                            $(settings.list).find("li").each(function () {
-                                var pathArr = [];
-                                $(this).parentsUntil("#" + settings.list.attr("id"), "li").each(function () {
-                                    var text = $($($(this).children("a")).children("span").contents()[0]).text();
-                                    text = text.trim();
-                                    pathArr.unshift(text);
-                                });
-
-                                var li = $("<li>");
-                                if ($(this).hasClass("hawkFacet-active")) {
-                                    li.addClass("hawkFacet-active");
-                                }
-
-                                li.appendTo(searchList);
-                                var anchor = $(this).children("a").clone();
-                                if (pathArr.length > 0) {
-                                    var textSpan = anchor.children("span")
-                                    var spanCount = textSpan.children(".hawk-facetCount").remove()
-                                    pathArr.push(textSpan.text());
-                                    textSpan.html(pathArr.join(" &raquo; "));
-                                    textSpan.append(spanCount);
-                                }
-
-                                anchor.appendTo(li);
-                            });
-                            var liHeight = searchList.children("li").first().outerHeight();
-                            //set search list for max 20 elements
-                            searchList.css("max-height", (liHeight * 20) + "px");
-                            settings.list.hide();
-                        }
-                        else {
-                            searchList = $("#" + flatUlId);
-                            searchList.show();
-                            settings.list.hide();
-                        }
-                    }
-                    var noResults = ("<li><span>No Results Found</span></li>");
-
-                    if (filter) {
-                        searchList
-                            // hide items that do not match input filter
-                            .find("li:not(:containsNoCase(" + filter + "))").hide()
-                            // show items that match input filter
-                            .end().find("li:containsNoCase(" + filter + ")").show();
-
-                        var items = searchList.find("li:containsNoCase(" + filter + ")");
-
-                        // nothing matches filter
-                        // add no results found
-                        if (items.length == 0) {
-                            var item = $(noResults);
-                            searchList.prepend(item);
-                            return;
-                        }
-
-                        //check if more results
-                        var options = settings.list.data().options;
-                        var moreItems = items.filter(function (index) {
-                            return index >= options.cutoff;
-                        });
-                        moreItems.hide();
-
-                        //if no more results
-                        if (moreItems.length == 0) {
-                            return;
-                        }
-
-                        //otherwise
-                        //remove no results
-                        items.find(":contains('No Results Found')").remove();
-
-                        if (moreItems) {
-                            //add more button and handle it's click event
-                            var more = settings.list.find("li.hawk-navMore");
-                            more.off("click").each(function () { $(this).find("span").text($(this).parent().data().options.moreText); });
-                            more.show();
-
-                            more.on("click", function (event) {
-                                var moreTrigger = $(this);
-                                if ($(this).hasClass("hawk-navMoreActive")) {
-                                    searchList
-                                        // hide items that do not match input filter
-                                        .find("li:not(:containsNoCase(" + filter + "))").hide()
-                                        // show items that match input filter
-                                        .end().find("li:containsNoCase(" + filter + ")").show();
-
-                                    items = searchList.find("li:containsNoCase(" + filter + ")");
-
-                                    moreItems = items.filter(function (index) {
-                                        return index >= options.cutoff;
-                                    });
-                                    moreItems.hide();
-
-                                    moreTrigger.find("span").text(moreTrigger.parent().data().options.moreText);
-                                    moreTrigger.removeClass("hawk-navMoreActive");
-                                    window["hawkexpfacet_" + searchList.attr("id")] = null;
-                                    moreTrigger.show();
-                                } else {
-                                    searchList
-                                        // hide items that do not match input filter
-                                        .find("li:not(:containsNoCase(" + filter + "))").hide()
-                                        // show items that match input filter
-                                        .end().find("li:containsNoCase(" + filter + ")").show();
-
-                                    items = searchList.find("li:containsNoCase(" + filter + ")");
-
-                                    // nothing matches filter
-                                    if (items.length == 0) {
-                                        var item = $(noResults);
-                                        searchList.prepend(item);
-                                        return;
-                                    }
-                                    moreTrigger.addClass("hawk-navMoreActive").find("span").text(options.lessText);
-                                    moreTrigger.show();
-                                    window["hawkexpfacet_" + searchList.attr("id")] = true;
-                                };
-                            });
-
-                        }
-                        //no filter
-                    } else {
-                        //remove no results option
-                        settings.list.find(":contains('No Results Found')").remove();
-
-                        // if nothing is entered display all items in list
-                        if (isNestedFacet) {
-                            searchList.hide();
-                            settings.list.show();
-                        }
-                        else {
-                            if (settings.list.hasClass("hawk-navTruncateList")) {
-                                var wasExpanded = settings.list.find("li.hawk-navMore > span").hasClass("hawk-navMoreActive");
-
-                                if (wasExpanded) {
-                                    settings.list.find("li").show();
-                                }
-                                else {
-                                    var options = settings.list.data().options;
-                                    var items = settings.list.find("li:not(.hawk-navMore)");
-
-                                    items.each(function (i, el) {
-                                        if (i < options.cutoff) {
-                                            $(this).show();
-                                        } else {
-                                            $(this).hide();
-                                        }
-                                    });
-
-
-                                    //check if more results
-                                    var options = settings.list.data().options;
-                                    var moreItems = items.filter(function (index) {
-                                        return index >= options.cutoff;
-                                    });
-                                    moreItems.hide();
-
-                                    //if no more results
-                                    if (moreItems.length == 0) {
-                                        return;
-                                    }
-
-                                    if (moreItems) {
-                                        var more = settings.list.find("li.hawk-navMore");
-                                        more.off("click").find("span").text(options.moreText);
-                                        more.show();
-
-                                        more.on("click", function (event) {
-                                            var moreTrigger = $(this);
-                                            if ($(this).hasClass("hawk-navMoreActive")) {
-                                                moreTrigger.hide();
-                                                moreTrigger.removeClass("hawk-navMoreActive").find("span").text(options.moreText);
-                                                window["hawkexpfacet_" + searchList.attr("id")] = null;
-                                                moreTrigger.show();
-                                            } else {
-                                                moreTrigger.addClass("hawk-navMoreActive").find("span").text(options.lessText);
-                                                window["hawkexpfacet_" + searchList.attr("id")] = true;
-                                                moreTrigger.show();
-                                            };
-                                        });
-                                    }
-
-                                }
-                            } else {
-                                settings.list.find("li").show();
-                            }
-                        }
-                    }
-                }).keyup(function () {
-                    //trigger above actions at every keyup
-                    $(this).change();
-                });
-
-            });
-        };
-
-        /************************/
-        /* Custom Plugins Below */
-        /************************/
-
+    /**
+     * Custom jQuery Plugins Below
+     */
+    function loadJQueryPlugins($) {
         //requireJS, these are not the plugins you are looking for
         //TRUST ME. THIS IS GOOD. PLEASE DON'T REMOVE THIS.
         var define = undefined;
@@ -4440,23 +4362,23 @@
                             } b(c).data("blockUI.onUnblock", a.onUnblock); var d = a.baseZ, m; m = t || a.forceIframe ? b('<iframe class="blockUI" style="z-index:' + d++ + ';display:none;border:none;margin:0;padding:0;position:absolute;width:100%;height:100%;top:0;left:0" src="' + a.iframeSrc + '"></iframe>') : b('<div class="blockUI" style="display:none"></div>');
                             k = a.theme ? b('<div class="blockUI blockOverlay ui-widget-overlay" style="z-index:' + d++ + ';display:none"></div>') : b('<div class="blockUI blockOverlay" style="z-index:' + d++ + ';display:none;border:none;margin:0;padding:0;width:100%;height:100%;top:0;left:0"></div>'); a.theme && e ? (d = '<div class="blockUI ' + a.blockMsgClass + ' blockPage ui-dialog ui-widget ui-corner-all" style="z-index:' + (d + 10) + ';display:none;position:fixed">', a.title && (d += '<div class="ui-widget-header ui-dialog-titlebar ui-corner-all blockTitle">' +
                                 (a.title || "&nbsp;") + "</div>"), d += '<div class="ui-widget-content ui-dialog-content"></div></div>') : a.theme ? (d = '<div class="blockUI ' + a.blockMsgClass + ' blockElement ui-dialog ui-widget ui-corner-all" style="z-index:' + (d + 10) + ';display:none;position:absolute">', a.title && (d += '<div class="ui-widget-header ui-dialog-titlebar ui-corner-all blockTitle">' + (a.title || "&nbsp;") + "</div>"), d += '<div class="ui-widget-content ui-dialog-content"></div>', d += "</div>") : d = e ? '<div class="blockUI ' + a.blockMsgClass + ' blockPage" style="z-index:' +
-                                    (d + 10) + ';display:none;position:fixed"></div>' : '<div class="blockUI ' + a.blockMsgClass + ' blockElement" style="z-index:' + (d + 10) + ';display:none;position:absolute"></div>'; d = b(d); g && (a.theme ? (d.css(h), d.addClass("ui-widget-content")) : d.css(f)); a.theme || k.css(a.overlayCSS); k.css("position", e ? "fixed" : "absolute"); (t || a.forceIframe) && m.css("opacity", 0); f = [m, k, d]; var r = e ? b("body") : b(c); b.each(f, function () { this.appendTo(r) }); a.theme && a.draggable && b.fn.draggable && d.draggable({ handle: ".ui-dialog-titlebar", cancel: "li" });
+                                (d + 10) + ';display:none;position:fixed"></div>' : '<div class="blockUI ' + a.blockMsgClass + ' blockElement" style="z-index:' + (d + 10) + ';display:none;position:absolute"></div>'; d = b(d); g && (a.theme ? (d.css(h), d.addClass("ui-widget-content")) : d.css(f)); a.theme || k.css(a.overlayCSS); k.css("position", e ? "fixed" : "absolute"); (t || a.forceIframe) && m.css("opacity", 0); f = [m, k, d]; var r = e ? b("body") : b(c); b.each(f, function () { this.appendTo(r) }); a.theme && a.draggable && b.fn.draggable && d.draggable({ handle: ".ui-dialog-titlebar", cancel: "li" });
                             h = A && (!b.support.boxModel || 0 < b("object,embed", e ? null : c).length); if (v || h) {
                                 e && a.allowBodyStretch && b.support.boxModel && b("html,body").css("height", "100%"); if ((v || !b.support.boxModel) && !e) {
                                     h = parseInt(b.css(c, "borderTopWidth"), 10) || 0; var q = parseInt(b.css(c, "borderLeftWidth"), 10) || 0, w = h ? "(0 - " + h + ")" : 0, x = q ? "(0 - " + q + ")" : 0
                                 } b.each(f, function (b, c) {
                                     var d = c[0].style; d.position = "absolute"; if (2 > b) e ? d.setExpression("height", "Math.max(document.body.scrollHeight, document.body.offsetHeight) - (jQuery.support.boxModel?0:" +
                                         a.quirksmodeOffsetHack + ') + "px"') : d.setExpression("height", 'this.parentNode.offsetHeight + "px"'), e ? d.setExpression("width", 'jQuery.support.boxModel && document.documentElement.clientWidth || document.body.clientWidth + "px"') : d.setExpression("width", 'this.parentNode.offsetWidth + "px"'), x && d.setExpression("left", x), w && d.setExpression("top", w); else if (a.centerY) e && d.setExpression("top", '(document.documentElement.clientHeight || document.body.clientHeight) / 2 - (this.offsetHeight / 2) + (blah = document.documentElement.scrollTop ? document.documentElement.scrollTop : document.body.scrollTop) + "px"'),
-                                            d.marginTop = 0; else if (!a.centerY && e) {
-                                                var f = "((document.documentElement.scrollTop ? document.documentElement.scrollTop : document.body.scrollTop) + " + (a.css && a.css.top ? parseInt(a.css.top, 10) : 0) + ') + "px"'; d.setExpression("top", f)
-                                            }
+                                        d.marginTop = 0; else if (!a.centerY && e) {
+                                        var f = "((document.documentElement.scrollTop ? document.documentElement.scrollTop : document.body.scrollTop) + " + (a.css && a.css.top ? parseInt(a.css.top, 10) : 0) + ') + "px"'; d.setExpression("top", f)
+                                    }
                                 })
                             } g && (a.theme ? d.find(".ui-widget-content").append(g) : d.append(g), (g.jquery || g.nodeType) && b(g).show()); (t || a.forceIframe) && a.showOverlay && m.show(); if (a.fadeIn) f = a.onBlock ? a.onBlock : u, m = a.showOverlay && !g ? f : u, f = g ? f : u, a.showOverlay && k._fadeIn(a.fadeIn, m), g && d._fadeIn(a.fadeIn,
                                 f); else if (a.showOverlay && k.show(), g && d.show(), a.onBlock) a.onBlock(); y(1, c, a); e ? (l = d[0], n = b(a.focusableElements, l), a.focusInput && setTimeout(z, 20)) : B(d[0], a.centerX, a.centerY); a.timeout && (g = setTimeout(function () { e ? b.unblockUI(a) : b(c).unblock(a) }, a.timeout), b(c).data("blockUI.timeout", g))
                         }
                     } function s(c, a) {
                         var f, h = c == window, e = b(c), g = e.data("blockUI.history"), k = e.data("blockUI.timeout"); k && (clearTimeout(k), e.removeData("blockUI.timeout")); a = b.extend({}, b.blockUI.defaults, a || {}); y(0, c, a); null === a.onUnblock &&
-                            (a.onUnblock = e.data("blockUI.onUnblock"), e.removeData("blockUI.onUnblock")); var d; d = h ? b("body").children().filter(".blockUI").add("body > .blockUI") : e.find(">.blockUI"); a.cursorReset && (1 < d.length && (d[1].style.cursor = a.cursorReset), 2 < d.length && (d[2].style.cursor = a.cursorReset)); h && (l = n = null); a.fadeOut ? (f = d.length, d.stop().fadeOut(a.fadeOut, function () { 0 === --f && r(d, g, a, c) })) : r(d, g, a, c)
+                        (a.onUnblock = e.data("blockUI.onUnblock"), e.removeData("blockUI.onUnblock")); var d; d = h ? b("body").children().filter(".blockUI").add("body > .blockUI") : e.find(">.blockUI"); a.cursorReset && (1 < d.length && (d[1].style.cursor = a.cursorReset), 2 < d.length && (d[2].style.cursor = a.cursorReset)); h && (l = n = null); a.fadeOut ? (f = d.length, d.stop().fadeOut(a.fadeOut, function () { 0 === --f && r(d, g, a, c) })) : r(d, g, a, c)
                     } function r(c, a, f, h) {
                         var e = b(h); if (!e.data("blockUI.isBlocked")) {
                             c.each(function (a, b) { this.parentNode && this.parentNode.removeChild(this) });
@@ -4564,7 +4486,8 @@
                     if (document.cookie && document.cookie != '') {
                         var cookies = document.cookie.split(';');
                         for (var i = 0; i < cookies.length; i++) {
-                            var cookie = $.trim(cookies[i]);
+
+                            var cookie = cookies[i].trim();
                             // Does this cookie string begin with the name we want?
                             if (cookie.substring(0, name.length + 1) == (name + '=')) {
                                 cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
@@ -5177,110 +5100,246 @@
         }
 
         /** jquery.onoff - v0.3.5 - 2014-05-12
-        * https://github.com/timmywil/jquery.onoff
-        * Copyright (c) 2014 Timmy Willison; Licensed MIT */
+         * https://github.com/timmywil/jquery.onoff
+         * Copyright (c) 2014 Timmy Willison; Licensed MIT */
         !function (a, b) { "function" == typeof define && define.amd ? define(["jquery"], b) : "object" == typeof exports ? b(require("jquery")) : b(a.HawkSearch.jQuery) }(this, function (a) { "use strict"; function b(c, d) { if (!(this instanceof b)) return new b(c, d); if ("input" !== c.nodeName.toLowerCase() || "checkbox" !== c.type) return a.error("OnOff should be called on checkboxes"); var e = a.data(c, b.datakey); return e ? e : (this.options = d = a.extend({}, b.defaults, d), this.elem = c, this.$elem = a(c).addClass(d.className), this.$doc = a(c.ownerDocument || document), d.namespace += a.guid++ , c.id || (c.id = "onoffswitch" + g++), this.enable(), a.data(c, b.datakey, this), void 0) } var c = "over out down up move enter leave cancel".split(" "), d = a.extend({}, a.event.mouseHooks), e = {}; if (window.PointerEvent) a.each(c, function (b, c) { a.event.fixHooks[e[c] = "pointer" + c] = d }); else { var f = d.props; d.props = f.concat(["touches", "changedTouches", "targetTouches", "altKey", "ctrlKey", "metaKey", "shiftKey"]), d.filter = function (a, b) { var c, d = f.length; if (!b.pageX && b.touches && (c = b.touches[0])) for (; d--;) a[f[d]] = c[f[d]]; return a }, a.each(c, function (b, c) { if (2 > b) e[c] = "mouse" + c; else { var f = "touch" + ("down" === c ? "start" : "up" === c ? "end" : c); a.event.fixHooks[f] = d, e[c] = f + " mouse" + c } }) } a.pointertouch = e; var g = 1, h = Array.prototype.slice; return b.datakey = "_onoff", b.defaults = { namespace: ".onoff", className: "onoffswitch-checkbox" }, b.prototype = { constructor: b, instance: function () { return this }, wrap: function () { var b = this.elem, c = this.$elem, d = this.options, e = c.parent(".onoffswitch"); e.length || (c.wrap('<div class="onoffswitch"></div>'), e = c.parent().addClass(b.className.replace(d.className, ""))), this.$con = e; var f = c.next('label[for="' + b.id + '"]'); f.length || (f = a("<label/>").attr("for", b.id).insertAfter(b)), this.$label = f.addClass("onoffswitch-label"); var g = f.find(".onoffswitch-inner"); g.length || (g = a("<div/>").addClass("onoffswitch-inner").prependTo(f)), this.$inner = g; var h = f.find(".onoffswitch-switch"); h.length || (h = a("<div/>").addClass("onoffswitch-switch").appendTo(f)), this.$switch = h }, _handleMove: function (a) { if (!this.disabled) { this.moved = !0, this.lastX = a.pageX; var b = Math.max(Math.min(this.startX - this.lastX, this.maxRight), 0); this.$switch.css("right", b), this.$inner.css("marginLeft", 100 * -(b / this.maxRight) + "%") } }, _startMove: function (b) { b.preventDefault(); var c, d; "pointerdown" === b.type ? (c = "pointermove", d = "pointerup") : "touchstart" === b.type ? (c = "touchmove", d = "touchend") : (c = "mousemove", d = "mouseup"); var e = this.elem, f = this.$elem, g = this.options.namespace, h = this.$switch, i = h[0], j = this.$inner.add(h).css("transition", "none"); this.maxRight = this.$con.width() - h.width() - a.css(i, "margin-left", !0) - a.css(i, "margin-right", !0) - a.css(i, "border-left-width", !0) - a.css(i, "border-right-width", !0); var k = e.checked; this.moved = !1, this.startX = b.pageX + (k ? 0 : this.maxRight); var l = this, m = this.$doc.on(c + g, a.proxy(this._handleMove, this)).on(d + g, function () { j.css("transition", ""), m.off(g), setTimeout(function () { if (l.moved) { var a = l.lastX > l.startX - l.maxRight / 2; e.checked !== a && (e.checked = a, f.trigger("change")) } l.$switch.css("right", ""), l.$inner.css("marginLeft", "") }) }) }, _bind: function () { this._unbind(), this.$switch.on(a.pointertouch.down, a.proxy(this._startMove, this)) }, enable: function () { this.wrap(), this._bind(), this.disabled = !1 }, _unbind: function () { this.$doc.add(this.$switch).off(this.options.namespace) }, disable: function () { this.disabled = !0, this._unbind() }, unwrap: function () { this.disable(), this.$label.remove(), this.$elem.unwrap().removeClass(this.options.className) }, isDisabled: function () { return this.disabled }, destroy: function () { this.disable(), a.removeData(this.elem, b.datakey) }, option: function (b, c) { var d, e = this.options; if (!b) return a.extend({}, e); if ("string" == typeof b) { if (1 === arguments.length) return void 0 !== e[b] ? e[b] : null; d = {}, d[b] = c } else d = b; a.each(d, a.proxy(function (a, b) { switch (a) { case "namespace": this._unbind(); break; case "className": this.$elem.removeClass(e.className) } switch (e[a] = b, a) { case "namespace": this._bind(); break; case "className": this.$elem.addClass(b) } }, this)) } }, a.fn.onoff = function (c) { var d, e, f, g; return "string" == typeof c ? (g = [], e = h.call(arguments, 1), this.each(function () { d = a.data(this, b.datakey), d ? "_" !== c.charAt(0) && "function" == typeof (f = d[c]) && void 0 !== (f = f.apply(d, e)) && g.push(f) : g.push(void 0) }), g.length ? 1 === g.length ? g[0] : g : this) : this.each(function () { new b(this, c) }) }, a.OnOff = b });
 
-        // END Plugins
+        $.expr[':'].containsNoCase = function (a, i, m) {
+            var regex = /(.*?)\s\(\d+?\)/;
+            var textNode = a.textContent || a.innerText || "";
+            var matches = textNode.match(regex);
+            if (matches == null) {
+                return null;
+            }
+
+            return (matches[1]).toUpperCase().indexOf(m[3].toUpperCase()) >= 0;
+        };
+
+        $.fn.filterThatList = function (options) {
+            // if there are no passed options create an empty options object
+            if (options === undefined || options === null) {
+                options = {};
+            }
+            ;
+
+            // set up default options
+            var defaults = {
+                searchTarget: $(this) // the search input
+            };
+
+            return this.each(function () {
+                // merge passed options with default options to create settings
+                var settings = $.extend(defaults, options);
+
+                settings.searchTarget.change(function () {
+                    // get the value of the input which is used to filter against
+                    var filter = $(this).val();
+                    var searchList = settings.list;
+                    var isNestedFacet = settings.list.hasClass("hawk-nestedfacet");
+                    //when nested facet prepare flat facet
+                    if (isNestedFacet) {
+                        var flatUlId = settings.list.attr("id") + "_flat";
+                        if ($("#" + flatUlId).length == 0) {
+                            var searchList = $(settings.list[0].cloneNode(false));
+                            searchList.removeClass("hawk-navTruncateList");
+                            searchList.addClass("hawk-scrollList");
+                            searchList.attr("id", flatUlId);
+                            searchList.appendTo(settings.list.parent());
+
+                            $(settings.list).find("li").each(function () {
+                                var pathArr = [];
+                                $(this).parentsUntil("#" + settings.list.attr("id"), "li").each(function () {
+                                    var text = $($($(this).children("a")).children("span").contents()[0]).text();
+                                    text = text.trim();
+                                    pathArr.unshift(text);
+                                });
+
+                                var li = $("<li>");
+                                if ($(this).hasClass("hawkFacet-active")) {
+                                    li.addClass("hawkFacet-active");
+                                }
+
+                                li.appendTo(searchList);
+                                var anchor = $(this).children("a").clone();
+                                if (pathArr.length > 0) {
+                                    var textSpan = anchor.children("span")
+                                    var spanCount = textSpan.children(".hawk-facetCount").remove()
+                                    pathArr.push(textSpan.text());
+                                    textSpan.html(pathArr.join(" &raquo; "));
+                                    textSpan.append(spanCount);
+                                }
+
+                                anchor.appendTo(li);
+                            });
+                            var liHeight = searchList.children("li").first().outerHeight();
+                            //set search list for max 20 elements
+                            searchList.css("max-height", (liHeight * 20) + "px");
+                            settings.list.hide();
+                        }
+                        else {
+                            searchList = $("#" + flatUlId);
+                            searchList.show();
+                            settings.list.hide();
+                        }
+                    }
+                    var noResults = ("<li><span>No Results Found</span></li>");
+
+                    if (filter) {
+                        searchList
+                            // hide items that do not match input filter
+                            .find("li:not(:containsNoCase(" + filter + "))").hide()
+                            // show items that match input filter
+                            .end().find("li:containsNoCase(" + filter + ")").show();
+
+                        var items = searchList.find("li:containsNoCase(" + filter + ")");
+
+                        // nothing matches filter
+                        // add no results found
+                        if (items.length == 0) {
+                            var item = $(noResults);
+                            searchList.prepend(item);
+                            return;
+                        }
+
+                        //check if more results
+                        var options = settings.list.data().options;
+                        var moreItems = items.filter(function (index) {
+                            return index >= options.cutoff;
+                        });
+                        moreItems.hide();
+
+                        //if no more results
+                        if (moreItems.length == 0) {
+                            return;
+                        }
+
+                        //otherwise
+                        //remove no results
+                        items.find(":contains('No Results Found')").remove();
+
+                        if (moreItems) {
+                            //add more button and handle it's click event
+                            var more = settings.list.find("li.hawk-navMore");
+                            more.off("click").each(function () { $(this).find("span").text($(this).parent().data().options.moreText); });
+                            more.show();
+
+                            more.on("click", function (event) {
+                                var moreTrigger = $(this);
+                                if ($(this).hasClass("hawk-navMoreActive")) {
+                                    searchList
+                                        // hide items that do not match input filter
+                                        .find("li:not(:containsNoCase(" + filter + "))").hide()
+                                        // show items that match input filter
+                                        .end().find("li:containsNoCase(" + filter + ")").show();
+
+                                    items = searchList.find("li:containsNoCase(" + filter + ")");
+
+                                    moreItems = items.filter(function (index) {
+                                        return index >= options.cutoff;
+                                    });
+                                    moreItems.hide();
+
+                                    moreTrigger.find("span").text(moreTrigger.parent().data().options.moreText);
+                                    moreTrigger.removeClass("hawk-navMoreActive");
+                                    window["hawkexpfacet_" + searchList.attr("id")] = null;
+                                    moreTrigger.show();
+                                } else {
+                                    searchList
+                                        // hide items that do not match input filter
+                                        .find("li:not(:containsNoCase(" + filter + "))").hide()
+                                        // show items that match input filter
+                                        .end().find("li:containsNoCase(" + filter + ")").show();
+
+                                    items = searchList.find("li:containsNoCase(" + filter + ")");
+
+                                    // nothing matches filter
+                                    if (items.length == 0) {
+                                        var item = $(noResults);
+                                        searchList.prepend(item);
+                                        return;
+                                    }
+                                    moreTrigger.addClass("hawk-navMoreActive").find("span").text(options.lessText);
+                                    moreTrigger.show();
+                                    window["hawkexpfacet_" + searchList.attr("id")] = true;
+                                };
+                            });
+
+                        }
+                        //no filter
+                    } else {
+                        //remove no results option
+                        settings.list.find(":contains('No Results Found')").remove();
+
+                        // if nothing is entered display all items in list
+                        if (isNestedFacet) {
+                            searchList.hide();
+                            settings.list.show();
+                        }
+                        else {
+                            if (settings.list.hasClass("hawk-navTruncateList")) {
+                                var wasExpanded = settings.list.find("li.hawk-navMore > span").hasClass("hawk-navMoreActive");
+
+                                if (wasExpanded) {
+                                    settings.list.find("li").show();
+                                }
+                                else {
+                                    var options = settings.list.data().options;
+                                    var items = settings.list.find("li:not(.hawk-navMore)");
+
+                                    items.each(function (i, el) {
+                                        if (i < options.cutoff) {
+                                            $(this).show();
+                                        } else {
+                                            $(this).hide();
+                                        }
+                                    });
+
+
+                                    //check if more results
+                                    var options = settings.list.data().options;
+                                    var moreItems = items.filter(function (index) {
+                                        return index >= options.cutoff;
+                                    });
+                                    moreItems.hide();
+
+                                    //if no more results
+                                    if (moreItems.length == 0) {
+                                        return;
+                                    }
+
+                                    if (moreItems) {
+                                        var more = settings.list.find("li.hawk-navMore");
+                                        more.off("click").find("span").text(options.moreText);
+                                        more.show();
+
+                                        more.on("click", function (event) {
+                                            var moreTrigger = $(this);
+                                            if ($(this).hasClass("hawk-navMoreActive")) {
+                                                moreTrigger.hide();
+                                                moreTrigger.removeClass("hawk-navMoreActive").find("span").text(options.moreText);
+                                                window["hawkexpfacet_" + searchList.attr("id")] = null;
+                                                moreTrigger.show();
+                                            } else {
+                                                moreTrigger.addClass("hawk-navMoreActive").find("span").text(options.lessText);
+                                                window["hawkexpfacet_" + searchList.attr("id")] = true;
+                                                moreTrigger.show();
+                                            };
+                                        });
+                                    }
+
+                                }
+                            } else {
+                                settings.list.find("li").show();
+                            }
+                        }
+                    }
+                }).keyup(function () {
+                    //trigger above actions at every keyup
+                    $(this).change();
+                });
+
+            });
+        };
     }
 
 }(window.HawkSearchLoader = window.HawkSearchLoader || {}));
-
-HawkSearch.Dictionary = (function () {
-    function Dictionary() {
-        if (!(this instanceof Dictionary))
-            return new Dictionary();
-    }
-
-    Dictionary.prototype.count = function () {
-        var key,
-            count = 0;
-
-        for (key in this) {
-            if (this.hasOwnProperty(key))
-                count += 1;
-        }
-        return count;
-    };
-
-    Dictionary.prototype.keys = function () {
-        var key,
-            keys = [];
-
-        for (key in this) {
-            if (this.hasOwnProperty(key))
-                keys.push(key);
-        }
-        return keys;
-    };
-
-    Dictionary.prototype.values = function () {
-        var key,
-            values = [];
-
-        for (key in this) {
-            if (this.hasOwnProperty(key))
-                values.push(this[key]);
-        }
-        return values;
-    };
-
-    Dictionary.prototype.keyValuePairs = function () {
-        var key,
-            keyValuePairs = [];
-
-        for (key in this) {
-            if (this.hasOwnProperty(key))
-                keyValuePairs.push({
-                    Key: key,
-                    Value: this[key]
-                });
-        }
-        return keyValuePairs;
-    };
-
-    Dictionary.prototype.add = function (key, value) {
-        this[key] = value;
-    }
-
-    Dictionary.prototype.clear = function () {
-        var key,
-            dummy;
-
-        for (key in this) {
-            if (this.hasOwnProperty(key))
-                dummy = delete this[key];
-        }
-    }
-
-    Dictionary.prototype.containsKey = function (key) {
-        return this.hasOwnProperty(key);
-    }
-
-    Dictionary.prototype.containsValue = function (value) {
-        var key;
-
-        for (key in this) {
-            if (this.hasOwnProperty(key) && this[key] === value)
-                return true;
-        }
-        return false;
-    }
-
-    Dictionary.prototype.remove = function (key) {
-        var dummy;
-
-        if (this.hasOwnProperty(key)) {
-            dummy = delete this[key];
-            return true;
-        } else
-            return false;
-    }
-
-    return Dictionary;
-}());
-HawkSearch.ContextObj = function () {
-};
-HawkSearch.ContextObj.prototype = new HawkSearch.Dictionary();
-HawkSearch.ContextObj.prototype.Custom = new HawkSearch.Dictionary();
-HawkSearch.Context = new HawkSearch.ContextObj();
