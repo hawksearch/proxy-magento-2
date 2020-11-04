@@ -98,6 +98,9 @@ class Index extends Action
         $result = [
             'success' => 'true',
             'html' => $html,
+            'multiple_wishlist' => $this->_view->getLayout()->getBlock('wishlist_behaviour')
+                ? $this->_view->getLayout()->getBlock('wishlist_behaviour')->toHtml()
+                : '',
             'location' => ''
         ];
 
