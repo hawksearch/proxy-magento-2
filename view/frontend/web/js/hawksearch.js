@@ -49,6 +49,8 @@
     HawkSearch.getTrackingUrl = function () {
         if (HawkSearch.TrackingUrl === undefined || HawkSearch.TrackingUrl === "") {
             return HawkSearch.BaseUrl;
+        } else if (HawkSearch.Tracking.Version.none === HawkSearch.Tracking.CurrentVersion()) {
+            return HawkSearch.HawkUrl;
         } else {
             return HawkSearch.TrackingUrl;
         }
