@@ -2394,6 +2394,7 @@ HawkSearch.Context = new HawkSearch.ContextObj();
                 var hawkflags = $('#hdnhawkflags').val();
                 var aid = $("#hdnhawkaid").val();
                 var hawkp = $("#hdnhawkp").val();
+                var product_list_mode = $("#hdnproductlistmode").val();
 
                 if (keyword && keyword !== "") qs += (qs === "" ? "" : "&") + keywordfield + "=" + encodeURIComponent(keyword);
                 if (prv && prv !== "") qs += (qs === "" ? "" : "&") + "prv=" + encodeURIComponent(prv);
@@ -2410,6 +2411,7 @@ HawkSearch.Context = new HawkSearch.ContextObj();
                 if (hawkflags && hawkflags !== "") qs += (qs === "" ? "" : "&") + "hawkflags=" + encodeURIComponent(hawkflags);
                 if (aid && aid !== "") qs += (qs === "" ? "" : "&") + "hawkaid=" + encodeURIComponent(aid);
                 if (hawkp && hawkp !== "") qs += (qs === "" ? "" : "&") + "hawkp=" + encodeURIComponent(hawkp);
+                if (product_list_mode && product_list_mode !== "") qs += (qs === "" ? "" : "&") + "product_list_mode=" + encodeURIComponent(product_list_mode);
 
                 $(".hawk-facetFilters li.hawkFacet-active > a").each(function () {
                     var options = $(this).data().options;
