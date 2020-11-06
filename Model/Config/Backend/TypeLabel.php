@@ -82,7 +82,7 @@ class TypeLabel extends ArraySerialized
                 $this->proxyHelper->getSearchUrl(
                     '',
                     ['q' => '', 'hawktabs' => 'json', 'it' => 'all', 'output' => 'custom']
-                ),
+                )
             );
             $response = $client->request();
             if ($response->getStatus() != 200) {
