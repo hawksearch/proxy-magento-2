@@ -4108,9 +4108,11 @@ HawkSearch.Context = new HawkSearch.ContextObj();
 
         loadJQueryPlugins($);
 
-        window.onpopstate = function () {
-            log("onhashchagne event handler");
-            HawkSearch.refreshResults(true);
+        window.onpopstate = function (e) {
+            if (e.state) {
+                log("onhashchagne event handler");
+                HawkSearch.refreshResults(true);
+            }
         }
 
         HawkSearch.loadRecommender = function () {
