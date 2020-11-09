@@ -40,19 +40,6 @@
         <plugin name="hawkproxy_redirect_url" type="HawkSearch\Proxy\Plugin\StoreRedirect" />
     </type>
 
-    <virtualType name="virtualHawkCatalogSearchListProduct" type="HawkSearch\Proxy\Block\Product\ListProduct">
-        <arguments>
-            <argument name="mode" xsi:type="string">catalogsearch</argument>
-        </arguments>
-    </virtualType>
-    <virtualType name="virtualHawkCategoryListProduct" type="HawkSearch\Proxy\Block\Product\ListProduct">
-        <arguments>
-            <argument name="mode" xsi:type="string">category</argument>
-        </arguments>
-    </virtualType>
-
-    <preference for="Magento\Catalog\Block\Product\ListProduct" type="virtualHawkCategoryListProduct" />
-    <preference for="Magento\CatalogSearch\Block\SearchResult\ListProduct" type="virtualHawkCatalogSearchListProduct" />
     <preference for="Magento\CatalogSearch\Controller\Result\Index" type="HawkSearch\Proxy\Controller\Result\Index" />
     <preference for="Magento\CatalogSearch\Block\Result" type="HawkSearch\Proxy\Block\Result" />
 </config>

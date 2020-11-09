@@ -63,6 +63,27 @@
             </container>
         </referenceContainer>
 
+        <referenceContainer name="search_result_list">
+            <block class="Magento\Catalog\Block\Product\ProductList\Toolbar"
+                   name="hawksearch_product_list_toolbar"
+                   template="HawkSearch_Proxy::product/list/toolbar.phtml">
+                <arguments>
+                    <argument name="toolbarViewModel" xsi:type="object">
+                        HawkSearch\Proxy\ViewModel\ProductListToolbar
+                    </argument>
+                </arguments>
+            </block>
+            <block class="Magento\Catalog\Block\Product\ProductList\Toolbar"
+                   name="hawksearch_product_list_toolbar_top"
+                   template="HawkSearch_Proxy::product/list/toolbar-top.phtml">
+                <arguments>
+                    <argument name="toolbarViewModel" xsi:type="object">
+                        HawkSearch\Proxy\ViewModel\ProductListToolbar
+                    </argument>
+                </arguments>
+            </block>
+        </referenceContainer>
+
         <referenceBlock name="catalogsearch.leftnav" remove="true" />
         <referenceContainer name="additional" remove="true" />
     </body>
