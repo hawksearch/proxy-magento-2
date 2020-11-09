@@ -10,6 +10,7 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
+
 namespace HawkSearch\Proxy\Block;
 
 use HawkSearch\Proxy\Helper\Data as ProxyHelper;
@@ -35,7 +36,7 @@ class Result extends CatalogSearchResult
      * @param Context $context
      * @param LayerResolver $layerResolver
      * @param Data $catalogSearchData
-     * @param QueryFactory  $queryFactory
+     * @param QueryFactory $queryFactory
      * @param ProxyHelper $helper
      * @param array $data
      */
@@ -61,14 +62,5 @@ class Result extends CatalogSearchResult
             return 'All Items';
         }
         return parent::getSearchQueryText();
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getTemplateFile($template = null)
-    {
-        $this->setData('module_name', 'Magento_CatalogSearch');
-        return parent::getTemplateFile($template);
     }
 }

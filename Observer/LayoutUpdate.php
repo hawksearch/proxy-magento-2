@@ -11,7 +11,7 @@
  * IN THE SOFTWARE.
  */
 
-namespace HawkSearch\Proxy\Model\Observer;
+namespace HawkSearch\Proxy\Observer;
 
 use HawkSearch\Proxy\Model\Config\Proxy as ProxyConfigProvider;
 use Magento\Framework\Event\Observer;
@@ -36,7 +36,7 @@ class LayoutUpdate implements ObserverInterface
     }
 
     /**
-     * @param  Observer $observer
+     * @param Observer $observer
      * @return void
      */
     public function execute(Observer $observer)
