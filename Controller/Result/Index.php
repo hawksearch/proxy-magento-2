@@ -94,17 +94,18 @@ class Index extends CatalogSearchResultIndex
         }
         $query = $this->queryFactory->get();
         $this->catalogSearchHelper->checkNotes();
+
         if ($query->getQueryText() == '' && $this->isTopCategoryRequest()) {
             $this->_view->loadLayout();
             $this->_view->getLayout()->unsetElement('page.main.title');
+        } elseif (!$this->proxyHelper->getResultData()->getResponseData()->getResults()->getItems()) {
+            $this->_view->loadLayout(static::DEFAULT_NO_RESULT_HANDLE);
+        } elseif ($this->proxyHelper->productsOnly()) {
+            $this->_view->loadLayout();
         } else {
-
-            if ($this->proxyHelper->productsOnly()) {
-                $this->_view->loadLayout();
-            } else {
-                $this->_view->loadLayout('hawksearch_proxy_tabbed');
-            }
+            $this->_view->loadLayout('hawksearch_proxy_tabbed');
         }
+
         $this->_view->getPage()->getConfig()->setRobots($this->proxyConfigProvider->getMetaRobots());
         $this->_view->renderLayout();
     }
