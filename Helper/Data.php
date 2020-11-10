@@ -338,10 +338,7 @@ class Data extends AbstractHelper
      */
     public function getLocation()
     {
-        if (empty($this->hawkData)) {
-            $this->fetchResponse();
-        }
-        return $this->hawkData->getLocation();
+        return $this->getResultData()->getLocation();
     }
 
     /**
@@ -352,9 +349,6 @@ class Data extends AbstractHelper
      */
     public function getTrackingDataHtml()
     {
-        if (empty($this->hawkData)) {
-            $this->fetchResponse();
-        }
         $counter = 1;
         $obj = [];
         $productCollection = $this->getProductCollection();
@@ -362,7 +356,7 @@ class Data extends AbstractHelper
             foreach ($productCollection as $item) {
                 $obj[] = [
                     'url' => $item->getProductUrl(),
-                    'tid' => $this->hawkData->getTrackingId(),
+                    'tid' => $this->getResultData()->getTrackingId(),
                     'sku' => $item->getSku(),
                     'i' => $counter++
                 ];
@@ -382,10 +376,7 @@ class Data extends AbstractHelper
      */
     public function getFacets()
     {
-        if (empty($this->hawkData)) {
-            $this->fetchResponse();
-        }
-        return $this->hawkData->getResponseData()->getFacets();
+        return $this->getResultData()->getResponseData()->getFacets();
     }
 
     /**
@@ -394,12 +385,8 @@ class Data extends AbstractHelper
      */
     public function productsOnly()
     {
-        if (empty($this->hawkData)) {
-            $this->fetchResponse();
-        }
-
-        if ($this->hawkData->getResponseData()->getResults()->getItems()) {
-            foreach ($this->hawkData->getResponseData()->getResults()->getItems() as $item) {
+        if ($this->getResultData()->getResponseData()->getResults()->getItems()) {
+            foreach ($this->getResultData()->getResponseData()->getResults()->getItems() as $item) {
                 $itemCustomData = $item->getCustom();
                 if (!isset($itemCustomData['sku'])) {
                     return false;
@@ -417,18 +404,14 @@ class Data extends AbstractHelper
      */
     public function getProductCollection()
     {
-        if (empty($this->hawkData)) {
-            $this->fetchResponse();
-        }
-
         $skus = [];
         $map = [];
         $bySku = [];
         $i = 0;
-        if (!$this->hawkData->getResponseData()->getResults()->getItems()) {
+        if (!$this->getResultData()->getResponseData()->getResults()->getItems()) {
             return $this->getResourceCollection([]);
         }
-        foreach ($this->hawkData->getResponseData()->getResults()->getItems() as $item) {
+        foreach ($this->getResultData()->getResponseData()->getResults()->getItems() as $item) {
             $itemCustomData = $item->getCustom();
             if (isset($itemCustomData['sku'])) {
                 $skus[] = $itemCustomData['sku'];
@@ -471,17 +454,14 @@ class Data extends AbstractHelper
      */
     public function getFeaturedProductCollection($zone)
     {
-        if (empty($this->hawkData)) {
-            $this->fetchResponse();
-        }
         $skus = [];
         $map = [];
         $i = 0;
 
-        if (!$this->hawkData->getResponseData()->getFeaturedItems()->getItems()) {
+        if (!$this->getResultData()->getResponseData()->getFeaturedItems()->getItems()) {
             return null;
         } else {
-            foreach ($this->hawkData->getResponseData()->getFeaturedItems()->getItems() as $banner) {
+            foreach ($this->getResultData()->getResponseData()->getFeaturedItems()->getItems() as $banner) {
                 /** @var SearchResultBanner $banner */
                 if ($banner->getZone() == $zone && $banner->getItems()) {
                     foreach ($banner->getItems() as $item) {
