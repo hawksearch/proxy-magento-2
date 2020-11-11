@@ -92,7 +92,7 @@ class SearchParametersBuilder implements BuilderInterface
 
         if (empty($buildSubject['it']) && $this->proxyConfigProvider->getResultType()) {
             $params['it'] = $this->proxyConfigProvider->getResultType();
-        } else {
+        } elseif (isset($buildSubject['it'])) {
             $params['it'] = $buildSubject['it'];
         }
 
