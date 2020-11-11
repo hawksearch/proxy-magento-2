@@ -24,7 +24,7 @@
         </referenceContainer>
         <move element="search.result" destination="hawksearch_hawkitems" />
         <referenceContainer name="sidebar.main">
-            <container htmlId="hawkbannerlefttop" htmlClass="bannerLeftTop"
+            <container htmlId="hawkbannerlefttop" htmlClass="bannerLeftTop block"
                        htmlTag="div"
                        name="hawksearch_left_top">
                 <block class="HawkSearch\Proxy\Block\Banner"
@@ -45,7 +45,7 @@
                    template="HawkSearch_Proxy::hawksearch/proxy/left/facets.phtml"
                    after="hawksearch_left_top" before="hawksearch_left_bottom"
             />
-            <container htmlId="hawkbannerleftbottom" htmlClass="bannerLeftBottom"
+            <container htmlId="hawkbannerleftbottom" htmlClass="bannerLeftBottom block"
                        htmlTag="div"
                        name="hawksearch_left_bottom">
                 <block class="HawkSearch\Proxy\Block\Banner"
