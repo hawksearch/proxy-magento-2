@@ -133,14 +133,12 @@ class SearchParametersBuilder implements BuilderInterface
                 }
                 break;
             case 'hawkproxy_index':
-                if (!(isset($buildSubject['lpurl'])
-                    && (
-                        substr(
-                            $buildSubject['lpurl'],
-                            0,
-                            strlen('/catalogsearch/result')
-                        ) === '/catalogsearch/result'
-                    ))
+                if (isset($buildSubject['lpurl'])
+                    && substr(
+                        $buildSubject['lpurl'],
+                        0,
+                        strlen('/catalogsearch/result')
+                    ) !== '/catalogsearch/result'
                 ) {
                     $params['lpurl'] = $buildSubject['lpurl'];
                 }
