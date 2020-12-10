@@ -43,7 +43,7 @@ if (!$configViewModel) {
         }
     }(window.HawkSearch = window.HawkSearch || {}));
 
-    require(["jquery", "hawksearch" ], function ($) {
+    require(["jquery"], function ($) {
         HawkSearch.initAutoSuggest = function () {
             <?php foreach ($configViewModel->getSearchBoxes() as $sbid) : ?>
             HawkSearch.suggestInit('#<?= /* @noEscape */ $sbid; ?>', {
@@ -72,4 +72,6 @@ if (!$configViewModel) {
             HawkSearch.bindClickTracking($(document).find('#hawktrackingdata').data('tracking'));
         };
     });
+
+    require(["jquery", "hawksearch" ], function ($) {});
 </script>
