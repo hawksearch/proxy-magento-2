@@ -67,7 +67,7 @@ class ProxyEmail
             ->setTemplateIdentifier('hawksearch_proxy_email')
             ->setTemplateOptions(
                 [
-                    'area' => Area::AREA_ADMINHTML,
+                    'area' => Area::AREA_FRONTEND,
                     'store' => Store::DEFAULT_STORE_ID,
                 ]
             )
