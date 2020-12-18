@@ -57,14 +57,19 @@ class SearchResultHandler implements HandlerInterface
     {
         $searchResults = $this->httpResponseReader->readResponseData($response);
 
-        //unserialize values
-        $searchResults['Data'][SearchResultDataInterface::RESULTS] = $this->processString(
-            $searchResults['Data'][SearchResultDataInterface::RESULTS]
-        );
-        $searchResults['Data'][SearchResultDataInterface::FEATURED_ITEMS] = $this->processString(
-            $searchResults['Data'][SearchResultDataInterface::FEATURED_ITEMS]
-        );
+        //deserialize values
+        if (isset($searchResults['Data'][SearchResultDataInterface::RESULTS])) {
+            $searchResults['Data'][SearchResultDataInterface::RESULTS] = $this->processString(
+                $searchResults['Data'][SearchResultDataInterface::RESULTS]
+            );
+        }
 
+        if (isset($searchResults['Data'][SearchResultDataInterface::FEATURED_ITEMS])) {
+            $searchResults['Data'][SearchResultDataInterface::FEATURED_ITEMS] = $this->processString(
+                $searchResults['Data'][SearchResultDataInterface::FEATURED_ITEMS]
+            );
+        }
+        
         return $searchResults;
     }
 

@@ -314,7 +314,9 @@ HawkSearch.Context = new HawkSearch.ContextObj();
                 lpurl: lpurl
             });
         }
-        HawkSearch.Tracking.ready(callback);
+        if (HawkSearch.Tracking.CurrentVersion() == HawkSearch.Tracking.Version.v2) {
+            HawkSearch.Tracking.ready(callback);
+        }
     }
 
 
@@ -1973,6 +1975,9 @@ HawkSearch.Context = new HawkSearch.ContextObj();
             };
 
             HawkSearch.regTracking = function () {
+                if (HawkSearch.Tracking.CurrentVersion() !== HawkSearch.Tracking.Version.v2) {
+                    return;
+                }
                 log("Register Tracking");
 
                 $(".hawk-bannerLink,.hawk-banner").each(function () {
