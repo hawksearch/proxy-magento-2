@@ -33,7 +33,11 @@ class FeaturedItemsHandler implements HandlerInterface
      */
     public function handle(array $handlingSubject, array $response)
     {
-        $featuredItems = &$response['Data'][SearchResultDataInterface::FEATURED_ITEMS];
+        $featuredItems = null;
+        if (isset($response['Data'][SearchResultDataInterface::FEATURED_ITEMS])) {
+            $featuredItems = &$response['Data'][SearchResultDataInterface::FEATURED_ITEMS];
+        }
+
         if ($featuredItems === null) {
             return $response;
         }
