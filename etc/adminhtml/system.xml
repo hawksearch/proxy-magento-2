@@ -27,12 +27,12 @@
             <group id="general" translate="label" type="text" sortOrder="5" showInDefault="1" showInWebsite="1"
                    showInStore="1">
                 <label>General</label>
-                <field id="enabled" translate="label comment" type="select" showInDefault="0" showInWebsite="0"
+                <field id="enabled" translate="label comment" type="select" showInDefault="1" showInWebsite="1"
                        showInStore="1" sortOrder="5">
                     <label>Enabled</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
-                <field id="logging_enabled" translate="label comment" type="select" showInDefault="0" showInWebsite="0"
+                <field id="logging_enabled" translate="label comment" type="select" showInDefault="1" showInWebsite="1"
                        showInStore="1" sortOrder="10">
                     <label>Enable Logging</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
@@ -46,12 +46,12 @@
             <group id="proxy" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1"
                    showInStore="1">
                 <label>Proxy Module Settings</label>
-                <field id="manage_categories" translate="label comment" type="select" showInDefault="0"
-                       showInWebsite="0" showInStore="1" sortOrder="40">
+                <field id="manage_categories" translate="label comment" type="select" showInDefault="1"
+                       showInWebsite="1" showInStore="1" sortOrder="40">
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <label>Manage Categories</label>
                 </field>
-                <field id="manage_all" translate="label comment" type="select" showInDefault="0" showInWebsite="0"
+                <field id="manage_all" translate="label comment" type="select" showInDefault="1" showInWebsite="1"
                        showInStore="1" sortOrder="45">
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <label>Manage All Categories</label>
@@ -62,12 +62,12 @@
                     </depends>
                 </field>
                 <field id="enable_hawk_landing_pages" translate="label comment"
-                       type="select" showInDefault="0" showInWebsite="0" showInStore="1" sortOrder="46">
+                       type="select" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="46">
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <label>Enable HawkSearch Landing pages</label>
                 </field>
                 <field id="hawk_landing_pages_cache" translate="label comment"
-                       type="text" showInDefault="0" showInWebsite="0" showInStore="1" sortOrder="46">
+                       type="text" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="46">
                     <label>HawkSearch Landing pages cache</label>
                     <comment>
                         Cache lifetime in seconds. Values below 300 are not recommended.
@@ -77,11 +77,11 @@
                 </field>
                 <field id="manage_search"
                        translate="label comment"
-                       type="select" showInDefault="0" showInWebsite="0" showInStore="1" sortOrder="50">
+                       type="select" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="50">
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <label>Manage Search</label>
                 </field>
-                <field id="meta_robots" type="select" showInDefault="0" showInWebsite="0" showInStore="1" sortOrder="51">
+                <field id="meta_robots" type="select" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="51">
                     <label>Meta Robots</label>
                     <comment>Meta robots used on "/catalogsearch/result" page only</comment>
                     <source_model>Magento\Config\Model\Config\Source\Design\Robots</source_model>
@@ -89,7 +89,7 @@
                         <field id="manage_search">1</field>
                     </depends>
                 </field>
-                <field id="search_box_ids" translate="label comment" type="text" showInDefault="0" showInWebsite="0"
+                <field id="search_box_ids" translate="label comment" type="text" showInDefault="1" showInWebsite="1"
                        showInStore="1" sortOrder="55">
                     <label>Search Box HTML ID's</label>
                     <comment>Comma separated list of HTML ID's of search boxes to attach to HawkSearch</comment>
@@ -99,7 +99,7 @@
                 </field>
                 <field id="enable_custom_search_route"
                        translate="label comment"
-                       type="select" showInDefault="0" showInWebsite="0" showInStore="1" sortOrder="60">
+                       type="select" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="60">
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <label>Add custom URL route for search</label>
                     <depends>
@@ -109,15 +109,15 @@
                 </field>
                 <field id="custom_search_route"
                        translate="label comment"
-                       type="text" showInDefault="0" showInWebsite="0" showInStore="1" sortOrder="65">
+                       type="text" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="65">
                     <label>Custom search route</label>
                     <comment>Route must not be used by another module or contain a directory separator '/'</comment>
                     <depends>
                         <field id="enable_custom_search_route">1</field>
                     </depends>
                 </field>
-                <field id="custom_search_use_suffix" translate="label comment" type="select" showInDefault="0"
-                       showInWebsite="0" showInStore="1" sortOrder="70">
+                <field id="custom_search_use_suffix" translate="label comment" type="select" showInDefault="1"
+                       showInWebsite="1" showInStore="1" sortOrder="70">
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <label>Use Category URL Suffix</label>
                     <depends>
@@ -128,14 +128,14 @@
                     </depends>
                 </field>
                 <field id="hawksearch_include_css" translate="label comment" type="select"
-                       showInDefault="0" showInStore="1" showInWebsite="0" sortOrder="80">
+                       showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="80">
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <label>Use HawkSearch CSS</label>
                 </field>
                 <field id="autocomplete_div_id"
                        type="text"
-                       showInWebsite="0"
-                       showInDefault="0"
+                       showInWebsite="1"
+                       showInDefault="1"
                        showInStore="1"
                        sortOrder="90">
                     <label>Autocomplete Div ID</label>
@@ -143,8 +143,8 @@
                 </field>
                 <field id="autocomplete_query_params"
                        type="text"
-                       showInWebsite="0"
-                       showInDefault="0"
+                       showInWebsite="1"
+                       showInDefault="1"
                        showInStore="1"
                        sortOrder="100">
                     <label>Query Params for the autosuggest call to HawkSearch</label>
@@ -154,19 +154,19 @@
                     <label>Result Type</label>
                     <comment>Default is 'item'</comment>
                 </field>
-                <field id="show_tabs" type="select" showInDefault="0" showInWebsite="0"
+                <field id="show_tabs" type="select" showInDefault="1" showInWebsite="1"
                        showInStore="1" sortOrder="120">
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <label>Show Hawk type tabs</label>
                     <comment>Display the HawkSearch type tabs</comment>
                 </field>
-                <field id="show_type_labels" showInStore="1" showInWebsite="0" showInDefault="0" sortOrder="125" type="select">
+                <field id="show_type_labels" showInStore="1" showInWebsite="1" showInDefault="1" sortOrder="125" type="select">
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <backend_model>HawkSearch\Proxy\Model\Config\Backend\ShowTypeLabels</backend_model>
                     <label>Show Hawk type labels</label>
                     <comment>You will need to rebuild the index after changing this field</comment>
                 </field>
-                <field id="type_label" showInStore="1" showInDefault="0" showInWebsite="0" sortOrder="130">
+                <field id="type_label" showInStore="1" showInDefault="1" showInWebsite="1" sortOrder="130">
                     <label>Type Labels</label>
                     <frontend_model>HawkSearch\Proxy\Block\System\Config\TypeLabel</frontend_model>
                     <backend_model>HawkSearch\Proxy\Model\Config\Backend\TypeLabel</backend_model>
@@ -188,7 +188,7 @@
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
                 <field id="synchronize" translate="button_label" sortOrder="26" showInDefault="1"
-                       showInWebsite="0" showInStore="0">
+                       showInWebsite="1" showInStore="0">
                     <label/>
                     <button_label>
                         <![CDATA[Schedule Synchronization]]>
