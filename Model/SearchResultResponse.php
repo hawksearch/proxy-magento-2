@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace HawkSearch\Proxy\Model;
 
+use HawkSearch\Proxy\Api\Data\SearchResultDataInterfaceFactory;
 use HawkSearch\Proxy\Api\Data\SearchResultDataInterface;
 use HawkSearch\Proxy\Api\Data\SearchResultResponseInterface;
 use Magento\Framework\Api\AbstractSimpleObject;
@@ -21,11 +22,26 @@ use Magento\Framework\Api\AbstractSimpleObject;
 class SearchResultResponse extends AbstractSimpleObject implements SearchResultResponseInterface
 {
     /**
+     * @var SearchResultDataInterfaceFactory
+     */
+    private $searchResultDataInterfaceFactory;
+
+    /**
+     * SearchResultResponse constructor.
+     * @param SearchResultDataInterfaceFactory $searchResultDataInterfaceFactory
+     */
+    public function __construct(
+        SearchResultDataInterfaceFactory $searchResultDataInterfaceFactory
+    ) {
+        $this->searchResultDataInterfaceFactory = $searchResultDataInterfaceFactory;
+    }
+
+    /**
      * @inheritDoc
      */
     public function getSuccess(): bool
     {
-        return $this->_get(self::SUCCESS);
+        return !!$this->_get(self::SUCCESS);
     }
 
     /**
@@ -41,7 +57,11 @@ class SearchResultResponse extends AbstractSimpleObject implements SearchResultR
      */
     public function getResponseData(): SearchResultDataInterface
     {
-        return $this->_get(self::RESPONSE_DATA);
+        $result = $this->_get(self::RESPONSE_DATA);
+        if ($result === null) {
+            $result = $this->searchResultDataInterfaceFactory->create();
+        }
+        return $result;
     }
 
     /**
@@ -217,7 +237,7 @@ class SearchResultResponse extends AbstractSimpleObject implements SearchResultR
      */
     public function getPageLayoutId(): int
     {
-        return $this->_get(self::PAGE_LAYOUT_ID);
+        return (int)$this->_get(self::PAGE_LAYOUT_ID);
     }
 
     /**
@@ -233,7 +253,7 @@ class SearchResultResponse extends AbstractSimpleObject implements SearchResultR
      */
     public function getSearchDuration(): int
     {
-        return $this->_get(self::SEARCH_DURATION);
+        return (int)$this->_get(self::SEARCH_DURATION);
     }
 
     /**
@@ -249,7 +269,7 @@ class SearchResultResponse extends AbstractSimpleObject implements SearchResultR
      */
     public function getQueryUsedAllKeywords(): bool
     {
-        return $this->_get(self::QUERY_USED_ALL_KEYWORDS);
+        return !!$this->_get(self::QUERY_USED_ALL_KEYWORDS);
     }
 
     /**

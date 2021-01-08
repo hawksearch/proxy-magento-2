@@ -15,13 +15,47 @@ declare(strict_types=1);
 namespace HawkSearch\Proxy\Model;
 
 use HawkSearch\Proxy\Api\Data\SearchResultContentInterface;
+use HawkSearch\Proxy\Api\Data\SearchResultContentInterfaceFactory;
 use HawkSearch\Proxy\Api\Data\SearchResultDataInterface;
 use HawkSearch\Proxy\Api\Data\SearchResultFeaturedInterface;
+use HawkSearch\Proxy\Api\Data\SearchResultFeaturedInterfaceFactory;
 use HawkSearch\Proxy\Api\Data\SearchResultMerchandisingInterface;
+use HawkSearch\Proxy\Api\Data\SearchResultMerchandisingInterfaceFactory;
 use Magento\Framework\Api\AbstractSimpleObject;
 
 class SearchResultData extends AbstractSimpleObject implements SearchResultDataInterface
 {
+    /**
+     * @var SearchResultContentInterfaceFactory
+     */
+    private $searchResultContentInterfaceFactory;
+
+    /**
+     * @var SearchResultMerchandisingInterfaceFactory
+     */
+    private $searchResultMerchandisingInterfaceFactory;
+
+    /**
+     * @var SearchResultFeaturedInterfaceFactory
+     */
+    private $searchResultFeaturedInterfaceFactory;
+
+    /**
+     * SearchResultData constructor.
+     * @param SearchResultContentInterfaceFactory $searchResultContentInterfaceFactory
+     * @param SearchResultMerchandisingInterfaceFactory $searchResultMerchandisingInterfaceFactory
+     * @param SearchResultFeaturedInterfaceFactory $searchResultFeaturedInterfaceFactory
+     */
+    public function __construct(
+        SearchResultContentInterfaceFactory $searchResultContentInterfaceFactory,
+        SearchResultMerchandisingInterfaceFactory $searchResultMerchandisingInterfaceFactory,
+        SearchResultFeaturedInterfaceFactory $searchResultFeaturedInterfaceFactory
+    ) {
+        $this->searchResultContentInterfaceFactory = $searchResultContentInterfaceFactory;
+        $this->searchResultMerchandisingInterfaceFactory = $searchResultMerchandisingInterfaceFactory;
+        $this->searchResultFeaturedInterfaceFactory = $searchResultFeaturedInterfaceFactory;
+    }
+
     /**
      * @inheritDoc
      */
@@ -107,7 +141,11 @@ class SearchResultData extends AbstractSimpleObject implements SearchResultDataI
      */
     public function getResults(): SearchResultContentInterface
     {
-        return $this->_get(self::RESULTS);
+        $result = $this->_get(self::RESULTS);
+        if ($result === null) {
+            $result = $this->searchResultContentInterfaceFactory->create();
+        }
+        return $result;
     }
 
     /**
@@ -123,7 +161,11 @@ class SearchResultData extends AbstractSimpleObject implements SearchResultDataI
      */
     public function getMerchandising(): SearchResultMerchandisingInterface
     {
-        return $this->_get(self::MERCHANDISING);
+        $result = $this->_get(self::MERCHANDISING);
+        if ($result === null) {
+            $result = $this->searchResultMerchandisingInterfaceFactory->create();
+        }
+        return $result;
     }
 
     /**
@@ -187,7 +229,11 @@ class SearchResultData extends AbstractSimpleObject implements SearchResultDataI
      */
     public function getFeaturedItems(): SearchResultFeaturedInterface
     {
-        return $this->_get(self::FEATURED_ITEMS);
+        $result = $this->_get(self::FEATURED_ITEMS);
+        if ($result === null) {
+            $result = $this->searchResultFeaturedInterfaceFactory->create();
+        }
+        return $result;
     }
 
     /**

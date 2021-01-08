@@ -20,6 +20,7 @@ use HawkSearch\Connector\Gateway\InstructionException;
 use HawkSearch\Connector\Helper\Url as UrlUtility;
 use HawkSearch\Connector\Model\Config\ApiSettings;
 use HawkSearch\Proxy\Api\Data\SearchResultResponseInterface;
+use HawkSearch\Proxy\Api\Data\SearchResultResponseInterfaceFactory;
 use HawkSearch\Proxy\Gateway\Http\Uri\SearchUriBuilder;
 use HawkSearch\Proxy\Model\Config\General as GeneralConfigProvider;
 use HawkSearch\Proxy\Model\Config\Proxy as ProxyConfigProvider;
@@ -199,6 +200,11 @@ class Data extends AbstractHelper
     private $urlUtility;
 
     /**
+     * @var SearchResultResponseInterfaceFactory
+     */
+    private $resultResponseFactory;
+
+    /**
      * Data constructor.
      *
      * @param Context $context
@@ -225,6 +231,7 @@ class Data extends AbstractHelper
      * @param AttributeConfig $attributeConfig
      * @param SearchUriBuilder $searchUriBuilder
      * @param UrlUtility $urlUtility
+     * @param SearchResultResponseInterfaceFactory $resultResponseFactory
      */
     public function __construct(
         Context $context,
@@ -250,7 +257,8 @@ class Data extends AbstractHelper
         GeneralConfigProvider $generalConfigProvider,
         AttributeConfig $attributeConfig,
         SearchUriBuilder $searchUriBuilder,
-        UrlUtility $urlUtility
+        UrlUtility $urlUtility,
+        SearchResultResponseInterfaceFactory $resultResponseFactory
     ) {
         parent::__construct($context);
         $this->storeManager = $storeManager;
@@ -277,18 +285,18 @@ class Data extends AbstractHelper
         $this->attributeConfig = $attributeConfig;
         $this->searchUriBuilder = $searchUriBuilder;
         $this->urlUtility = $urlUtility;
+        $this->resultResponseFactory = $resultResponseFactory;
     }
 
     /**
+     * @return SearchResultResponseInterface
      * @throws InstructionException
      * @throws NotFoundException
      */
     private function fetchResponse()
     {
-        $this->hawkData = $this->instructionManagerPool->get('hawksearch')
+        return $this->instructionManagerPool->get('hawksearch')
             ->executeByCode('searchResults', $this->_getRequest()->getParams())->get();
-
-        return;
     }
 
     /**
@@ -299,7 +307,12 @@ class Data extends AbstractHelper
     public function getResultData()
     {
         if (empty($this->hawkData)) {
-            $this->fetchResponse();
+            try {
+                $this->hawkData = $this->fetchResponse();
+            } catch (\Exception $e) {
+                $this->hawkData = $this->resultResponseFactory->create();
+            }
+
         }
         return $this->hawkData;
     }
@@ -447,7 +460,7 @@ class Data extends AbstractHelper
 
     /**
      * @param string $zone
-     * @return Collection|null
+     * @return Collection|array
      * @throws InstructionException
      * @throws LocalizedException
      * @throws NotFoundException
@@ -459,7 +472,7 @@ class Data extends AbstractHelper
         $i = 0;
 
         if (!$this->getResultData()->getResponseData()->getFeaturedItems()->getItems()) {
-            return null;
+            return [];
         } else {
             foreach ($this->getResultData()->getResponseData()->getFeaturedItems()->getItems() as $banner) {
                 /** @var SearchResultBanner $banner */
