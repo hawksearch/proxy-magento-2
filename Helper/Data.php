@@ -36,6 +36,7 @@ use Magento\CatalogUrlRewrite\Model\CategoryUrlRewriteGenerator;
 use Magento\Framework\App\CacheInterface as Cache;
 use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\App\Helper\Context;
+use Magento\Framework\App\Response\Http;
 use Magento\Framework\Escaper;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
@@ -199,6 +200,11 @@ class Data extends AbstractHelper
     private $urlUtility;
 
     /**
+     * @var Http
+     */
+    private $response;
+
+    /**
      * Data constructor.
      *
      * @param Context $context
@@ -225,6 +231,7 @@ class Data extends AbstractHelper
      * @param AttributeConfig $attributeConfig
      * @param SearchUriBuilder $searchUriBuilder
      * @param UrlUtility $urlUtility
+     * @param Http $response
      */
     public function __construct(
         Context $context,
@@ -250,7 +257,8 @@ class Data extends AbstractHelper
         GeneralConfigProvider $generalConfigProvider,
         AttributeConfig $attributeConfig,
         SearchUriBuilder $searchUriBuilder,
-        UrlUtility $urlUtility
+        UrlUtility $urlUtility,
+        Http $response
     ) {
         parent::__construct($context);
         $this->storeManager = $storeManager;
@@ -277,6 +285,7 @@ class Data extends AbstractHelper
         $this->attributeConfig = $attributeConfig;
         $this->searchUriBuilder = $searchUriBuilder;
         $this->urlUtility = $urlUtility;
+        $this->response = $response;
     }
 
     /**
@@ -301,6 +310,12 @@ class Data extends AbstractHelper
         if (empty($this->hawkData)) {
             $this->fetchResponse();
         }
+
+        // setup redirect if it is in the result
+        if ($this->hawkData->getLocation()) {
+            $this->response->setRedirect($this->hawkData->getLocation())->sendResponse();
+        }
+
         return $this->hawkData;
     }
 
@@ -329,16 +344,6 @@ class Data extends AbstractHelper
             )->__toString();
         }
         return $url;
-    }
-
-    /**
-     * @return string|null
-     * @throws InstructionException
-     * @throws NotFoundException
-     */
-    public function getLocation()
-    {
-        return $this->getResultData()->getLocation();
     }
 
     /**
