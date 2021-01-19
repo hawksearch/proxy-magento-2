@@ -118,6 +118,7 @@ class SearchParametersBuilder implements BuilderInterface
         $controller = implode('_', [$this->httpRequest->getModuleName(), $this->httpRequest->getControllerName()]);
         if (isset($buildSubject['lpurl'])) {
             $buildSubject['lpurl'] = rtrim($buildSubject['lpurl'], "/");
+            $buildSubject['lpurl'] = '/' . ltrim($buildSubject['lpurl'], "/");
         }
         switch ($controller) {
             case 'hawkproxy_landingPage':

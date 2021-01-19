@@ -48,4 +48,16 @@ class ResultBlockPlugin
         }
         return $result;
     }
+
+    /**
+     * We override the no_result_text message
+     * and don't take into account the "Minimal Query Length" configuration setting
+     * @param Result $subject
+     * @param Phrase|string $result
+     * @return Phrase
+     */
+    public function afterGetNoResultText(Result $subject, $result)
+    {
+        return __('We can\'t find products matching the selection.');
+    }
 }
