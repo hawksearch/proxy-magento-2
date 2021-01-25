@@ -2716,7 +2716,11 @@ HawkSearch.Context = new HawkSearch.ContextObj();
 
             HawkSearch.copyValue = function (objs, name) {
                 var obj = objs.find(name);
-                if (obj != null && obj.length > 0) $(name).html(obj.html());
+                if (obj != null && obj.length > 0) {
+                    $(name).html(obj.html());
+                } else {
+                    $(name).html("");
+                }
             };
 
             HawkSearch.copyCustomBanners = function (objs) {
