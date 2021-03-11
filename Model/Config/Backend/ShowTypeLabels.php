@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2020 Hawksearch (www.hawksearch.com) - All Rights Reserved
+ * Copyright (c) 2021 Hawksearch (www.hawksearch.com) - All Rights Reserved
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -19,6 +19,7 @@ use Magento\Framework\App\Cache\TypeListInterface;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\Config\Value;
 use Magento\Framework\Data\Collection\AbstractDb;
+use Magento\Framework\DataObject;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Model\Context;
 use Magento\Framework\Model\ResourceModel\AbstractResource;
@@ -75,12 +76,12 @@ class ShowTypeLabels extends Value
     {
         if ($this->getValue() === null) {
             //determine state from hawksearch
-            $res = $this->apiGetCall('Field', ['fieldName' => 'it']);
-            if ($res['code'] == 200) {
-                $it = $res['object'];
-                if ($it->DoNotStore == false && $it->IsOutput == true) {
-                    $this->setValue(1);
-                }
+            $field = $this->getFieldByName('it');
+            if ($field->hasData()
+                && $field->getData('DoNotStore') == false
+                && $field->getData('IsOutput') == true
+            ) {
+                $this->setValue(1);
             }
         }
         return parent::afterLoad();
@@ -88,19 +89,22 @@ class ShowTypeLabels extends Value
 
     /**
      * @return ShowTypeLabels
+     * @throws NoSuchEntityException
+     * @throws Zend_Http_Client_Exception
      */
     public function beforeSave()
     {
-        if ($this->getValue() === 1 && $this->getOldValue() === 0) {
-            $res = $this->activateTypeInResult();
-        } elseif ($this->getValue() === 0 && $this->getOldValue() === 1) {
-            $res = $this->deactivateTypeInResult();
-        } else {
-            return parent::beforeSave();
+        if ($this->isValueChanged()) {
+            if ($this->getValue()) {
+                $res = $this->activateTypeInResult();
+            } else {
+                $res = $this->deactivateTypeInResult();
+            }
+            if (!$res) {
+                $this->setValue($this->getOldValue());
+            }
         }
-        if ($res != 'OK') {
-            $this->setValue($this->getOldValue());
-        }
+
         return parent::beforeSave();
     }
 
@@ -109,22 +113,15 @@ class ShowTypeLabels extends Value
      * @throws NoSuchEntityException
      * @throws Zend_Http_Client_Exception
      */
-    public function activateTypeInResult()
+    private function activateTypeInResult()
     {
-        $res = $this->apiGetCall('Field', ['fieldName' => 'it']);
-        if ($res['code'] == 200) {
-            $it = $res['object'];
-            $it->DoNotStore = false;
-            $it->IsOutput = true;
-            $res = $this->apiPutCall('Field/' . $it->SyncGuid, json_encode($it));
-            if ($res['code'] == 200) {
-                return 'OK';
-            } else {
-                return 'error';
-            }
-        } else {
-            return 'error';
+        $field = $this->getFieldByName('it');
+        if ($field->hasData()) {
+            $field->setData('DoNotStore', false);
+            $field->setData('IsOutput', true);
+            return $this->updateField($field);
         }
+        return false;
     }
 
     /**
@@ -132,29 +129,57 @@ class ShowTypeLabels extends Value
      * @throws NoSuchEntityException
      * @throws Zend_Http_Client_Exception
      */
-    public function deactivateTypeInResult()
+    private function deactivateTypeInResult()
     {
-        $res = $this->apiGetCall('Field', ['fieldName' => 'it']);
+        $field = $this->getFieldByName('it');
+        if ($field->hasData()) {
+            $field->setData('DoNotStore', true);
+            $field->setData('IsOutput', false);
+            return $this->updateField($field);
+        }
+        return false;
+    }
+
+    /**
+     * @param string $field
+     * @return DataObject
+     * @throws Zend_Http_Client_Exception
+     */
+    private function getFieldByName($field)
+    {
+        $res = $this->apiGetCall('Field', ['fieldName' => $field]);
+        $dataObject = new DataObject();
         if ($res['code'] == 200) {
             $it = $res['object'];
-            $it->DoNotStore = true;
-            $it->IsOutput = false;
-            $res = $this->apiPutCall('Field/' . $it->SyncGuid, json_encode($it));
-            if ($res['code'] == 200) {
-                return 'OK';
-            } else {
-                return 'error';
+            if ($it) {
+                $dataObject = new DataObject($it);
             }
-        } else {
-            return 'error';
         }
+        return $dataObject;
+    }
+
+    /**
+     * @param DataObject $field
+     * @return bool
+     * @throws NoSuchEntityException
+     * @throws Zend_Http_Client_Exception
+     */
+    private function updateField(DataObject $field)
+    {
+        if ($field->hasData() && $field->getData('SyncGuid')) {
+            $res = $this->apiPutCall('Field/' . $field->getData('FieldId'), json_encode($field->getData()));
+            if ($res['code'] == 200) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
      * @param $path
      * @param $args
      * @return array
-     * @throws NoSuchEntityException
      * @throws Zend_Http_Client_Exception
      */
     private function apiGetCall($path, $args)
@@ -166,7 +191,7 @@ class ShowTypeLabels extends Value
         $client->setHeaders('Accept', 'application/json');
 
         $response = $client->request();
-        return ['code' => $response->getStatus(), 'object' => json_decode($response->getBody())];
+        return ['code' => $response->getStatus(), 'object' => json_decode($response->getBody(), true)];
     }
 
     /**
