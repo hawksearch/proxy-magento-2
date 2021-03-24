@@ -11,4 +11,8 @@
         <section name="multiplewishlist"/>
         <section name="requisition"/>
     </action>
+    <action name="hawkproxy/index/category">
+        <section name="multiplewishlist"/>
+        <section name="requisition"/>
+    </action>
 </config>

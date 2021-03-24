@@ -46,6 +46,7 @@ use Magento\Framework\Filesystem;
 use Magento\Framework\Filesystem\Driver\File;
 use Magento\Framework\Filesystem\Io\File as ioFile;
 use Magento\Framework\Logger\Monolog;
+use Magento\Framework\Registry;
 use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Store\Model\App\Emulation;
 use Magento\Store\Model\ResourceModel\Store\CollectionFactory as StoreCollectionFactory;
@@ -211,6 +212,11 @@ class Data extends AbstractHelper
     private $response;
 
     /**
+     * @var Registry
+     */
+    private $coreRegistry;
+
+    /**
      * Data constructor.
      *
      * @param Context $context
@@ -239,6 +245,7 @@ class Data extends AbstractHelper
      * @param UrlUtility $urlUtility
      * @param SearchResultResponseInterfaceFactory $resultResponseFactory
      * @param Http $response
+     * @param Registry $coreRegistry
      */
     public function __construct(
         Context $context,
@@ -266,7 +273,8 @@ class Data extends AbstractHelper
         SearchUriBuilder $searchUriBuilder,
         UrlUtility $urlUtility,
         SearchResultResponseInterfaceFactory $resultResponseFactory,
-        Http $response
+        Http $response,
+        Registry $coreRegistry
     ) {
         parent::__construct($context);
         $this->storeManager = $storeManager;
@@ -295,6 +303,7 @@ class Data extends AbstractHelper
         $this->urlUtility = $urlUtility;
         $this->resultResponseFactory = $resultResponseFactory;
         $this->response = $response;
+        $this->coreRegistry = $coreRegistry;
     }
 
     /**
@@ -395,6 +404,23 @@ class Data extends AbstractHelper
     public function getFacets()
     {
         return $this->getResultData()->getResponseData()->getFacets();
+    }
+
+    /**
+     * @return bool
+     */
+    public function isShowFacets()
+    {
+        /** @var Category $category */
+        $category = $this->coreRegistry->registry('current_category');
+        if ($category) {
+            $isContentMode = $category->getDisplayMode() === \Magento\Catalog\Model\Category::DM_PAGE;
+            if ($isContentMode || !$category->getIsAnchor()) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -606,9 +632,14 @@ class Data extends AbstractHelper
 
         $path = '/' . rtrim(ltrim($path, '/'), '/');
 
-        if (in_array($path, ['/catalogsearch/result', '/hawkproxy'])
-            && $this->proxyConfigProvider->isManageSearch()
-        ) {
+        $isSearchPath = strpos($path, '/catalogsearch/result') === 0;
+        $isProxySearchPath = strpos($path, '/hawkproxy/index/index') === 0;
+        $isProxyCategoryPath = strpos($path, '/hawkproxy/index/category') === 0;
+        if (($isSearchPath || $isProxySearchPath) && $this->proxyConfigProvider->isManageSearch()) {
+            return true;
+        }
+
+        if ($isProxyCategoryPath && $this->proxyConfigProvider->isManageCategories()) {
             return true;
         }
 

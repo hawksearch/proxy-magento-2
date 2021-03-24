@@ -63,7 +63,15 @@ class Html extends Template
      */
     public function getFacets()
     {
-        return $this->helper->getResultData()->getResponseData()->getFacets();
+        return $this->helper->getFacets();
+    }
+
+    /**
+     * @return bool
+     */
+    public function isShowFacets()
+    {
+        return $this->helper->isShowFacets();
     }
 
     /**

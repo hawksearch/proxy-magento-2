@@ -16,6 +16,8 @@ namespace HawkSearch\Proxy\ViewModel;
 use HawkSearch\Connector\Model\Config\ApiSettings;
 use HawkSearch\Proxy\Helper\Data as ProxyHelper;
 use HawkSearch\Proxy\Model\Config\Proxy as ProxyConfigProvider;
+use Magento\Catalog\Model\Category;
+use Magento\Framework\Registry;
 use Magento\Framework\UrlInterface;
 use Magento\Framework\View\Element\Block\ArgumentInterface;
 
@@ -43,22 +45,30 @@ class Config implements ArgumentInterface
     private $apiSettingsConfigProvider;
 
     /**
+     * @var Registry
+     */
+    private $coreRegistry;
+
+    /**
      * Footer constructor.
      * @param ProxyConfigProvider $proxyConfigProvider
      * @param UrlInterface $urlBuilder
      * @param ProxyHelper $proxyHelper
      * @param ApiSettings $apiSettingsConfigProvider
+     * @param Registry $coreRegistry
      */
     public function __construct(
         ProxyConfigProvider $proxyConfigProvider,
         UrlInterface $urlBuilder,
         ProxyHelper $proxyHelper,
-        ApiSettings $apiSettingsConfigProvider
+        ApiSettings $apiSettingsConfigProvider,
+        Registry $coreRegistry
     ) {
         $this->proxyConfigProvider = $proxyConfigProvider;
         $this->urlBuilder = $urlBuilder;
         $this->proxyHelper = $proxyHelper;
         $this->apiSettingsConfigProvider = $apiSettingsConfigProvider;
+        $this->coreRegistry = $coreRegistry;
     }
 
     /**
@@ -66,7 +76,16 @@ class Config implements ArgumentInterface
      */
     public function getBaseUrl()
     {
-        return $this->urlBuilder->getUrl('hawkproxy');
+        /** @var Category $category */
+        $category = $this->coreRegistry->registry('current_category');
+
+        if ($category) {
+            $params = [];
+            $params['catid'] = $category->getId();
+            return $this->urlBuilder->getUrl('hawkproxy/index/category', $params);
+        }
+
+        return $this->urlBuilder->getUrl('hawkproxy/index/index');
     }
 
     /**

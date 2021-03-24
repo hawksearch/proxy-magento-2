@@ -15,6 +15,10 @@ use HawkSearch\Proxy\Block\Product\Facets;
 
 /** @var $block Facets */
 ?>
+<?php if ($block->isShowFacets()): ?>
 <div id="hawkfacets" class="block">
-    <?= /* @noEscape */ $block->getFacets(); ?>
+<?php else: ?>
+<div id="hawkfacets" style="display: none">
+<?php endif; ?>
+    <?= /* @noEscape */ $block->getFacets() ?>
 </div>

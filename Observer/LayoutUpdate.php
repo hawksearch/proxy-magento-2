@@ -41,27 +41,26 @@ class LayoutUpdate implements ObserverInterface
      */
     public function execute(Observer $observer)
     {
-        if ($observer->getFullActionName() == 'catalogsearch_result_index') {
+        /** @var Layout $layout */
+        $layout = $observer->getData('layout');
+        $action = $observer->getData('full_action_name');
+        if ($action == 'catalogsearch_result_index') {
             if ($this->proxyConfigProvider->isManageSearch()) {
-                $layout = $observer->getLayout();
                 $layout->getUpdate()->addHandle('hawksearch_catalogsearch_result');
             }
-        } elseif ($observer->getFullActionName() == 'catalog_category_view') {
+        } elseif ($action == 'catalog_category_view') {
             if ($this->proxyConfigProvider->isManageCategories()) {
-                $layout = $observer->getLayout();
                 $layout->getUpdate()->addHandle('hawksearch_category_view');
             }
-        } elseif ($observer->getFullActionName() == 'hawkproxy_landingPage_view') {
-            /**
-             * @var Layout $layout
-             */
-            $layout = $observer->getLayout();
+        } elseif ($action == 'hawkproxy_landingPage_view') {
             $layout->getUpdate()->addHandle('catalog_category_view')
                 ->addHandle('hawksearch_category_view')
                 ->addHandle('catalog_category_view_type_layered')
                 ->addHandle('catalog_category_view_type_layered_without_children');
-        } elseif ($observer->getFullActionName() == 'hawkproxy_index_index') {
-            $layout = $observer->getLayout();
+        } elseif ($action == 'hawkproxy_index_index') {
+            $layout->getUpdate()
+                ->addHandle('hawksearch_catalogsearch_result');
+        } elseif ($action == 'hawkproxy_index_category') {
             $layout->getUpdate()
                 ->addHandle('hawksearch_catalogsearch_result');
         }
