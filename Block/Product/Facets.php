@@ -58,4 +58,12 @@ class Facets extends Template
     {
         return $this->hawkHelper->getFacets();
     }
+
+    /**
+     * @return bool
+     */
+    public function isShowFacets()
+    {
+        return $this->hawkHelper->isShowFacets();
+    }
 }
