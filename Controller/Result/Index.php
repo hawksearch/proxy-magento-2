@@ -100,6 +100,12 @@ class Index extends CatalogSearchResultIndex
             $this->_view->getLayout()->unsetElement('page.main.title');
         } elseif (!$this->proxyHelper->getResultData()->getResponseData()->getResults()->getItems()) {
             $this->_view->loadLayout(static::DEFAULT_NO_RESULT_HANDLE);
+        }
+        elseif ($this->proxyHelper->getResultData()->getLocation()) {
+            // Redirect if there is one in the result.
+            $redirect = $this->resultRedirectFactory->create();
+            $redirect->setUrl($this->proxyHelper->getResultData()->getLocation());
+            return $redirect;
         } elseif ($this->proxyHelper->productsOnly()) {
             $this->_view->loadLayout();
         } else {
