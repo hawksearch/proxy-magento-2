@@ -336,6 +336,8 @@ class Data extends AbstractHelper
         // setup redirect if it is in the result
         if ($this->hawkData->getLocation()) {
             $this->response->setRedirect($this->hawkData->getLocation())->sendResponse();
+            // phpcs:ignore Magento2.Security.LanguageConstruct.ExitUsage
+            exit(0);
         }
 
         return $this->hawkData;
