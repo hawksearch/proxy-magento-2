@@ -22,4 +22,16 @@
     <event name="core_layout_render_element">
         <observer name="hawksearch_productlist_toolbar" instance="HawkSearch\Proxy\Observer\ModifyToolbarBlock" />
     </event>
+
+    <event name="controller_action_predispatch_catalogsearch_result_index">
+        <observer name="hawksearch_rule_redirect" instance="HawkSearch\Proxy\Observer\RuleRedirectObserver" />
+    </event>
+
+    <event name="controller_action_predispatch_catalog_category_view">
+        <observer name="hawksearch_rule_redirect" instance="HawkSearch\Proxy\Observer\RuleRedirectObserver" />
+    </event>
+
+    <event name="controller_action_predispatch_hawkproxy_landingPage_view">
+        <observer name="hawksearch_rule_redirect" instance="HawkSearch\Proxy\Observer\RuleRedirectObserver" />
+    </event>
 </config>

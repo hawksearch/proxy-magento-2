@@ -61,7 +61,7 @@ class LandingPageRouter implements RouterInterface
         if (!$this->proxyConfigProvider->isLandingPageRouteEnabled()) {
             return false;
         }
-        if (!$this->helper->getIsHawkManaged(trim($request->getPathInfo(), '/'))) {
+        if (!$this->helper->getIsHawkManaged($request->getPathInfo())) {
             return false;
         }
 

@@ -43,6 +43,12 @@
         <plugin name="hawkproxy_result" type="HawkSearch\Proxy\Plugin\ResultBlockPlugin" />
     </type>
 
+    <type name="HawkSearch\Proxy\Observer\RuleRedirectObserver">
+        <arguments>
+            <argument name="responseProvider" xsi:type="object">HawkSearch\Proxy\Model\Provider\Response\RuleRedirectProvider</argument>
+        </arguments>
+    </type>
+
     <preference for="Magento\CatalogSearch\Controller\Result\Index" type="HawkSearch\Proxy\Controller\Result\Index" />
 </config>
 
