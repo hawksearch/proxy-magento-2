@@ -72,6 +72,11 @@
             <argument name="context" xsi:type="object">hawkSearchProxyVirtualContext</argument>
         </arguments>
     </type>
+    <type name="\HawkSearch\Proxy\Gateway\Request\SearchParametersBuilder">
+        <arguments>
+            <argument name="customerSession" xsi:type="object">Magento\Customer\Model\Session\Proxy</argument>
+        </arguments>
+    </type>
 
     <!-- Instructions  -->
     <virtualType name="HawkSearchInstructionsPool" type="HawkSearch\Connector\Gateway\Instruction\InstructionPool">
