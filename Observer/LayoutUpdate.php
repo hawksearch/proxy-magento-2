@@ -13,9 +13,11 @@
 
 namespace HawkSearch\Proxy\Observer;
 
+use HawkSearch\Proxy\Helper\Data as ProxyHelper;
 use HawkSearch\Proxy\Model\Config\Proxy as ProxyConfigProvider;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\View\Layout;
 
 class LayoutUpdate implements ObserverInterface
@@ -26,43 +28,56 @@ class LayoutUpdate implements ObserverInterface
     private $proxyConfigProvider;
 
     /**
+     * @var ProxyHelper
+     */
+    private $proxyHelper;
+
+    /**
      * LayoutUpdate constructor.
      * @param ProxyConfigProvider $proxyConfigProvider
+     * @param ProxyHelper $proxyHelper
      */
     public function __construct(
-        ProxyConfigProvider $proxyConfigProvider
+        ProxyConfigProvider $proxyConfigProvider,
+        ProxyHelper $proxyHelper
     ) {
         $this->proxyConfigProvider = $proxyConfigProvider;
+        $this->proxyHelper = $proxyHelper;
     }
 
     /**
      * @param Observer $observer
      * @return void
+     * @throws NoSuchEntityException
      */
     public function execute(Observer $observer)
     {
+        $isManaged = $this->proxyHelper->getIsHawkManaged();
+        if (!$isManaged) {
+            return;
+        }
+
         /** @var Layout $layout */
         $layout = $observer->getData('layout');
         $action = $observer->getData('full_action_name');
-        if ($action == 'catalogsearch_result_index') {
-            if ($this->proxyConfigProvider->isManageSearch()) {
+        switch ($action) {
+            case 'catalogsearch_result_index':
+            case 'hawkproxy_index_index':
+            case 'hawkproxy_index_category':
                 $layout->getUpdate()->addHandle('hawksearch_catalogsearch_result');
-            }
-        } elseif ($action == 'catalog_category_view') {
-            if ($this->proxyConfigProvider->isManageCategories()) {
+                break;
+
+            case 'catalog_category_view':
                 $layout->getUpdate()->addHandle('hawksearch_category_view');
-            }
-        } elseif ($action == 'hawkproxy_landingPage_view') {
-            $layout->getUpdate()->addHandle('catalog_category_view')
-                ->addHandle('hawksearch_category_view')
-                ->addHandle('catalog_category_view_type_layered')
-                ->addHandle('catalog_category_view_type_layered_without_children');
-        } elseif ($action == 'hawkproxy_index_index') {
-            $layout->getUpdate()
-                ->addHandle('hawksearch_catalogsearch_result');
-        } elseif ($action == 'hawkproxy_index_category') {
-            $layout->getUpdate()
-                ->addHandle('hawksearch_catalogsearch_result');
+                break;
+
+            case 'hawkproxy_landingPage_view':
+                $layout->getUpdate()
+                    ->addHandle('catalog_category_view')
+                    ->addHandle('hawksearch_category_view')
+                    ->addHandle('catalog_category_view_type_layered')
+                    ->addHandle('catalog_category_view_type_layered_without_children');
+                break;
         }
     }
 }

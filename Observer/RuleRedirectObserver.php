@@ -53,7 +53,7 @@ class RuleRedirectObserver implements ObserverInterface
     {
         /** @var RequestInterface $request */
         $request = $observer->getData('request');
-        if ($this->proxyHelper->getIsHawkManaged($request->getOriginalPathInfo())
+        if ($this->proxyHelper->getIsHawkManaged()
             && $this->proxyHelper->getResultData()->getLocation()
         ) {
             /** @var Action $controller */
