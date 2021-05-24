@@ -19,6 +19,8 @@ use HawkSearch\Connector\Model\ConfigProvider as ConnectorConfigProvider;
 use HawkSearch\Proxy\Helper\Data;
 use HawkSearch\Proxy\Model\Config\Proxy as ProxyConfigProvider;
 use Magento\Catalog\Model\Session as CatalogSession;
+use Magento\Customer\Api\GroupManagementInterface;
+use Magento\Customer\Model\Session;
 use Magento\Framework\App\RequestInterface;
 
 class SearchParametersBuilder implements BuilderInterface
@@ -49,26 +51,41 @@ class SearchParametersBuilder implements BuilderInterface
     private $helper;
 
     /**
+     * @var Session
+     */
+    private $customerSession;
+
+    /**
+     * @var GroupManagementInterface
+     */
+    private $groupManagement;
+
+    /**
      * SearchParamsBuilder constructor.
      * @param RequestInterface $httpRequest
      * @param ConnectorConfigProvider $connectorConfigProvider
      * @param ProxyConfigProvider $proxyConfigProvider
      * @param CatalogSession $catalogSession
      * @param Data $helper
+     * @param Session $customerSession
+     * @param GroupManagementInterface $groupManagement
      */
     public function __construct(
         RequestInterface $httpRequest,
         ConnectorConfigProvider $connectorConfigProvider,
         ProxyConfigProvider $proxyConfigProvider,
         CatalogSession $catalogSession,
-        Data $helper
-
+        Data $helper,
+        Session $customerSession,
+        GroupManagementInterface $groupManagement
     ) {
         $this->httpRequest = $httpRequest;
         $this->connectorConfigProvider = $connectorConfigProvider;
         $this->proxyConfigProvider = $proxyConfigProvider;
         $this->catalogSession = $catalogSession;
         $this->helper = $helper;
+        $this->customerSession = $customerSession;
+        $this->groupManagement = $groupManagement;
     }
 
     /**
@@ -103,6 +120,14 @@ class SearchParametersBuilder implements BuilderInterface
         }
         $this->manageLandingPageParam($params, $buildSubject)
             ->sanitizeParams($params);
+
+        if ($this->customerSession->isLoggedIn()) {
+            $groupId = $this->customerSession->getCustomerGroupId();
+        } else {
+            $groupId = $this->groupManagement->getNotLoggedInGroup()->getId();
+        }
+
+        $params['customerGroupId'] = $groupId;
 
         return $params;
     }
