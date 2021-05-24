@@ -49,7 +49,6 @@ class Html extends Template
         BannerFactory $bannerFactory,
         array $data = []
     ) {
-        $helper->setIsHawkManaged(true);
         $this->helper = $helper;
         $this->bannerFactory = $bannerFactory;
 

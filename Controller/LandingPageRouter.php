@@ -55,13 +55,15 @@ class LandingPageRouter implements RouterInterface
 
     /**
      * @inheritDoc
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function match(RequestInterface $request)
     {
         if (!$this->proxyConfigProvider->isLandingPageRouteEnabled()) {
             return false;
         }
-        if (!$this->helper->getIsHawkManaged($request->getPathInfo())) {
+
+        if (!$this->helper->isManagedLandingPage($request->getPathInfo())) {
             return false;
         }
 

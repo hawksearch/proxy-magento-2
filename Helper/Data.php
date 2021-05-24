@@ -26,6 +26,7 @@ use HawkSearch\Proxy\Model\Config\General as GeneralConfigProvider;
 use HawkSearch\Proxy\Model\Config\Proxy as ProxyConfigProvider;
 use HawkSearch\Proxy\Model\ProxyEmailFactory;
 use HawkSearch\Proxy\Model\SearchResultBanner;
+use Magento\Catalog\Api\CategoryRepositoryInterface;
 use Magento\Catalog\Model\Attribute\Config as AttributeConfig;
 use Magento\Catalog\Model\Category;
 use Magento\Catalog\Model\Config;
@@ -37,7 +38,6 @@ use Magento\CatalogUrlRewrite\Model\CategoryUrlRewriteGenerator;
 use Magento\Framework\App\CacheInterface as Cache;
 use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\App\Helper\Context;
-use Magento\Framework\App\Response\Http;
 use Magento\Framework\Escaper;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
@@ -207,14 +207,14 @@ class Data extends AbstractHelper
     private $resultResponseFactory;
 
     /**
-     * @var Http
-     */
-    private $response;
-
-    /**
      * @var Registry
      */
     private $coreRegistry;
+
+    /**
+     * @var CategoryRepositoryInterface
+     */
+    private $categoryRepository;
 
     /**
      * Data constructor.
@@ -244,8 +244,8 @@ class Data extends AbstractHelper
      * @param SearchUriBuilder $searchUriBuilder
      * @param UrlUtility $urlUtility
      * @param SearchResultResponseInterfaceFactory $resultResponseFactory
-     * @param Http $response
      * @param Registry $coreRegistry
+     * @param CategoryRepositoryInterface $categoryRepository
      */
     public function __construct(
         Context $context,
@@ -273,8 +273,8 @@ class Data extends AbstractHelper
         SearchUriBuilder $searchUriBuilder,
         UrlUtility $urlUtility,
         SearchResultResponseInterfaceFactory $resultResponseFactory,
-        Http $response,
-        Registry $coreRegistry
+        Registry $coreRegistry,
+        CategoryRepositoryInterface $categoryRepository
     ) {
         parent::__construct($context);
         $this->storeManager = $storeManager;
@@ -302,8 +302,8 @@ class Data extends AbstractHelper
         $this->searchUriBuilder = $searchUriBuilder;
         $this->urlUtility = $urlUtility;
         $this->resultResponseFactory = $resultResponseFactory;
-        $this->response = $response;
         $this->coreRegistry = $coreRegistry;
+        $this->categoryRepository = $categoryRepository;
     }
 
     /**
@@ -608,38 +608,90 @@ class Data extends AbstractHelper
     }
 
     /**
-     * @param bool $im
-     */
-    public function setIsHawkManaged($im)
-    {
-        $this->isManaged = $im;
-    }
-
-    /**
      * @param string|null $path
      * @return bool
+     * @throws NoSuchEntityException
      */
     public function getIsHawkManaged($path = null)
     {
-        if (empty($path)) {
-            return $this->isManaged;
+        if ($path === null) {
+            $path = $this->_getRequest()->getOriginalPathInfo();
         }
 
         $path = '/' . rtrim(ltrim($path, '/'), '/');
 
-        $isSearchPath = strpos($path, '/catalogsearch/result') === 0;
-        $isProxySearchPath = strpos($path, '/hawkproxy/index/index') === 0;
-        $isProxyCategoryPath = strpos($path, '/hawkproxy/index/category') === 0;
-        if (($isSearchPath || $isProxySearchPath) && $this->proxyConfigProvider->isManageSearch()) {
-            return true;
+        //switch ($path) {
+        switch ($this->_getRequest()->getFullActionName()) {
+            // Catalog search or Hawk Proxy search
+            case 'catalogsearch_result_index':
+            case 'hawkproxy_index_index':
+                $isManaged = $this->proxyConfigProvider->isManageSearch();
+                break;
+
+            // Category page or Hawk Proxy category page
+            case 'catalog_category_view':
+            case 'hawkproxy_index_category':
+                $isManaged = $this->isManagedCategory($path);
+                break;
+
+            // Hawk Landing page
+            case 'hawkproxy_landingPage_view':
+                $isManaged = $this->isManagedLandingPage($path);
+                break;
+
+            default:
+                $isManaged = false;
         }
 
-        if ($isProxyCategoryPath && $this->proxyConfigProvider->isManageCategories()) {
-            return true;
+        return $isManaged;
+    }
+
+    /**
+     * @param string $path
+     * @return bool
+     * @throws NoSuchEntityException
+     */
+    public function isManagedCategory($path)
+    {
+        $category = $this->initCategory();
+        if (!$category) {
+            return false;
         }
 
-        $this->isManaged = $this->isManagedLandingPage($path);
-        return $this->isManaged;
+        if (!$this->proxyConfigProvider->isManageCategories()) {
+            return false;
+        }
+
+        $isCategoryManaged = $this->proxyConfigProvider->isManageAllCategories()
+            || (!$this->proxyConfigProvider->isManageAllCategories() && $category->getData('hawk_landing_page'));
+
+        return $isCategoryManaged && $this->isManagedLandingPage($path);
+    }
+
+    /**
+     * Initialize category from request
+     *
+     * @return Category|bool
+     */
+    private function initCategory()
+    {
+        $category = $this->coreRegistry->registry('current_category');
+        if ($category) {
+            return $category;
+        }
+
+        $categoryId = (int)$this->_getRequest()->getParam('id', false);
+        if (!$categoryId) {
+            return false;
+        }
+
+        try {
+            $category = $this->categoryRepository->get($categoryId, $this->storeManager->getStore()->getId());
+        } catch (NoSuchEntityException $e) {
+            return false;
+        }
+
+        return $category;
     }
 
     /**
@@ -647,7 +699,7 @@ class Data extends AbstractHelper
      * @return bool
      * @throws NoSuchEntityException
      */
-    private function isManagedLandingPage($pageUrl)
+    public function isManagedLandingPage($pageUrl)
     {
         $pageUrl = '/' . rtrim(ltrim($pageUrl, '/'), '/');
 

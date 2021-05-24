@@ -90,7 +90,7 @@ class ListProductBlockInitCollection implements ObserverInterface
                 $isActive = false;
         }
 
-        if ($isActive && $this->hawkHelper->getIsHawkManaged($this->request->getOriginalPathInfo())) {
+        if ($isActive && $this->hawkHelper->getIsHawkManaged()) {
             $block->setToolbarBlockName('hawksearch_product_list_toolbar');
             $block->setCollection($this->hawkHelper->getProductCollection());
         }
