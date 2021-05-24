@@ -92,11 +92,6 @@ class Data extends AbstractHelper
     private $filesystem;
 
     /**
-     * @var Monolog $logger
-     */
-    private $overwriteFlag;
-
-    /**
      * @var ProxyEmailFactory
      */
     private $email_helper;
@@ -282,7 +277,6 @@ class Data extends AbstractHelper
         $this->collectionFactory = $collectionFactory;
         $this->session = $session;
         $this->catalogConfig = $catalogConfig;
-        $this->overwriteFlag = false;
         $this->email_helper = $email_helper;
         $this->categoryCollectionFactory = $categoryCollectionFactory;
         $this->emulation = $emulation;
@@ -884,9 +878,7 @@ RuleType="Group" Operator="All" />'
             $customVal = null;
             if ($sc < 0) {
                 //Hawk has page Magento doesn't want managed, delete, increment left
-                if (substr($hawkList[$left]['custom'], 0, strlen('__mage_catid_')) == '__mage_catid_'
-                    || $this->overwriteFlag
-                ) {
+                if (substr($hawkList[$left]['custom'], 0, strlen('__mage_catid_')) == '__mage_catid_') {
                     $resp = $this->getHawkResponse(
                         Zend_Http_Client::DELETE,
                         self::HAWK_LANDING_PAGE_URL . $hawkList[$left]['pageid']
@@ -1015,7 +1007,7 @@ RuleType="Group" Operator="All" />'
         $hawkPages = [];
         $pages = json_decode($this->getHawkResponse(Zend_Http_Client::GET, 'LandingPage'));
         foreach ($pages as $page) {
-            if (empty($page->Custom) && !$this->overwriteFlag) {
+            if (empty($page->Custom)) {
                 continue;
             }
             $hawkPages[] = [
@@ -1035,17 +1027,32 @@ RuleType="Group" Operator="All" />'
      */
     public function getMagentoLandingPages()
     {
+        /** @var \Magento\Catalog\Model\ResourceModel\Category\Collection  $collection */
         $collection = $this->categoryCollectionFactory->create();
-        $collection->addAttributeToSelect(['name', 'is_active', 'parent_id', 'position', 'include_in_menu']);
-        $collection->addAttributeToFilter('is_active', ['eq' => '1']);
-        $collection->addAttributeToSort('entity_id')->addAttributeToSort('parent_id')->addAttributeToSort('position');
-        $collection->addAttributeToFilter('level', ['gteq' => '2']);
+
+        $collection->addAttributeToSelect(
+            [
+                'name',
+                'is_active',
+                'parent_id',
+                'position',
+                'include_in_menu'
+            ]
+        );
+        $collection
+            ->addUrlRewriteToResult()
+            ->addIsActiveFilter()
+            ->addAttributeToFilter('level', ['gteq' => '2'])
+            ->addAttributeToSort('entity_id')
+            ->addAttributeToSort('parent_id')
+            ->addAttributeToSort('position')
+            ->setPageSize(1000)
+        ;
+
         if (!$this->proxyConfigProvider->isManageAllCategories()) {
-            $collection->addAttributeToFilter('hawk_landing_page', ['eq' => '1']);
+            $collection->addAttributeToFilter('hawk_landing_page', 1);
         }
 
-        $collection->joinUrlRewrite();
-        $collection->setPageSize(1000);
         $pages = $collection->getLastPageNumber();
         $currentPage = 1;
         $cats = [];
