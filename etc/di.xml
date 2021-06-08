@@ -86,6 +86,8 @@
             </argument>
         </arguments>
     </virtualType>
+
+    <!-- searchResults Instruction  -->
     <virtualType name="HawkSearchGetResultsInstruction" type="HawkSearch\Connector\Gateway\Instruction\GatewayInstruction">
         <arguments>
             <argument name="requestBuilder" xsi:type="object">HawkSearchGetResultsRequestBuilder</argument>
@@ -95,7 +97,6 @@
             <argument name="resultFactory" xsi:type="object">HawkSearchGetResultsResultFactory</argument>
         </arguments>
     </virtualType>
-
     <virtualType name="HawkSearchGetResultsRequestBuilder" type="HawkSearch\Connector\Gateway\Request\BuilderComposite">
         <arguments>
             <argument name="builders" xsi:type="array">
@@ -109,7 +110,6 @@
             <argument name="uriBuilder" xsi:type="object">HawkSearch\Proxy\Gateway\Http\Uri\SearchUriBuilder</argument>
         </arguments>
     </virtualType>
-
     <virtualType name="HawkSearchGetResultsHandler" type="HawkSearch\Connector\Gateway\Response\HandlerChain">
         <arguments>
             <argument name="handlers" xsi:type="array">
@@ -118,13 +118,11 @@
             </argument>
         </arguments>
     </virtualType>
-
     <virtualType name="HawkSearchGetResultsResultFactory" type="HawkSearch\Connector\Gateway\Instruction\ResultInterfaceFactory">
         <arguments>
             <argument xsi:type="string" name="instanceName">HawkSearch\Proxy\Gateway\Instruction\Result\SearchResult</argument>
         </arguments>
     </virtualType>
-
     <virtualType name="HawkSearchGetResultsHeaders" type="HawkSearch\Connector\Gateway\Request\BuilderComposite">
         <arguments>
             <argument name="builders" xsi:type="array">
@@ -132,20 +130,11 @@
             </argument>
         </arguments>
     </virtualType>
+    <!-- END searchResults Instruction  -->
+
+
     <!-- END Instructions  -->
 
-    <type name="HawkSearch\Proxy\Gateway\Request\SearchResultsHeaders">
-        <arguments>
-            <argument name="httpRequest" xsi:type="object">Magento\Framework\App\Request\Http\Proxy</argument>
-        </arguments>
-    </type>
-
-    <type name="HawkSearch\Proxy\Gateway\Request\SearchParametersBuilder">
-        <arguments>
-            <argument name="httpRequest" xsi:type="object">Magento\Framework\App\Request\Http\Proxy</argument>
-            <argument name="catalogSession" xsi:type="object">Magento\Catalog\Model\Session\Proxy</argument>
-        </arguments>
-    </type>
 
     <!-- Configs -->
     <type name="HawkSearch\Proxy\Model\Config\General">
@@ -166,4 +155,18 @@
         </arguments>
     </type>
     <!-- END Configs -->
+
+    <!-- Types -->
+    <type name="HawkSearch\Proxy\Gateway\Request\SearchResultsHeaders">
+        <arguments>
+            <argument name="httpRequest" xsi:type="object">Magento\Framework\App\Request\Http\Proxy</argument>
+        </arguments>
+    </type>
+    <type name="HawkSearch\Proxy\Gateway\Request\SearchParametersBuilder">
+        <arguments>
+            <argument name="httpRequest" xsi:type="object">Magento\Framework\App\Request\Http\Proxy</argument>
+            <argument name="catalogSession" xsi:type="object">Magento\Catalog\Model\Session\Proxy</argument>
+        </arguments>
+    </type>
+    <!-- End Types -->
 </config>
