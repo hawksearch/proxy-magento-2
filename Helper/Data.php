@@ -15,6 +15,8 @@ namespace HawkSearch\Proxy\Helper;
 
 use Composer\Util\Filesystem as UtilFileSystem;
 use Exception;
+use HawkSearch\Connector\Gateway\Http\Converter\JsonToArray;
+use HawkSearch\Connector\Gateway\Http\ConverterException;
 use HawkSearch\Connector\Gateway\Instruction\InstructionManagerPool;
 use HawkSearch\Connector\Gateway\InstructionException;
 use HawkSearch\Connector\Helper\Url as UrlUtility;
@@ -212,6 +214,11 @@ class Data extends AbstractHelper
     private $categoryRepository;
 
     /**
+     * @var JsonToArray
+     */
+    private $converter;
+
+    /**
      * Data constructor.
      *
      * @param Context $context
@@ -241,6 +248,7 @@ class Data extends AbstractHelper
      * @param SearchResultResponseInterfaceFactory $resultResponseFactory
      * @param Registry $coreRegistry
      * @param CategoryRepositoryInterface $categoryRepository
+     * @param JsonToArray $converter
      */
     public function __construct(
         Context $context,
@@ -269,7 +277,8 @@ class Data extends AbstractHelper
         UrlUtility $urlUtility,
         SearchResultResponseInterfaceFactory $resultResponseFactory,
         Registry $coreRegistry,
-        CategoryRepositoryInterface $categoryRepository
+        CategoryRepositoryInterface $categoryRepository,
+        JsonToArray $converter
     ) {
         parent::__construct($context);
         $this->storeManager = $storeManager;
@@ -298,6 +307,7 @@ class Data extends AbstractHelper
         $this->resultResponseFactory = $resultResponseFactory;
         $this->coreRegistry = $coreRegistry;
         $this->categoryRepository = $categoryRepository;
+        $this->converter = $converter;
     }
 
     /**
@@ -543,7 +553,7 @@ class Data extends AbstractHelper
      * @param string $method
      * @param string $url
      * @param string|resource $data
-     * @return string
+     * @return array
      */
     public function getHawkResponse($method, $url, $data = null)
     {
@@ -559,10 +569,11 @@ class Data extends AbstractHelper
             $client->setHeaders('Accept', 'application/json');
             $this->log(sprintf('fetching request. URL: %s, Method: %s', $client->getUri(), $method));
             $response = $client->request();
-            return $response->getBody();
+            $responseBody = $response->getBody();
+            return $this->converter->convert($responseBody);
         } catch (Exception $e) {
             $this->log($e);
-            return json_encode(['Message' => "Internal Error - " . $e->getMessage()]);
+            return ['Message' => "Internal Error - " . $e->getMessage()];
         }
     }
 
@@ -585,11 +596,7 @@ class Data extends AbstractHelper
         if (($serialized = $this->cache->load($this->getLPCacheKey()))) {
             $landingPages = $this->serializer->unserialize($serialized);
         } else {
-            $landingPages = $this->serializer->unserialize(
-                $this->getHawkResponse(Zend_Http_Client::GET, 'LandingPage/Urls')
-            );
-            $landingPages = $landingPages ?: [];
-
+            $landingPages = $this->getHawkResponse(Zend_Http_Client::GET, 'LandingPage/Urls') ?: [];
             sort($landingPages, SORT_STRING);
             $this->cache->save(
                 $this->serializer->serialize($landingPages),
@@ -809,13 +816,14 @@ RuleType="Group" Operator="All" />'
                 $resp = $this->getHawkResponse(
                     Zend_Http_Client::PUT,
                     self::HAWK_LANDING_PAGE_URL . $otherObject['PageId'],
-                    json_encode($otherObject)
+                    $this->serializer->serialize($otherObject)
+
                 );
                 $this->validateHawkLandingPageResponse(
                     $resp,
                     Zend_Http_Client::PUT,
                     $lpObject['CustomUrl'],
-                    json_encode($lpObject)
+                    $this->serializer->serialize($lpObject)
                 );
             }
         }
@@ -892,7 +900,7 @@ RuleType="Group" Operator="All" />'
                         sprintf(
                             'attempt to remove page %s resulted in: %s',
                             $hawkList[$left]['hawkurl'],
-                            $resp
+                            $this->serializer->serialize($resp)
                         )
                     );
                 } else {
@@ -917,20 +925,20 @@ RuleType="Group" Operator="All" />'
                 $resp = $this->getHawkResponse(
                     Zend_Http_Client::POST,
                     self::HAWK_LANDING_PAGE_URL,
-                    json_encode($lpObject)
+                    $this->serializer->serialize($lpObject)
                 );
                 $this->validateHawkLandingPageResponse(
                     $resp,
                     Zend_Http_Client::POST,
                     $mageList[$right]['hawkurl'],
-                    json_encode($lpObject)
+                    $this->serializer->serialize($lpObject)
                 );
 
                 $this->log(
                     sprintf(
                         'attempt to add page %s resulted in: %s',
                         $mageList[$right]['hawkurl'],
-                        $resp
+                        $this->serializer->serialize($resp)
                     )
                 );
                 $right++;
@@ -948,20 +956,20 @@ RuleType="Group" Operator="All" />'
                 $resp = $this->getHawkResponse(
                     Zend_Http_Client::PUT,
                     self::HAWK_LANDING_PAGE_URL . $hawkList[$left]['pageid'],
-                    json_encode($lpObject)
+                    $this->serializer->serialize($lpObject)
                 );
                 $this->validateHawkLandingPageResponse(
                     $resp,
                     Zend_Http_Client::PUT,
                     $hawkList[$left]['hawkurl'],
-                    json_encode($lpObject)
+                    $this->serializer->serialize($lpObject)
                 );
 
                 $this->log(
                     sprintf(
                         'attempt to update page %s resulted in %s',
                         $hawkList[$left]['hawkurl'],
-                        $resp
+                        $this->serializer->serialize($resp)
                     )
                 );
                 $left++;
@@ -1005,7 +1013,7 @@ RuleType="Group" Operator="All" />'
     public function getHawkLandingPages()
     {
         $hawkPages = [];
-        $pages = json_decode($this->getHawkResponse(Zend_Http_Client::GET, 'LandingPage'));
+        $pages = $this->getHawkResponse(Zend_Http_Client::GET, 'LandingPage');
         foreach ($pages as $page) {
             if (empty($page->Custom)) {
                 continue;
@@ -1109,16 +1117,14 @@ RuleType="Group" Operator="All" />'
     }
 
     /**
-     * @param string $response
+     * @param array $response
      * @param string $action
      * @param string $url
      * @param string|null $request_raw
      */
     private function validateHawkLandingPageResponse($response, $action, $url, $request_raw = null)
     {
-        // valid response
-        $res = json_decode($response, true);
-        if (isset($res['Message'])) {
+        if (isset($response['Message'])) {
             // valid action
             switch ($action) {
                 case Zend_Http_Client::PUT:
@@ -1138,7 +1144,7 @@ RuleType="Group" Operator="All" />'
                 'action' => $act,
                 'url' => $url,
                 'request_raw' => $request_raw,
-                'error' => $res['Message']
+                'error' => $response['Message']
             ];
         }
     }
