@@ -15,9 +15,11 @@ namespace HawkSearch\Proxy\Observer;
 
 use HawkSearch\Proxy\Helper\Data as ProxyHelper;
 use HawkSearch\Proxy\Model\Config\Proxy as ProxyConfigProvider;
+use Magento\Catalog\Model\Category as CategoryModel;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Framework\Registry;
 use Magento\Framework\View\Layout;
 
 class LayoutUpdate implements ObserverInterface
@@ -33,16 +35,23 @@ class LayoutUpdate implements ObserverInterface
     private $proxyHelper;
 
     /**
+     * @var Registry
+     */
+    private $coreRegistry;
+
+    /**
      * LayoutUpdate constructor.
      * @param ProxyConfigProvider $proxyConfigProvider
      * @param ProxyHelper $proxyHelper
      */
     public function __construct(
         ProxyConfigProvider $proxyConfigProvider,
-        ProxyHelper $proxyHelper
+        ProxyHelper $proxyHelper,
+        Registry $coreRegistry
     ) {
         $this->proxyConfigProvider = $proxyConfigProvider;
         $this->proxyHelper = $proxyHelper;
+        $this->coreRegistry = $coreRegistry;
     }
 
     /**
@@ -52,32 +61,41 @@ class LayoutUpdate implements ObserverInterface
      */
     public function execute(Observer $observer)
     {
-        $isManaged = $this->proxyHelper->getIsHawkManaged();
-        if (!$isManaged) {
-            return;
-        }
+        $path = null;
+        $handles = [];
 
         /** @var Layout $layout */
         $layout = $observer->getData('layout');
         $action = $observer->getData('full_action_name');
         switch ($action) {
+            /** @noinspection PhpMissingBreakStatementInspection */
+            case 'hawkproxy_index_category':
+                /** @var CategoryModel $category */
+                $category = $this->coreRegistry->registry('current_category');
+                if ($category->getId()) {
+                    $path = $this->proxyHelper->getRequestPath($category);
+                }
+                //skipping break here
             case 'catalogsearch_result_index':
             case 'hawkproxy_index_index':
-            case 'hawkproxy_index_category':
-                $layout->getUpdate()->addHandle('hawksearch_catalogsearch_result');
+                $handles[] = 'hawksearch_catalogsearch_result';
                 break;
 
             case 'catalog_category_view':
-                $layout->getUpdate()->addHandle('hawksearch_category_view');
+                $handles[] = 'hawksearch_category_view';
                 break;
 
             case 'hawkproxy_landingPage_view':
-                $layout->getUpdate()
-                    ->addHandle('catalog_category_view')
-                    ->addHandle('hawksearch_category_view')
-                    ->addHandle('catalog_category_view_type_layered')
-                    ->addHandle('catalog_category_view_type_layered_without_children');
+                $handles[] = 'catalog_category_view';
+                $handles[] = 'hawksearch_category_view';
+                $handles[] = 'catalog_category_view_type_layered';
+                $handles[] = 'catalog_category_view_type_layered_without_children';
                 break;
+        }
+
+        $isManaged = $this->proxyHelper->getIsHawkManaged($path);
+        if ($isManaged) {
+            $layout->getUpdate()->addHandle($handles);
         }
     }
 }
