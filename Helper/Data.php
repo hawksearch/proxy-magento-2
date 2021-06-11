@@ -16,7 +16,6 @@ namespace HawkSearch\Proxy\Helper;
 use Composer\Util\Filesystem as UtilFileSystem;
 use Exception;
 use HawkSearch\Connector\Gateway\Http\Converter\JsonToArray;
-use HawkSearch\Connector\Gateway\Http\ConverterException;
 use HawkSearch\Connector\Gateway\Instruction\InstructionManagerPool;
 use HawkSearch\Connector\Gateway\InstructionException;
 use HawkSearch\Connector\Helper\Url as UrlUtility;
@@ -29,6 +28,7 @@ use HawkSearch\Proxy\Model\Config\Proxy as ProxyConfigProvider;
 use HawkSearch\Proxy\Model\ProxyEmailFactory;
 use HawkSearch\Proxy\Model\SearchResultBanner;
 use Magento\Catalog\Api\CategoryRepositoryInterface;
+use Magento\Catalog\Api\Data\CategoryInterface;
 use Magento\Catalog\Model\Attribute\Config as AttributeConfig;
 use Magento\Catalog\Model\Category;
 use Magento\Catalog\Model\Config;
@@ -47,7 +47,6 @@ use Magento\Framework\Exception\NotFoundException;
 use Magento\Framework\Filesystem;
 use Magento\Framework\Filesystem\Driver\File;
 use Magento\Framework\Filesystem\Io\File as ioFile;
-use Magento\Framework\Logger\Monolog;
 use Magento\Framework\Registry;
 use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Store\Model\App\Emulation;
@@ -630,8 +629,13 @@ class Data extends AbstractHelper
                 break;
 
             // Category page or Hawk Proxy category page
-            case 'catalog_category_view':
+            /** @noinspection PhpMissingBreakStatementInspection */
             case 'hawkproxy_index_category':
+                $category = $this->coreRegistry->registry('current_category');
+                if ($category->getId()) {
+                    $path = $this->getRequestPath($category);
+                }
+            case 'catalog_category_view':
                 $isManaged = $this->isManagedCategory($path);
                 break;
 
@@ -672,7 +676,7 @@ class Data extends AbstractHelper
     /**
      * Initialize category from request
      *
-     * @return Category|bool
+     * @return bool|CategoryInterface|Category
      */
     private function initCategory()
     {
@@ -1087,7 +1091,7 @@ RuleType="Group" Operator="All" />'
      * @param Category $category
      * @return string|null
      */
-    protected function getRequestPath(Category $category)
+    public function getRequestPath(Category $category)
     {
         if ($category->hasData('request_path') && $category->getRequestPath() != null) {
             return $category->getRequestPath();

@@ -14,6 +14,8 @@ declare(strict_types=1);
 
 namespace HawkSearch\Proxy\Gateway\Response;
 
+use HawkSearch\Connector\Gateway\Helper\HttpResponseReader;
+use HawkSearch\Connector\Gateway\Http\ClientInterface;
 use HawkSearch\Connector\Gateway\Response\HandlerInterface;
 use HawkSearch\Proxy\Api\Data\SearchResultDataInterface;
 
@@ -25,6 +27,21 @@ use HawkSearch\Proxy\Api\Data\SearchResultDataInterface;
 class FeaturedItemsHandler implements HandlerInterface
 {
     /**
+     * @var HttpResponseReader
+     */
+    private $httpResponseReader;
+
+    /**
+     * FeaturedItemsHandler constructor.
+     * @param HttpResponseReader $httpResponseReader
+     */
+    public function __construct(
+        HttpResponseReader $httpResponseReader
+    ) {
+        $this->httpResponseReader = $httpResponseReader;
+    }
+
+    /**
      * Handles response
      *
      * @param array $handlingSubject
@@ -34,8 +51,9 @@ class FeaturedItemsHandler implements HandlerInterface
     public function handle(array $handlingSubject, array $response)
     {
         $featuredItems = null;
-        if (isset($response['Data'][SearchResultDataInterface::FEATURED_ITEMS])) {
-            $featuredItems = &$response['Data'][SearchResultDataInterface::FEATURED_ITEMS];
+        $responseData = $this->httpResponseReader->readResponseData($response);
+        if (isset($responseData['Data'][SearchResultDataInterface::FEATURED_ITEMS])) {
+            $featuredItems = &$responseData['Data'][SearchResultDataInterface::FEATURED_ITEMS];
         }
 
         if ($featuredItems === null) {
@@ -45,6 +63,8 @@ class FeaturedItemsHandler implements HandlerInterface
         if (isset($featuredItems['Items']['Items'])) {
             $featuredItems['Items'] = $featuredItems['Items']['Items'];
         }
+
+        $response[ClientInterface::RESPONSE_DATA] = $responseData;
 
         return $response;
     }

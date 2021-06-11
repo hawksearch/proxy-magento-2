@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace HawkSearch\Proxy\Gateway\Instruction\Result;
 
+use HawkSearch\Connector\Gateway\Helper\HttpResponseReader;
 use HawkSearch\Connector\Gateway\Instruction\ResultInterface;
 use HawkSearch\Proxy\Api\Data\SearchResultResponseInterface;
 use HawkSearch\Proxy\Api\Data\SearchResultResponseInterfaceFactory;
@@ -37,6 +38,11 @@ class SearchResult implements ResultInterface
     private $dataObjectHelper;
 
     /**
+     * @var HttpResponseReader
+     */
+    private $httpResponseReader;
+
+    /**
      * @param SearchResultResponseInterfaceFactory $resultResponseFactory
      * @param DataObjectHelper $dataObjectHelper
      * @param array $result
@@ -44,11 +50,13 @@ class SearchResult implements ResultInterface
     public function __construct(
         SearchResultResponseInterfaceFactory $resultResponseFactory,
         DataObjectHelper $dataObjectHelper,
+        HttpResponseReader $httpResponseReader,
         array $result = []
     ) {
         $this->result = $result;
         $this->resultResponseFactory = $resultResponseFactory;
         $this->dataObjectHelper = $dataObjectHelper;
+        $this->httpResponseReader = $httpResponseReader;
     }
 
     /**
@@ -58,13 +66,14 @@ class SearchResult implements ResultInterface
      */
     public function get()
     {
-        $this->result[SearchResultResponseInterface::RESPONSE_DATA] = $this->result['Data'];
-        unset($this->result['Data']);
+        $responseData = $this->httpResponseReader->readResponseData($this->result);
+        $responseData[SearchResultResponseInterface::RESPONSE_DATA] = $responseData['Data'];
+        unset($responseData['Data']);
 
         $resultResponseDataObject = $this->resultResponseFactory->create();
         $this->dataObjectHelper->populateWithArray(
             $resultResponseDataObject,
-            $this->result,
+            $responseData,
             SearchResultResponseInterface::class
         );
         return $resultResponseDataObject;
