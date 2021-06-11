@@ -15,11 +15,10 @@ declare(strict_types=1);
 namespace HawkSearch\Proxy\Gateway\Response;
 
 use HawkSearch\Connector\Gateway\Helper\HttpResponseReader;
+use HawkSearch\Connector\Gateway\Http\ClientInterface;
 use HawkSearch\Connector\Gateway\Http\Converter\JsonToArray;
-use HawkSearch\Connector\Gateway\Http\ConverterException;
 use HawkSearch\Connector\Gateway\Response\HandlerInterface;
 use HawkSearch\Proxy\Api\Data\SearchResultDataInterface;
-use InvalidArgumentException;
 
 class SearchResultHandler implements HandlerInterface
 {
@@ -55,22 +54,27 @@ class SearchResultHandler implements HandlerInterface
      */
     public function handle(array $handlingSubject, array $response)
     {
-        $searchResults = $this->httpResponseReader->readResponseData($response);
+        $responseData = $this->httpResponseReader->readResponseData($response);
+        if ($responseData === '') {
+            $responseData = [];
+        }
 
         //deserialize values
-        if (isset($searchResults['Data'][SearchResultDataInterface::RESULTS])) {
-            $searchResults['Data'][SearchResultDataInterface::RESULTS] = $this->processString(
-                $searchResults['Data'][SearchResultDataInterface::RESULTS]
+        if (isset($responseData['Data'][SearchResultDataInterface::RESULTS])) {
+            $responseData['Data'][SearchResultDataInterface::RESULTS] = $this->processString(
+                $responseData['Data'][SearchResultDataInterface::RESULTS]
             );
         }
 
-        if (isset($searchResults['Data'][SearchResultDataInterface::FEATURED_ITEMS])) {
-            $searchResults['Data'][SearchResultDataInterface::FEATURED_ITEMS] = $this->processString(
-                $searchResults['Data'][SearchResultDataInterface::FEATURED_ITEMS]
+        if (isset($responseData['Data'][SearchResultDataInterface::FEATURED_ITEMS])) {
+            $responseData['Data'][SearchResultDataInterface::FEATURED_ITEMS] = $this->processString(
+                $responseData['Data'][SearchResultDataInterface::FEATURED_ITEMS]
             );
         }
-        
-        return $searchResults;
+
+        $response[ClientInterface::RESPONSE_DATA] = $responseData;
+
+        return $response;
     }
 
     /**
@@ -82,9 +86,7 @@ class SearchResultHandler implements HandlerInterface
     {
         try {
             $result = ($string !== null) ? $this->converter->convert($string) : [];
-        } catch (ConverterException $e) {
-            $result = [];
-        } catch (InvalidArgumentException $e) {
+        } catch (\InvalidArgumentException $e) {
             $result = [];
         }
 
