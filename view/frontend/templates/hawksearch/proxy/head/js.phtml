@@ -17,7 +17,7 @@ use HawkSearch\Proxy\ViewModel\Config as ConfigViewModel;
 /** @var Template $block */
 /** @var ConfigViewModel $configViewModel */
 $configViewModel = $block->getData('configViewModel');
-if (!$configViewModel) {
+if (!$configViewModel || !$configViewModel->isHawkCssIncluded()) {
     return;
 }
 ?>

@@ -99,7 +99,8 @@ class Proxy extends ConfigProvider
      */
     public function isHawkCssIncluded($store = null): bool
     {
-        return !!$this->getConfig(self::CONFIG_HAWKSEARCH_INCLUDE_CSS, $store);
+        return ($this->isManageCategories($store) || $this->isManageSearch())
+            && $this->getConfig(self::CONFIG_HAWKSEARCH_INCLUDE_CSS, $store);
     }
 
     /**
