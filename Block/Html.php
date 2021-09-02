@@ -156,9 +156,12 @@ class Html
     }
     public function getTabs()
     {
-        $resultData = $this->helper->getResultData()->Data;
-        if(property_exists($resultData, 'Tabs')){
-            return $resultData->Tabs;
+        $data = $this->helper->getResultData();
+        if(is_object($data) && property_exists($data, 'Data')) {
+            $resultData = $this->helper->getResultData()->Data;
+            if(property_exists($resultData, 'Tabs')){
+                return $resultData->Tabs;
+            }
         }
         return null;
     }
