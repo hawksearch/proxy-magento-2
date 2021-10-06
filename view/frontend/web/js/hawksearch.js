@@ -1,5 +1,5 @@
-﻿/*
- * Copyright (c) 2020 Hawksearch (www.hawksearch.com) - All Rights Reserved
+﻿/**
+ * Copyright (c) 2021 Hawksearch (www.hawksearch.com) - All Rights Reserved
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -4097,10 +4097,37 @@ HawkSearch.Context = new HawkSearch.ContextObj();
             var recommender = new HawkSearch.Recommender(HawkSearch.jQuery);
         }
 
+        HawkSearch.bindClickTracking = function(data) {
+            var items = $('#hawkitemlist');
+            for(var row in data) {
+                items.find('a[href="' + data[row]["url"] + '"]').click({tid:data[row]["tid"],
+                    idx:data[row]["i"], sku:data[row]["sku"]}, function(e) {
+                    return HawkSearch.link(e, e.data.tid, e.data.idx, e.data.sku, 0);
+                });
+            }
+        };
+
         $(document).ready(function () {
             // initialize auto-suggest
             if (HawkSearch.initAutoSuggest !== undefined) {
                 HawkSearch.initAutoSuggest();
+            } else if (HawkSearch.SearchBoxes !== undefined) {
+                for (i = 0; i < HawkSearch.SearchBoxes.length; i++) {
+                    HawkSearch.suggestInit('#' + HawkSearch.SearchBoxes[i], {
+                        lookupUrlPrefix: HawkSearch.HawkUrl + HawkSearch.AutosuggestionParams,
+                        hiddenDivName: HawkSearch.AutocompleteDiv,
+                        isAutoWidth: true
+                    });
+                }
+
+                HawkSearch.origProcessFacets = HawkSearch.processFacets;
+                HawkSearch.processFacets = function(hash, json, queryGuid, backbutton) {
+                    HawkSearch.origProcessFacets(hash, json, queryGuid, backbutton);
+                    var data = $(json.html).find('#hawktrackingdata').data('tracking');
+                    HawkSearch.bindClickTracking(data);
+                    $('#hawkitemlist').trigger('contentUpdated');
+                };
+                HawkSearch.bindClickTracking($(document).find('#hawktrackingdata').data('tracking'));
             }
 
             if (HawkSearch.customEvent !== undefined) {
