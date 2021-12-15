@@ -979,7 +979,7 @@ HawkSearch.Context = new HawkSearch.ContextObj();
                 self.event.write();
                 self.event = self.freshEvent();
             };
-        };
+        }
 
         this.createObjectProps = function (obj) {
             var key_map = obj._key_map;
@@ -1141,7 +1141,7 @@ HawkSearch.Context = new HawkSearch.ContextObj();
                 if (args && args.type) {
                     // event type
                     this.set('event_type', args.type);
-                };
+                }
                 if (args && args.event) {
 
                     // mouse coordinates
@@ -1806,7 +1806,7 @@ HawkSearch.Context = new HawkSearch.ContextObj();
     function log(msg) {
         if (HawkSearchLoader.debugMode && window.console && console.log) {
             console.log('HawkSearch: ' + msg);
-        };
+        }
     }
 
     if (HawkSearchLoader.loadjQuery) {
@@ -1901,7 +1901,7 @@ HawkSearch.Context = new HawkSearch.ContextObj();
         }
 
         containedHawkSearchInitializer(jQuery);
-    };
+    }
 
     //Since we're loading jQuery dynamically and are using callbacks, we need to store all of our
     //plugins inside a single function that passes $ aliased from our version of jQuery.
@@ -1934,6 +1934,10 @@ HawkSearch.Context = new HawkSearch.ContextObj();
             HawkSearch.jQuery = $;
 
             HawkSearch.normalizeHeights = function () {
+
+                if (typeof imagesLoaded === "undefined") {
+                    return;
+                }
                 var container = $("#hawkitemlist");
                 var topcontainer = $("#hawkbannertop");
                 var targetElement = container.find(".itemWrapper");
@@ -1970,7 +1974,7 @@ HawkSearch.Context = new HawkSearch.ContextObj();
                         // change broken image src with spacer.gif and apply broken image class
                         image.img.src = "/sites/shared/images/spacer.gif";
                         image.img.className = "itemImage hawk-brokenImage";
-                    };
+                    }
                 });
             };
 
@@ -2201,7 +2205,7 @@ HawkSearch.Context = new HawkSearch.ContextObj();
                             moreItems.show();
                             moreTrigger.addClass("hawk-navMoreActive").closest("span").text(options.lessText);
                             window["hawkexpfacet_" + cont.attr("id")] = true;
-                        };
+                        }
                     });
 
                     if (window["hawkexpfacet_" + cont.attr("id")]) cont.find(".hawk-navMore span").click();
@@ -2241,7 +2245,7 @@ HawkSearch.Context = new HawkSearch.ContextObj();
                                 closestLi.addClass("hawkFacet-indetermined");
                             }
                         });
-                    };
+                    }
                 });
 
                 // initializes filter quicksearch
@@ -2702,7 +2706,7 @@ HawkSearch.Context = new HawkSearch.ContextObj();
                             HawkSearch.processFacets(hash, json, queryGuid);
                         }
                     });
-                };
+                }
             };
 
             HawkSearch.getUrl = function () {
@@ -3022,7 +3026,7 @@ HawkSearch.Context = new HawkSearch.ContextObj();
                             HawkSearch.SuggesterGlobal.divName = settings.hiddenDivName;
                         } else {
                             HawkSearch.SuggesterGlobal.divName = "querydiv";
-                        };
+                        }
 
                         // This is the function that monitors the queryField, and calls the lookup functions when the queryField value changes.
                         function suggestLookup(suggestQueryField, settings) {
@@ -3033,7 +3037,7 @@ HawkSearch.Context = new HawkSearch.ContextObj();
                                 suggestDoRemoteQuery(encodeURI(val));
                             }
                             return true;
-                        };
+                        }
 
                         function suggestDoRemoteQuery(val) {
                             HawkSearch.SuggesterGlobal.searching = true;
@@ -3068,7 +3072,7 @@ HawkSearch.Context = new HawkSearch.ContextObj();
                                     HawkSearch.SuggesterGlobal.searching = false;
                                 }
                             });
-                        };
+                        }
 
                         // Get the <DIV> we're using to display the lookup results, and create the <DIV> if it doesn't already exist.
                         function getSuggestDiv(divId) {
@@ -3115,11 +3119,11 @@ HawkSearch.Context = new HawkSearch.ContextObj();
                                     }
 
                                     //HawkSearch.SuggesterGlobal.divFormatted = true;
-                                };
-                            };
+                                }
+                            }
 
                             return HawkSearch.SuggesterGlobal.queryDiv;
-                        };
+                        }
 
                         function suggestIsAbove() {
 
@@ -3134,9 +3138,9 @@ HawkSearch.Context = new HawkSearch.ContextObj();
                                 if (!HawkSearch.SuggesterGlobal.queryDiv.hasClass("hawk-queryAbove")) {
                                     HawkSearch.SuggesterGlobal.queryDiv.addClass("hawk-queryAbove");
                                 }
-                            };
+                            }
 
-                        };
+                        }
 
                         // This is the key handler function, for when a user presses the up arrow, down arrow, tab key, or enter key from the input field.
                         function keypressHandler(e) {
@@ -3172,7 +3176,7 @@ HawkSearch.Context = new HawkSearch.ContextObj();
                                 suggestLookup(suggestQueryField, settings, e);
                                 return true;
                                 }, 200);
-                            };
+                            }
 
                             // get the span that's currently selected, and perform an appropriate action
                             var selectedIndex = getSelectedItem(suggestDiv);
@@ -3188,11 +3192,11 @@ HawkSearch.Context = new HawkSearch.ContextObj();
                                         return false;
                                     } else {
                                         e.preventDefault();
-                                    };
+                                    }
                                 } else {
                                     hideSuggest(e);
                                     return true;
-                                };
+                                }
                             } else if (key == KEYTAB) {
                                 if ((selectedIndex + 1) < suggestDiv.find(".hawk-sqItem").length) {
                                     e.cancelBubble = true;
@@ -3200,19 +3204,19 @@ HawkSearch.Context = new HawkSearch.ContextObj();
                                     selectedItem = setSelectedItem(suggestDiv, selectedIndex + 1);
                                 } else {
                                     hideSuggest(e)
-                                };
+                                }
                             } else {
                                 if (key == KEYUP) {
                                     selectedItem = setSelectedItem(suggestDiv, selectedIndex - 1);
                                 } else if (key == KEYDOWN) {
                                     selectedItem = setSelectedItem(suggestDiv, selectedIndex + 1);
-                                };
-                            };
+                                }
+                            }
 
 
                             //showSuggest();
                             return true;
-                        };
+                        }
 
                         // displays query div and query results
                         function showQueryDiv(autoSuggestResult) {
@@ -3255,7 +3259,7 @@ HawkSearch.Context = new HawkSearch.ContextObj();
                                 showFooter(suggestDiv, autoSuggestResult.Count, autoSuggestResult.ContentCount, autoSuggestResult.SearchWebsiteUrl, autoSuggestResult.KeywordField);
                                 showSuggest(true);
                             }
-                        };
+                        }
 
                         // controls the visibility of the result lookup based on the "show" parameter
                         function showSuggest(show) {
@@ -3266,8 +3270,8 @@ HawkSearch.Context = new HawkSearch.ContextObj();
                             } else {
                                 suggestDisplay.show();
                                 $("body").on("click", hideSuggest);
-                            };
-                        };
+                            }
+                        }
 
                         // We originally used showSuggest as the function that was called by the onBlur
                         // event of the field, but it turns out that Firefox will pass an event as the first
@@ -3277,14 +3281,14 @@ HawkSearch.Context = new HawkSearch.ContextObj();
                             if (!updatedDisplay && $(e.target).closest(".hawk-searchQuery").length <= 0) {
                                 showSuggest(false);
                                 updatedDisplay = true;
-                            };
-                        };
+                            }
+                        }
 
                         function isEven(num) {
                             if (num !== false && num !== true && !isNaN(num)) {
                                 return num % 2 == 0;
                             } else return false;
-                        };
+                        }
 
                         function showTerms(suggestDiv, terms, title, type) {
                             if (terms.length >= 1) {
@@ -3317,7 +3321,7 @@ HawkSearch.Context = new HawkSearch.ContextObj();
                                         resultItem.className = "hawk-sqItem term";
                                     } else {
                                         resultItem.className = "hawk-sqItem hawk-sqItemAlt term";
-                                    };
+                                    }
 
                                     var resultItemContent = document.createElement("h1");
                                     resultItemContent.className = "hawk-sqItemName";
@@ -3327,7 +3331,7 @@ HawkSearch.Context = new HawkSearch.ContextObj();
 
                                     // append results of suggest options to the suggest content container
                                     suggestContent.appendChild(resultItem);
-                                };
+                                }
 
                                 // find all newly added suggest options
                                 var suggestItems = suggestDiv.find(".hawk-sqContent .hawk-sqItem");
@@ -3337,8 +3341,8 @@ HawkSearch.Context = new HawkSearch.ContextObj();
 
                                 // check to see if query div should show above field
                                 suggestIsAbove();
-                            };
-                        };
+                            }
+                        }
 
                         function showProducts(suggestDiv, products, title) {
 
@@ -3369,7 +3373,7 @@ HawkSearch.Context = new HawkSearch.ContextObj();
                                         resultItem.className = "hawk-sqItem";
                                     } else {
                                         resultItem.className = "hawk-sqItem hawk-sqItemAlt";
-                                    };
+                                    }
 
                                     resultItem.setAttribute('data-url', product.Url);
                                     resultItem.setAttribute("data-autoCompleteType", HawkSearch.LilBro.Schema.AutoCompleteClick.AutoCompleteType.product);
@@ -3377,28 +3381,31 @@ HawkSearch.Context = new HawkSearch.ContextObj();
 
                                     // append results of suggest options to the suggest content container
                                     suggestContent.appendChild(resultItem);
-                                };
+                                }
 
                                 // find all newly added suggest options
                                 var suggestItems = suggestDiv.find(".hawk-sqContent .hawk-sqItem");
 
                                 // pass suggestItems to 'suggestItemHandler' to handle events
                                 suggestItemHandler(suggestItems);
-                               var imgLoad = imagesLoaded(suggestDiv);
-                                // Triggered after each image has been loaded.
-                                imgLoad.on("progress", function (instance, image) {
-                                    var result = image.isLoaded ? 'loaded' : 'broken';
-                                    // check if image is broken
-                                    if (result === "broken") {
-                                        // in debug mode log broken image src
-                                        log('Image Broken: ' + image.img.src);
-                                        // change broken image src with spacer.gif and apply broken image class
-                                        image.img.src = "http://manage.hawksearch.com/sites/shared/images/spacer.gif";
-                                        image.img.className = "item hawk-brokenSuggestImage"
-                                    };
-                                });
-                            };
-                        };
+
+                                if (typeof imagesLoaded !== "undefined") {
+                                    var imgLoad = imagesLoaded(suggestDiv);
+                                    // Triggered after each image has been loaded.
+                                    imgLoad.on("progress", function (instance, image) {
+                                        var result = image.isLoaded ? 'loaded' : 'broken';
+                                        // check if image is broken
+                                        if (result === "broken") {
+                                            // in debug mode log broken image src
+                                            log('Image Broken: ' + image.img.src);
+                                            // change broken image src with spacer.gif and apply broken image class
+                                            image.img.src = "http://manage.hawksearch.com/sites/shared/images/spacer.gif";
+                                            image.img.className = "item hawk-brokenSuggestImage"
+                                        }
+                                    });
+                                }
+                            }
+                        }
 
                         function showFooter(suggestDiv, count, contentCount, url, keywordfield) {
                             // creating the footer container
@@ -3428,7 +3435,7 @@ HawkSearch.Context = new HawkSearch.ContextObj();
 
                             // check to see if query div should show above field
                             suggestIsAbove();
-                        };
+                        }
 
 
                         function showContent(suggestDiv, content, title) {
@@ -3459,22 +3466,22 @@ HawkSearch.Context = new HawkSearch.ContextObj();
                                         resultItem.className = "hawk-sqItem term";
                                     } else {
                                         resultItem.className = "hawk-sqItem hawk-sqItemAlt term";
-                                    };
+                                    }
                                     resultItem.setAttribute('data-url', product.Url);
                                     resultItem.setAttribute("data-autoCompleteType", HawkSearch.LilBro.Schema.AutoCompleteClick.AutoCompleteType.content);
                                     resultItem.innerHTML = product.Html
 
                                     // append results of suggest options to the suggest content container
                                     suggestContent.appendChild(resultItem);
-                                };
+                                }
 
                                 // find all newly added suggest options
                                 var suggestItems = suggestDiv.find(".hawk-sqContent .hawk-sqItem");
 
                                 // pass suggestItems to 'suggestItemHandler' to handle events
                                 suggestItemHandler(suggestItems);
-                            };
-                        };
+                            }
+                        }
 
 
                         // sets up events for suggest items
@@ -3494,7 +3501,7 @@ HawkSearch.Context = new HawkSearch.ContextObj();
                             // bind 'mousedown' event to suggest options to go to url
                             // using 'mousedown' instead of 'click' due to 'blur' event blocking the 'click' event from firing
                             suggestItems.off('click').on("click", SuggestedItemClick);
-                        };
+                        }
 
                         function SuggestedItemClick(e) {
                             e.preventDefault();
@@ -3520,40 +3527,40 @@ HawkSearch.Context = new HawkSearch.ContextObj();
                                 }
                             }
                             window.location = itemUrl;
-                        };
+                        }
 
                         // This is called whenever the user clicks one of the lookup results.
                         // It puts the value of the result in the queryField and hides the lookup div.
                         function selectResult(item) {
                             _selectResult(item);
-                        };
+                        }
                         // This actually fills the field with the selected result and hides the div
                         function _selectResult(item) {
                             itemUrl = item.data("url");
                             window.location = itemUrl;
-                        };
+                        }
 
 
                         // This is called when a user mouses over a lookup result
                         function highlightResult(item) {
                             $(HawkSearch.SuggesterGlobal.globalDiv).find(".hawk-sqItem").removeClass("hawk-sqActive");
                             _highlightResult(item);
-                        };
+                        }
                         // This actually highlights the selected result
                         function _highlightResult(item) {
                             if (item == null) return;
                             item.addClass("hawk-sqActive");
-                        };
+                        }
 
 
                         // This is called when a user mouses away from a lookup result
                         function unhighlightResult(item) {
                             _unhighlightResult(item);
-                        };
+                        }
                         // This actually unhighlights the selected result
                         function _unhighlightResult(item) {
                             item.removeClass("hawk-sqActive");
-                        };
+                        }
 
 
                         // Get the number of the result that's currently selected/highlighted
@@ -3565,10 +3572,10 @@ HawkSearch.Context = new HawkSearch.ContextObj();
                             if (sqItems) {
                                 if (sqItems.filter(".hawk-sqActive").length == 1) {
                                     count = sqItems.index(sqItems.filter(".hawk-sqActive"));
-                                };
+                                }
                             }
                             return count
-                        };
+                        }
 
 
                         // Select and highlight the result at the given position
@@ -3582,7 +3589,7 @@ HawkSearch.Context = new HawkSearch.ContextObj();
                                 for (var i = 0; i < sqItems.length; i++) {
                                     if (first == null) {
                                         first = sqItems.eq(i);
-                                    };
+                                    }
 
                                     if (++count == selectedIndex) {
                                         _highlightResult(sqItems.eq(i));
@@ -3590,8 +3597,8 @@ HawkSearch.Context = new HawkSearch.ContextObj();
                                     } else {
                                         _unhighlightResult(sqItems.eq(i));
                                     }
-                                };
-                            };
+                                }
+                            }
 
                             // handle if nothing is select yet to select first
                             // or loop through results if at the end/beginning.
@@ -3601,11 +3608,11 @@ HawkSearch.Context = new HawkSearch.ContextObj();
                             } else if (selectedItem == null) {
                                 selectedItem = first;
                                 _highlightResult(selectedItem);
-                            };
+                            }
 
                             return selectedItem;
-                        };
-                    };
+                        }
+                    }
                 };
 
                 $(queryField).hawksearchSuggest(settings);
@@ -4035,7 +4042,7 @@ HawkSearch.Context = new HawkSearch.ContextObj();
                             HawkCompare.addImage(json.Image);
                         }
                     });
-                };
+                }
             };
 
             HawkCompare.addImage = function (htmlLi) {
@@ -4243,7 +4250,7 @@ HawkSearch.Context = new HawkSearch.ContextObj();
                     var options = $(this).data().options;
                     if (window.location.hash == options.hash) {
                         window.history.pushState({}, {}, window.location.pathname);
-                        HawkSearch.refreshResults();;
+                        HawkSearch.refreshResults();
                     } else {
                         window.history.pushState({}, {}, "?" + options.hash);
                         HawkSearch.refreshResults();
@@ -4545,7 +4552,7 @@ HawkSearch.Context = new HawkSearch.ContextObj();
                     }
                     return -1;
                 }
-            };
+            }
         }
 
         /*
@@ -4681,7 +4688,7 @@ HawkSearch.Context = new HawkSearch.ContextObj();
             if (options === undefined || options === null) {
                 options = {};
             }
-            ;
+
 
             // set up default options
             var defaults = {
@@ -4822,7 +4829,7 @@ HawkSearch.Context = new HawkSearch.ContextObj();
                                     moreTrigger.addClass("hawk-navMoreActive").find("span").text(options.lessText);
                                     moreTrigger.show();
                                     window["hawkexpfacet_" + searchList.attr("id")] = true;
-                                };
+                                }
                             });
 
                         }
@@ -4884,7 +4891,7 @@ HawkSearch.Context = new HawkSearch.ContextObj();
                                                 moreTrigger.addClass("hawk-navMoreActive").find("span").text(options.lessText);
                                                 window["hawkexpfacet_" + searchList.attr("id")] = true;
                                                 moreTrigger.show();
-                                            };
+                                            }
                                         });
                                     }
 
