@@ -164,6 +164,12 @@ HawkSearch.Context = new HawkSearch.ContextObj();
         }
     };
 
+    HawkSearch.triggerHook = function (hookName, inputData, ...params) {
+        if (typeof HawkSearchHooks !== 'undefined') {
+            HawkSearchHooks.trigger(hookName, inputData, params);
+        }
+    };
+
     HawkSearch.getClientGuid = function () {
         if (HawkSearch.ClientGuid !== undefined) {
             return HawkSearch.ClientGuid;
@@ -4133,6 +4139,7 @@ HawkSearch.Context = new HawkSearch.ContextObj();
                     var data = $(json.html).find('#hawktrackingdata').data('tracking');
                     HawkSearch.bindClickTracking(data);
                     $('#hawkitemlist').trigger('contentUpdated');
+                    HawkSearch.triggerHook('HawkSearch:processFacetsAfter', json);
                 };
                 HawkSearch.bindClickTracking($(document).find('#hawktrackingdata').data('tracking'));
             }
