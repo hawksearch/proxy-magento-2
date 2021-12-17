@@ -4139,7 +4139,7 @@ HawkSearch.Context = new HawkSearch.ContextObj();
                     var data = $(json.html).find('#hawktrackingdata').data('tracking');
                     HawkSearch.bindClickTracking(data);
                     $('#hawkitemlist').trigger('contentUpdated');
-                    HawkSearch.triggerHook('HawkSearch:processFacetsAfter', json);
+                    HawkSearch.triggerHook('processFacetsAfter', json);
                 };
                 HawkSearch.bindClickTracking($(document).find('#hawktrackingdata').data('tracking'));
             }
