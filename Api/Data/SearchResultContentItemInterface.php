@@ -82,13 +82,13 @@ interface SearchResultContentItemInterface extends ExtensibleDataInterface
     /**
      * @return string|null
      */
-    public function getCustomUrl() : ?string;
+    public function getCustomURL() : ?string;
 
     /**
      * @param string $value
      * @return $this
      */
-    public function setCustomUrl(string $value);
+    public function setCustomURL(string $value);
 
     /**
      * @return float
@@ -126,13 +126,13 @@ interface SearchResultContentItemInterface extends ExtensibleDataInterface
     /**
      * @return string|null
      */
-    public function getSku() : ?string;
+    public function getSKU() : ?string;
 
     /**
      * @param string $value
      * @return $this
      */
-    public function setSku(string $value);
+    public function setSKU(string $value);
 
     /**
      * @return string[]
