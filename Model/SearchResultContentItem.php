@@ -86,7 +86,7 @@ class SearchResultContentItem extends AbstractSimpleObject implements SearchResu
     /**
      * @inheritDoc
      */
-    public function getCustomUrl(): ?string
+    public function getCustomURL(): ?string
     {
         return $this->_get(self::CUSTOM_URL);
     }
@@ -94,7 +94,7 @@ class SearchResultContentItem extends AbstractSimpleObject implements SearchResu
     /**
      * @inheritDoc
      */
-    public function setCustomUrl(string $value)
+    public function setCustomURL(string $value)
     {
         return $this->setData(self::CUSTOM_URL, $value);
     }
@@ -150,7 +150,7 @@ class SearchResultContentItem extends AbstractSimpleObject implements SearchResu
     /**
      * @inheritDoc
      */
-    public function getSku(): ?string
+    public function getSKU(): ?string
     {
         return $this->_get(self::SKU);
     }
@@ -158,7 +158,7 @@ class SearchResultContentItem extends AbstractSimpleObject implements SearchResu
     /**
      * @inheritDoc
      */
-    public function setSku(string $value)
+    public function setSKU(string $value)
     {
         return $this->setData(self::SKU, $value);
     }
