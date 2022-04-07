@@ -56,7 +56,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     protected $_syncingExceptions = [];
 
     protected $storeManager;
-    private $hawkData;
+    protected $hawkData;
     private $rawResponse;
     private $store = null;
     private $landingPages;
