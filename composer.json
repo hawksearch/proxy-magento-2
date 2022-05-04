@@ -3,7 +3,7 @@
   "license": "proprietary",
   "description": "Hawksearch Proxy module for Magento 2",
   "type": "magento2-module",
-  "version": "2.2.35.18",
+  "version": "2.2.35.19",
   "require": {
     "php": "^7.2|^7.3|^7.4",
     "magento/magento-composer-installer": "*",

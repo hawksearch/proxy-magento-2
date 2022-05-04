@@ -12,6 +12,8 @@
  */
 namespace HawkSearch\Proxy\Controller\Index;
 
+use GuzzleHttp\Client;
+
 class Index
     extends \Magento\Framework\App\Action\Action
 {
@@ -39,6 +41,9 @@ class Index
 
     public function execute()
     {
+        if($this->isAutoCompleteClick()) {
+            return $this->directProxy();
+        }
         $tab = $this->getRequest()->getParam('it');
         $html = '';
 
@@ -56,6 +61,24 @@ class Index
         $this->result->setHeader('Content-Type', 'application/javascript');
         $this->result->setContents($params['callback'] . '(' . json_encode($obj) . ')');
 
+        return $this->result;
+    }
+
+    public function isAutoCompleteClick() {
+        if($this->getRequest()->getParam('fn') == 'ajax' && $this->getRequest()->getParam('f') == 'GetAutoCompleteClick') {
+            return true;
+        }
+        return false;
+    }
+    public function directProxy() {
+        $client = new Client([
+            'base_uri' => $this->data->getHawkUrlWithEngine(),
+            'headers' => ['Content-Type' => 'application/json']
+        ]);
+        $resp = $client->get('?' . $_SERVER['QUERY_STRING']);
+        $body = $resp->getBody();
+        $this->result->setHeader('Content-Type', 'application/javascript');
+        $this->result->setContents($body);
         return $this->result;
     }
 }
