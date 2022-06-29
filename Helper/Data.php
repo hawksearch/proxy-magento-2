@@ -333,7 +333,6 @@ class Data extends AbstractHelper
             } catch (\Exception $e) {
                 $this->hawkData = $this->resultResponseFactory->create();
             }
-
         }
 
         return $this->hawkData;
@@ -1116,7 +1115,7 @@ RuleType="Group" Operator="All" />'
     public function log($message)
     {
         if ($this->generalConfigProvider->isLoggingEnabled()) {
-            $this->_logger->addDebug($message);
+            $this->_logger->debug($message);
         }
     }
 

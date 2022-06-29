@@ -16,10 +16,11 @@ namespace HawkSearch\Proxy\ViewModel\OnePage;
 
 use HawkSearch\Connector\Helper\Url as UrlUtility;
 use HawkSearch\Connector\Model\Config\ApiSettings;
-use HawkSearch\Proxy\Logger\ProxyLogger;
+use HawkSearch\Proxy\Logger\LoggerFactory;
 use Magento\Catalog\Model\Session as CatalogSession;
 use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Framework\View\Element\Block\ArgumentInterface;
+use Psr\Log\LoggerInterface;
 
 class Tracking implements ArgumentInterface
 {
@@ -34,7 +35,7 @@ class Tracking implements ArgumentInterface
     private $checkoutSession;
 
     /**
-     * @var ProxyLogger
+     * @var LoggerInterface
      */
     private $logger;
 
@@ -52,20 +53,20 @@ class Tracking implements ArgumentInterface
      * Tracking constructor.
      * @param CheckoutSession $checkoutSession
      * @param CatalogSession $session
-     * @param ProxyLogger $logger
+     * @param LoggerFactory $loggerFactory
      * @param UrlUtility $urlUtility
      * @param ApiSettings $apiSettingsConfigProvider
      */
     public function __construct(
         CheckoutSession $checkoutSession,
         CatalogSession $session,
-        ProxyLogger $logger,
+        LoggerFactory $loggerFactory,
         UrlUtility $urlUtility,
         ApiSettings $apiSettingsConfigProvider
     ) {
         $this->catalogSession = $session;
         $this->checkoutSession = $checkoutSession;
-        $this->logger = $logger;
+        $this->logger = $loggerFactory->create();
         $this->urlUtility = $urlUtility;
         $this->apiSettingsConfigProvider = $apiSettingsConfigProvider;
     }
@@ -90,7 +91,7 @@ class Tracking implements ArgumentInterface
             'sites/_hawk/hawkconversion.aspx'
         )->__toString();
 
-        $url = $this->urlUtility->getUriWithQuery(
+        return $this->urlUtility->getUriWithQuery(
             $url,
             [
                 'd' => $this->apiSettingsConfigProvider->getOrderTrackingKey(),
@@ -99,7 +100,5 @@ class Tracking implements ArgumentInterface
                 'total' => $order->getGrandTotal()
             ]
         )->__toString();
-
-        return $url;
     }
 }
