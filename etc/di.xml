@@ -20,7 +20,6 @@
     <preference for="HawkSearch\Proxy\Api\Data\SearchResultContentInterface" type="HawkSearch\Proxy\Model\SearchResultContent" />
     <preference for="HawkSearch\Proxy\Api\Data\SearchResultBannerInterface" type="HawkSearch\Proxy\Model\SearchResultBanner" />
     <preference for="HawkSearch\Proxy\Api\Data\SearchResultContentItemInterface" type="HawkSearch\Proxy\Model\SearchResultContentItem" />
-    <preference for="HawkSearch\Proxy\Api\Data\SearchResultContentItemCustomDataInterface" type="HawkSearch\Proxy\Model\SearchResultContentItemCustomData" />
 
     <type name="Magento\Framework\Console\CommandList">
         <arguments>
@@ -42,39 +41,32 @@
         </arguments>
     </virtualType>
 
-    <type name="HawkSearch\Proxy\Logger\ProxyLogger">
+    <virtualType name="HawkSearch\Proxy\Logger\Handler\Base" type="Magento\Framework\Logger\Handler\Base">
+        <arguments>
+            <argument name="fileName" xsi:type="string">/var/log/hawksearch_proxy.log</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="HawkSearch\Proxy\Logger\Logger" type="Magento\Framework\Logger\Monolog">
         <arguments>
             <argument name="handlers" xsi:type="array">
-                <item name="debug" xsi:type="object">HawkSearch\Proxy\Logger\Handler\DebugHandler</item>
+                <item name="debug" xsi:type="object">HawkSearch\Proxy\Logger\Handler\Base</item>
             </argument>
+        </arguments>
+    </virtualType>
+    <type name="HawkSearch\Proxy\Logger\LoggerFactory">
+        <arguments>
+            <argument name="instanceName" xsi:type="string">HawkSearch\Proxy\Logger\Logger</argument>
         </arguments>
     </type>
 
-    <virtualType name="hawkSearchProxyVirtualLogHandler" type="Magento\Framework\Logger\Handler\Base">
-        <arguments>
-            <argument name="fileName" xsi:type="string">var/log/hawksearch_proxy.log</argument>
-        </arguments>
-    </virtualType>
-    <virtualType name="hawkSearchProxyVirtualLogger" type="Magento\Framework\Logger\Monolog">
-        <arguments>
-            <argument name="handlers" xsi:type="array">
-                <item name="report" xsi:type="object">hawkSearchProxyVirtualLogHandler</item>
-            </argument>
-        </arguments>
-    </virtualType>
     <virtualType name="hawkSearchProxyVirtualContext" type="Magento\Framework\App\Helper\Context">
         <arguments>
-            <argument name="logger" xsi:type="object">hawkSearchProxyVirtualLogger</argument>
+            <argument name="logger" xsi:type="object">HawkSearch\Proxy\Logger\Logger</argument>
         </arguments>
     </virtualType>
     <type name="HawkSearch\Proxy\Helper\Data">
         <arguments>
             <argument name="context" xsi:type="object">hawkSearchProxyVirtualContext</argument>
-        </arguments>
-    </type>
-    <type name="\HawkSearch\Proxy\Gateway\Request\SearchParametersBuilder">
-        <arguments>
-            <argument name="customerSession" xsi:type="object">Magento\Customer\Model\Session\Proxy</argument>
         </arguments>
     </type>
 
@@ -166,6 +158,7 @@
         <arguments>
             <argument name="httpRequest" xsi:type="object">Magento\Framework\App\Request\Http\Proxy</argument>
             <argument name="catalogSession" xsi:type="object">Magento\Catalog\Model\Session\Proxy</argument>
+            <argument name="customerSession" xsi:type="object">Magento\Customer\Model\Session\Proxy</argument>
         </arguments>
     </type>
     <!-- End Types -->

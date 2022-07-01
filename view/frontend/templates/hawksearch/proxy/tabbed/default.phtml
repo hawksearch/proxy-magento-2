@@ -20,9 +20,9 @@
         $block->getTypeLabel($item); ?>
         <h3 class="title hawk-contentTitle">
             <a href="<?= /* @noEscape */
-            $block->getCustomUrl($item->getCustomURL() ?? ''); ?>"
+            $block->getCustomUrl($item->getCustomUrl() ?? ''); ?>"
                onclick="<?= /* @noEscape */
-                sprintf("return HawkSearch.link(this,'%s',%d,'%d',0);", $block->getHawksearchTrackingId(), $block->getIncrement(), $item->getItemId() ?? ''); ?>"><?= /* @noEscape */
+                sprintf("return HawkSearch.link(this,'%s',%d,'%d',0);", $block->getHawksearchTrackingId(), $block->getIncrement(), $item->getId() ?? ''); ?>"><?= /* @noEscape */
                 $item->getItemName() ?? ''; ?>
             </a>
         </h3>
