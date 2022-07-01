@@ -13,7 +13,8 @@ var config = {
     "map": {
         "*": {
             "quickSearch": "HawkSearch_Proxy/js/autosuggest",
-            "hawksearch": "HawkSearch_Proxy/js/hawksearch"
+            "hawksearch": "HawkSearch_Proxy/js/hawksearch",
+            "hawksearchWrapper": "HawkSearch_Proxy/js/wrapper"
         }
     },
     "shim": {
