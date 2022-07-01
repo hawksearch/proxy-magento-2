@@ -20,7 +20,6 @@
     <preference for="HawkSearch\Proxy\Api\Data\SearchResultContentInterface" type="HawkSearch\Proxy\Model\SearchResultContent" />
     <preference for="HawkSearch\Proxy\Api\Data\SearchResultBannerInterface" type="HawkSearch\Proxy\Model\SearchResultBanner" />
     <preference for="HawkSearch\Proxy\Api\Data\SearchResultContentItemInterface" type="HawkSearch\Proxy\Model\SearchResultContentItem" />
-    <preference for="HawkSearch\Proxy\Api\Data\SearchResultContentItemCustomDataInterface" type="HawkSearch\Proxy\Model\SearchResultContentItemCustomData" />
 
     <type name="Magento\Framework\Console\CommandList">
         <arguments>

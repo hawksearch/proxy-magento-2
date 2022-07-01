@@ -19,6 +19,8 @@ use HawkSearch\Connector\Gateway\Instruction\ResultInterface;
 use HawkSearch\Proxy\Api\Data\SearchResultResponseInterface;
 use HawkSearch\Proxy\Api\Data\SearchResultResponseInterfaceFactory;
 use Magento\Framework\Api\DataObjectHelper;
+use HawkSearch\Connector\Helper\DataObjectHelper as HawkSearchDataObjectHelper;
+use Magento\Framework\Api\SimpleDataObjectConverter;
 
 class SearchResult implements ResultInterface
 {
@@ -38,6 +40,11 @@ class SearchResult implements ResultInterface
     private $dataObjectHelper;
 
     /**
+     * @var HawkSearchDataObjectHelper
+     */
+    private $hawksearchDataObjectHelper;
+
+    /**
      * @var HttpResponseReader
      */
     private $httpResponseReader;
@@ -45,17 +52,21 @@ class SearchResult implements ResultInterface
     /**
      * @param SearchResultResponseInterfaceFactory $resultResponseFactory
      * @param DataObjectHelper $dataObjectHelper
+     * @param HawkSearchDataObjectHelper $hawksearchDataObjectHelper
+     * @param HttpResponseReader $httpResponseReader
      * @param array $result
      */
     public function __construct(
         SearchResultResponseInterfaceFactory $resultResponseFactory,
         DataObjectHelper $dataObjectHelper,
+        HawkSearchDataObjectHelper $hawksearchDataObjectHelper,
         HttpResponseReader $httpResponseReader,
         array $result = []
     ) {
         $this->result = $result;
         $this->resultResponseFactory = $resultResponseFactory;
         $this->dataObjectHelper = $dataObjectHelper;
+        $this->hawksearchDataObjectHelper = $hawksearchDataObjectHelper;
         $this->httpResponseReader = $httpResponseReader;
     }
 
@@ -73,7 +84,7 @@ class SearchResult implements ResultInterface
         $resultResponseDataObject = $this->resultResponseFactory->create();
         $this->dataObjectHelper->populateWithArray(
             $resultResponseDataObject,
-            $responseData,
+            $this->hawksearchDataObjectHelper->convertArrayToSnakeCase($responseData),
             SearchResultResponseInterface::class
         );
         return $resultResponseDataObject;

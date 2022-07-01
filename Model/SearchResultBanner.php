@@ -56,7 +56,7 @@ class SearchResultBanner extends AbstractSimpleObject implements SearchResultBan
      */
     public function getTitle(): ?string
     {
-        return $this->_get(self::Title);
+        return $this->_get(self::TITLE);
     }
 
     /**
@@ -64,7 +64,7 @@ class SearchResultBanner extends AbstractSimpleObject implements SearchResultBan
      */
     public function setTitle(string $value)
     {
-        return $this->setData(self::Title, $value);
+        return $this->setData(self::TITLE, $value);
     }
 
     /**
@@ -72,7 +72,7 @@ class SearchResultBanner extends AbstractSimpleObject implements SearchResultBan
      */
     public function getItems(): array
     {
-        return $this->_get(self::Items) ?? [];
+        return $this->_get(self::ITEMS) ?? [];
     }
 
     /**
@@ -80,6 +80,6 @@ class SearchResultBanner extends AbstractSimpleObject implements SearchResultBan
      */
     public function setItems(array $value)
     {
-        return $this->setData(self::Items, $value);
+        return $this->setData(self::ITEMS, $value);
     }
 }

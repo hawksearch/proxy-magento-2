@@ -23,7 +23,7 @@ interface SearchResultContentItemInterface extends ExtensibleDataInterface
      */
     const SCORE = 'Score';
     const ITEM_NAME = 'ItemName';
-    const IMAGE_URL = 'ImageUrl';
+    const IMAGE_URL = 'ImageURL';
     const ITEM_ID = 'Id';
     const CUSTOM_URL = 'CustomURL';
     const SALE_PRICE = 'SalePrice';
@@ -71,24 +71,24 @@ interface SearchResultContentItemInterface extends ExtensibleDataInterface
     /**
      * @return string|null
      */
-    public function getItemId() : ?string;
+    public function getId() : ?string;
 
     /**
      * @param string $value
      * @return $this
      */
-    public function setItemId(string $value);
+    public function setId(string $value);
 
     /**
      * @return string|null
      */
-    public function getCustomURL() : ?string;
+    public function getCustomUrl() : ?string;
 
     /**
      * @param string $value
      * @return $this
      */
-    public function setCustomURL(string $value);
+    public function setCustomUrl(string $value);
 
     /**
      * @return float
@@ -126,13 +126,13 @@ interface SearchResultContentItemInterface extends ExtensibleDataInterface
     /**
      * @return string|null
      */
-    public function getSKU() : ?string;
+    public function getSku() : ?string;
 
     /**
      * @param string $value
      * @return $this
      */
-    public function setSKU(string $value);
+    public function setSku(string $value);
 
     /**
      * @return string[]

@@ -331,6 +331,7 @@ class Data extends AbstractHelper
             try {
                 $this->hawkData = $this->fetchResponse();
             } catch (\Exception $e) {
+                $this->_logger->error($e->getMessage());
                 $this->hawkData = $this->resultResponseFactory->create();
             }
         }

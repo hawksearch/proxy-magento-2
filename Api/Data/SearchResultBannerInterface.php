@@ -23,8 +23,8 @@ interface SearchResultBannerInterface extends ExtensibleDataInterface
      */
     const ZONE = 'Zone';
     const HTML = 'Html';
-    const Title = 'Title';
-    const Items = 'Items';
+    const TITLE = 'Title';
+    const ITEMS = 'Items';
     /**#@-*/
 
     /**
