@@ -1,30 +1,51 @@
 <?xml version="1.0"?>
 <!--
-/**
- * Copyright (c) 2013 Hawksearch (www.hawksearch.com) - All Rights Reserved
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
- * IN THE SOFTWARE.
- */
--->
+  /**
+   * Copyright (c) 2020 Hawksearch (www.hawksearch.com) - All Rights Reserved
+   *
+   * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+   * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+   * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+   * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+   * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+   * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+   * IN THE SOFTWARE.
+   */
+  -->
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <body>
         <referenceContainer name="content">
-            <block class="Magento\Framework\View\Element\Template"
-                   name="hawksearch_landingpage"
+            <block class="HawkSearch\Proxy\Block\HawkItems"
+                   name="hawksearch_hawkitems"
                    template="HawkSearch_Proxy::hawksearch/proxy/content/hawkitems.phtml">
             </block>
         </referenceContainer>
-        <move element="category.products" destination="hawksearch_landingpage"/>
+        <move element="category.products" destination="hawksearch_hawkitems"/>
         <referenceContainer name="sidebar.main">
             <block class="HawkSearch\Proxy\Block\Product\Facets" name="hawksearch_facets" as="hawksearch_facets"
                    template="HawkSearch_Proxy::hawksearch/proxy/left/facets.phtml"/>
+        </referenceContainer>
+
+        <referenceContainer name="category.products.list">
+            <block class="Magento\Catalog\Block\Product\ProductList\Toolbar"
+                   name="hawksearch_product_list_toolbar"
+                   template="HawkSearch_Proxy::product/list/toolbar.phtml">
+                <arguments>
+                    <argument name="toolbarViewModel" xsi:type="object">
+                        HawkSearch\Proxy\ViewModel\ProductListToolbar
+                    </argument>
+                </arguments>
+            </block>
+            <block class="Magento\Catalog\Block\Product\ProductList\Toolbar"
+                   name="hawksearch_product_list_toolbar_top"
+                   template="HawkSearch_Proxy::product/list/toolbar-top.phtml">
+                <arguments>
+                    <argument name="toolbarViewModel" xsi:type="object">
+                        HawkSearch\Proxy\ViewModel\ProductListToolbar
+                    </argument>
+                </arguments>
+            </block>
         </referenceContainer>
         <referenceBlock name="catalog.leftnav" remove="true" />
     </body>

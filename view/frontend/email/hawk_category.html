@@ -1,0 +1,27 @@
+<!--
+  /**
+   * Copyright (c) 2020 Hawksearch (www.hawksearch.com) - All Rights Reserved
+   *
+   * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+   * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+   * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+   * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+   * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+   * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+   * IN THE SOFTWARE.
+   */
+-->
+
+<!--@subject {{var subject}} @-->
+<!--@vars {
+"var errors":"Errors",
+"var subject":"Subject"
+} @-->
+{{template config_path="design/email/header_template"}}
+{{if errors}}
+<p>There were errors during the HawkSearch Category Sync process:</p>
+<pre>{{var errors|raw}}</pre>
+{{else}}
+<p>The HawkSearch Category Sync process completed without errors.</p>
+{{/if}}
+{{template config_path="design/email/footer_template"}}

@@ -1,0 +1,90 @@
+<?xml version="1.0"?>
+<!--
+  /**
+   * Copyright (c) 2020 Hawksearch (www.hawksearch.com) - All Rights Reserved
+   *
+   * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+   * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+   * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+   * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+   * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+   * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+   * IN THE SOFTWARE.
+   */
+  -->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <update handle="catalogsearch_result_index"/>
+    <body>
+        <referenceContainer name="content">
+            <block class="HawkSearch\Proxy\Block\HawkItems"
+                   name="hawksearch_hawkitems"
+                   template="HawkSearch_Proxy::hawksearch/proxy/content/hawkitems.phtml">
+            </block>
+        </referenceContainer>
+        <move element="search.result" destination="hawksearch_hawkitems" />
+        <referenceContainer name="sidebar.main">
+            <container htmlId="hawkbannerlefttop" htmlClass="bannerLeftTop block"
+                       htmlTag="div"
+                       name="hawksearch_left_top">
+                <block class="HawkSearch\Proxy\Block\Banner"
+                       name="hawksearch_banner_left_top" >
+                    <action method="setZone">
+                        <argument name="zone" xsi:type="string">BannerLeftTop</argument>
+                    </action>
+                </block>
+                <block class="HawkSearch\Proxy\Block\Featured" name="hawksearch_featured_left_top"
+                       template="HawkSearch_Proxy::product/featured/sidebar.phtml">
+                    <action method="setZone">
+                        <argument name="zone" xsi:type="string">FeaturedLeftTop</argument>
+                    </action>
+                </block>
+            </container>
+            <block class="HawkSearch\Proxy\Block\Product\Facets"
+                   name="hawksearch_facets" as="hawksearch_facets"
+                   template="HawkSearch_Proxy::hawksearch/proxy/left/facets.phtml"
+                   after="hawksearch_left_top" before="hawksearch_left_bottom"
+            />
+            <container htmlId="hawkbannerleftbottom" htmlClass="bannerLeftBottom block"
+                       htmlTag="div"
+                       name="hawksearch_left_bottom">
+                <block class="HawkSearch\Proxy\Block\Banner"
+                       name="hawksearch_banner_left_bottom" >
+                    <action method="setZone">
+                        <argument name="zone" xsi:type="string">BannerLeftBottom</argument>
+                    </action>
+                </block>
+                <block class="HawkSearch\Proxy\Block\Featured" name="hawksearch_featured_left_bottom"
+                       template="HawkSearch_Proxy::product/featured/sidebar.phtml">
+                    <action method="setZone">
+                        <argument name="zone" xsi:type="string">FeaturedLeftBottom</argument>
+                    </action>
+                </block>
+            </container>
+        </referenceContainer>
+
+        <referenceContainer name="search_result_list">
+            <block class="Magento\Catalog\Block\Product\ProductList\Toolbar"
+                   name="hawksearch_product_list_toolbar"
+                   template="HawkSearch_Proxy::product/list/toolbar.phtml">
+                <arguments>
+                    <argument name="toolbarViewModel" xsi:type="object">
+                        HawkSearch\Proxy\ViewModel\ProductListToolbar
+                    </argument>
+                </arguments>
+            </block>
+            <block class="Magento\Catalog\Block\Product\ProductList\Toolbar"
+                   name="hawksearch_product_list_toolbar_top"
+                   template="HawkSearch_Proxy::product/list/toolbar-top.phtml">
+                <arguments>
+                    <argument name="toolbarViewModel" xsi:type="object">
+                        HawkSearch\Proxy\ViewModel\ProductListToolbar
+                    </argument>
+                </arguments>
+            </block>
+        </referenceContainer>
+
+        <referenceBlock name="catalogsearch.leftnav" remove="true" />
+        <referenceContainer name="additional" remove="true" />
+    </body>
+</page>

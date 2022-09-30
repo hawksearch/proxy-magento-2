@@ -1,0 +1,39 @@
+<?php
+/**
+ * Copyright (c) 2020 Hawksearch (www.hawksearch.com) - All Rights Reserved
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+ * IN THE SOFTWARE.
+ */
+
+/** @var $block \HawkSearch\Proxy\Block\Tabbed */
+$increment = 1;
+$tabs = $block->getTabs();
+
+?>
+
+<div>
+    <div id="hawktitle"><?= /* @noEscape */
+        $block->getTitle() ?>
+    </div>
+
+    <?= /* @noEscape */ $block->getChildHtml('hawksearch_tabbed_additional_top'); ?>
+
+    <div id="hawktoptext"><?= /* @noEscape */
+        $block->getTopText(); ?>
+    </div>
+    <div id="hawkrelated"><?= /* @noEscape */
+        $block->getRelated() ?>
+    </div>
+
+    <div id="hawkitemlist">
+        <?= /* @noEscape */ $block->getChildHtml('hawksearch_tabbed_items'); ?>
+    </div>
+
+    <?= /* @noEscape */ $block->getChildHtml('hawksearch_tabbed_additional_bottom'); ?>
+</div>

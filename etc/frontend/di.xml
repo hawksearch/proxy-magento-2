@@ -1,32 +1,55 @@
 <?xml version="1.0"?>
 <!--
-/**
- * Copyright (c) 2013 Hawksearch (www.hawksearch.com) - All Rights Reserved
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
- * IN THE SOFTWARE.
- */
--->
+  /**
+   * Copyright (c) 2020 Hawksearch (www.hawksearch.com) - All Rights Reserved
+   *
+   * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+   * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+   * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+   * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+   * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+   * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+   * IN THE SOFTWARE.
+   */
+  -->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
     <type name="Magento\Framework\App\RouterList">
         <arguments>
             <argument name="routerList" xsi:type="array">
-                <item name="hawksearch_proxy" xsi:type="array">
-                    <item name="class" xsi:type="string">HawkSearch\Proxy\Controller\Router</item>
+                <item name="hawksearch_search" xsi:type="array">
+                    <item name="class" xsi:type="string">HawkSearch\Proxy\Controller\SearchRouter</item>
+                    <item name="disable" xsi:type="boolean">false</item>
+                    <item name="sortOrder" xsi:type="string">70</item>
+                </item>
+                <item name="hawksearch_landingpage" xsi:type="array">
+                    <item name="class" xsi:type="string">HawkSearch\Proxy\Controller\LandingPageRouter</item>
                     <item name="disable" xsi:type="boolean">false</item>
                     <item name="sortOrder" xsi:type="string">70</item>
                 </item>
             </argument>
         </arguments>
     </type>
-    <preference for="Magento\Catalog\Block\Product\ListProduct" type="HawkSearch\Proxy\Block\Product\ListProduct" />
-    <preference for="Magento\CatalogSearch\Block\SearchResult\ListProduct" type="HawkSearch\Proxy\Block\Product\ListProduct" />
+    <type name="Magento\Catalog\Helper\Data">
+        <plugin name="landingPage_breadcrumb" type="HawkSearch\Proxy\Plugin\BreadcrumbPlugin"/>
+    </type>
+    <type name="Magento\Framework\Controller\Result\Redirect">
+        <plugin name="hawkproxy_redirect_url" type="HawkSearch\Proxy\Plugin\Redirect" />
+    </type>
+    <type name="Magento\Store\App\Response\Redirect">
+        <plugin name="hawkproxy_redirect_url" type="HawkSearch\Proxy\Plugin\StoreRedirect" />
+    </type>
+    <type name="Magento\CatalogSearch\Block\Result">
+        <plugin name="hawkproxy_result" type="HawkSearch\Proxy\Plugin\ResultBlockPlugin" />
+    </type>
+
+    <type name="HawkSearch\Proxy\Observer\RuleRedirectObserver">
+        <arguments>
+            <argument name="responseProvider" xsi:type="object">HawkSearch\Proxy\Model\Provider\Response\RuleRedirectProvider</argument>
+        </arguments>
+    </type>
+
+    <preference for="Magento\CatalogSearch\Controller\Result\Index" type="HawkSearch\Proxy\Controller\Result\Index" />
 </config>
 
 

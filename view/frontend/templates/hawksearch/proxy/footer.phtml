@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2013 Hawksearch (www.hawksearch.com) - All Rights Reserved
+ * Copyright (c) 2021 Hawksearch (www.hawksearch.com) - All Rights Reserved
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -10,31 +10,43 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
+
+use Magento\Framework\View\Element\Template;
+use HawkSearch\Proxy\ViewModel\Config as ConfigViewModel;
+
+/** @var Template $block */
+/** @var ConfigViewModel $configViewModel */
+$configViewModel = $block->getData('configViewModel');
+if (!$configViewModel) {
+    return;
+}
 ?>
 <script type="text/javascript">
-    (function (HawkSearch, undefined) {
-        HawkSearch.BaseUrl = '<?php echo $block->getBaseUrl(); ?>';
-        HawkSearch.TrackingUrl = '<?php echo $block->getTrackingUrl(); ?>';
+    (function (HawkSearch) {
+        HawkSearch.BaseUrl = '<?= /* @noEscape */ $configViewModel->getBaseUrl(); ?>';
+        HawkSearch.HawkUrl = '<?= /* @noEscape */ $configViewModel->getHawkUrl(); ?>';
+        HawkSearch.TrackingUrl = '<?= /* @noEscape */ $configViewModel->getTrackingUrl(); ?>';
+        HawkSearch.RecommenderUrl = '<?= /* @noEscape */ $configViewModel->getRecommendedUrl(); ?>';
+        HawkSearch.ClientGuid = '<?= /* @noEscape */ $configViewModel->getTrackingKey(); ?>';
         if ('http:' == document.location.protocol) {
             HawkSearch.BaseUrl = HawkSearch.BaseUrl.replace('https://', 'http://');
+            HawkSearch.HawkUrl = HawkSearch.HawkUrl.replace('https://', 'http://');
             HawkSearch.TrackingUrl = HawkSearch.TrackingUrl.replace('https://', 'http://');
+            HawkSearch.RecommenderUrl = HawkSearch.RecommenderUrl.replace('https://', 'http://');
         }
         if ('https:' == document.location.protocol) {
             HawkSearch.BaseUrl = HawkSearch.BaseUrl.replace('http://', 'https://');
+            HawkSearch.HawkUrl = HawkSearch.HawkUrl.replace('http://', 'https://');
             HawkSearch.TrackingUrl = HawkSearch.TrackingUrl.replace('http://', 'https://');
+            HawkSearch.RecommenderUrl = HawkSearch.RecommenderUrl.replace('http://', 'https://');
         }
+        HawkSearch.SearchBoxes = [];
+        <?php foreach ($configViewModel->getSearchBoxes() as $sbid) : ?>
+        HawkSearch.SearchBoxes.push('<?= /* @noEscape */ $sbid; ?>');
+        <?php endforeach; ?>
+        HawkSearch.AutosuggestionParams = '<?= /* @noEscape */ $configViewModel->getAutosuggestionParams(); ?>';
+        HawkSearch.AutocompleteDiv = '<?= /* @noEscape */ $configViewModel->getHiddenDivName(); ?>';
     }(window.HawkSearch = window.HawkSearch || {}));
 
-    require(["hawksearch"], function() {
-        HawkSearch.initAutoSuggest = function () {
-<?php foreach($block->getSearchBoxes() as $sbid) : ?>
-            HawkSearch.suggestInit('#<?php echo $sbid; ?>', {
-                lookupUrlPrefix: HawkSearch.TrackingUrl +
-                '/?fn=ajax&f=GetSuggestions',
-                hiddenDivName: '',
-                isAutoWidth: true
-            });
-<?php endforeach; ?>
-        };
-    });
+    require(["jquery", "hawksearchWrapper" ], function ($) {});
 </script>

@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2013 Hawksearch (www.hawksearch.com) - All Rights Reserved
+ * Copyright (c) 2020 Hawksearch (www.hawksearch.com) - All Rights Reserved
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -10,102 +10,224 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
+
 namespace HawkSearch\Proxy\Block;
 
+use HawkSearch\Connector\Gateway\InstructionException;
+use HawkSearch\Proxy\Helper\Data as ProxyHelper;
+use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Exception\NotFoundException;
 use Magento\Framework\View\Element\Template;
 
 /**
  *  Html block
+ * @method getTabbedContent() string
+ * @method setTabbedContent(bool $value) string
  */
-class Html
-    extends Template
+class Html extends Template
 {
-
+    /**
+     * @var ProxyHelper
+     */
     private $helper;
 
-    public function __construct(Template\Context $context,
-                                \HawkSearch\Proxy\Helper\Data $helper,
-                                array $data = [])
-    {
-        $helper->setUri($context->getRequest()->getParams());
-        $helper->setClientIp($context->getRequest()->getClientIp());
-        $helper->setClientUa($context->getRequest()->getHeader('UserAgent'));
-        $helper->setIsHawkManaged(true);
+    /**
+     * @var BannerFactory
+     */
+    private $bannerFactory;
+
+    /**
+     * Html constructor.
+     * @param Template\Context $context
+     * @param ProxyHelper $helper
+     * @param BannerFactory $bannerFactory
+     * @param array $data
+     */
+    public function __construct(
+        Template\Context $context,
+        ProxyHelper $helper,
+        BannerFactory $bannerFactory,
+        array $data = []
+    ) {
         $this->helper = $helper;
+        $this->bannerFactory = $bannerFactory;
 
         parent::__construct($context, $data);
     }
 
-    function getFacets()
+    /**
+     * @return string|null
+     * @throws InstructionException
+     * @throws NotFoundException
+     */
+    public function getFacets()
     {
-
-        return $this->helper->getResultData()->Data->Facets;
+        return $this->helper->getFacets();
     }
 
-    function getTopPager()
+    /**
+     * @return bool
+     */
+    public function isShowFacets()
     {
-        return $this->helper->getResultData()->Data->TopPager;
+        return $this->helper->isShowFacets();
     }
 
-    function getBottomPager()
+    /**
+     * @return string|null
+     * @throws InstructionException
+     * @throws NotFoundException
+     */
+    public function getTopPager()
     {
-        return $this->helper->getResultData()->Data->BottomPager;
+        return $this->helper->getResultData()->getResponseData()->getTopPager();
     }
 
-    function getMetaRobots()
+    /**
+     * @return string|null
+     * @throws InstructionException
+     * @throws NotFoundException
+     */
+    public function getBottomPager()
     {
-        return $this->helper->getResultData()->MetaRobots;
+        return $this->helper->getResultData()->getResponseData()->getBottomPager();
     }
 
-    function getHeaderTitle()
+    /**
+     * @return string
+     * @throws InstructionException
+     * @throws NotFoundException
+     */
+    public function getMetaRobots()
     {
-        return $this->helper->getResultData()->HeaderTitle;
+        return $this->helper->getResultData()->getMetaRobots() ?? '';
     }
 
-    function getMetaDescription()
+    /**
+     * @return string|null
+     * @throws InstructionException
+     * @throws NotFoundException
+     */
+    public function getHeaderTitle()
     {
-        return $this->helper->getResultData()->MetaDescription;
+        return $this->helper->getResultData()->getHeaderTitle();
     }
 
-    function getMetaKeywords()
+    /**
+     * @return string|null
+     * @throws InstructionException
+     * @throws NotFoundException
+     */
+    public function getMetaDescription()
     {
-        return $this->helper->getResultData()->MetaKeywords;
+        return $this->helper->getResultData()->getMetaDescription();
     }
 
-    function getRelCanonical()
+    /**
+     * @return string|null
+     * @throws InstructionException
+     * @throws NotFoundException
+     */
+    public function getMetaKeywords()
     {
-        return $this->helper->getResultData()->RelCanonical;
+        return $this->helper->getResultData()->getMetaKeywords();
     }
 
-    function getTopText()
+    /**
+     * @return string|null
+     * @throws InstructionException
+     * @throws NotFoundException
+     */
+    public function getRelCanonical()
     {
-        return $this->helper->getResultData()->Data->TopText;
+        return $this->helper->getResultData()->getRelCanonical();
     }
 
-    function getRelated()
+    /**
+     * @return string|null
+     * @throws InstructionException
+     * @throws NotFoundException
+     */
+    public function getTopText()
     {
-        return $this->helper->getResultData()->Data->Related;
+        return $this->helper->getResultData()->getResponseData()->getTopText();
     }
 
-    function getBreadCrumb()
+    /**
+     * @return string|null
+     * @throws InstructionException
+     * @throws NotFoundException
+     */
+    public function getRelated()
     {
-        return $this->helper->getResultData()->Data->BreadCrumb;
+        return $this->helper->getResultData()->getResponseData()->getRelated();
     }
 
-    function getTitle()
+    /**
+     * @return string|null
+     * @throws InstructionException
+     * @throws NotFoundException
+     */
+    public function getBreadCrumb()
     {
-        return $this->helper->getResultData()->Data->Title;
+        return $this->helper->getResultData()->getResponseData()->getBreadCrumb();
     }
 
-    function getItemList()
+    /**
+     * @return string|null
+     * @throws InstructionException
+     * @throws NotFoundException
+     */
+    public function getTitle()
+    {
+        return $this->helper->getResultData()->getResponseData()->getTitle();
+    }
+
+    /**
+     * @return string
+     * @throws InstructionException
+     * @throws LocalizedException
+     * @throws NotFoundException
+     */
+    public function getHawkTrackingData()
+    {
+        return $this->helper->getTrackingDataHtml();
+    }
+
+    /**
+     * @return string
+     * @throws LocalizedException
+     * @throws \Exception
+     */
+    public function getItemList()
     {
         $layout = $this->getLayout();
-        $block = $layout->createBlock('HawkSearch\Proxy\Block\Product\ListProduct');
-        $block->getLoadedProductCollection();
-        $block->setTemplate('Magento_Catalog::product/list.phtml');
-
-        return $block->toHtml();
-
+        $lpurl = $this->_request->getParam('lpurl');
+        if ($this->getTabbedContent() && in_array($lpurl, ['/catalogsearch/result/', '/catalogsearch/result'])
+            && !$this->helper->productsOnly()) {
+            return $layout->getBlock('hawksearch_tabbed_items')->toHtml();
+        } else {
+            return $layout->getBlock('hawksearch_hawkitems')->getChildHtml();
+        }
     }
 
+    /**
+     * @return string|null
+     * @throws InstructionException
+     * @throws NotFoundException
+     */
+    public function getHawksearchTrackingId()
+    {
+        return $this->helper->getResultData()->getTrackingId();
+    }
+
+    /**
+     * @return string
+     * @throws InstructionException
+     * @throws NotFoundException
+     */
+    public function getTabs()
+    {
+        return $this->helper->getResultData()->getResponseData()->getTabs() ?? '';
+    }
 }

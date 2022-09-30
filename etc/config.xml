@@ -1,31 +1,42 @@
 <?xml version="1.0"?>
 <!--
-/**
- * Copyright (c) 2013 Hawksearch (www.hawksearch.com) - All Rights Reserved
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
- * IN THE SOFTWARE.
- */
--->
-<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../Store/etc/config.xsd">
-  <default>
-    <hawksearch_proxy>
-      <general>
-        <enabled>0</enabled>
-        <logging_enabled>0</logging_enabled>
-      </general>
-      <proxy>
-        <mode>0</mode>
-        <tracking_url_staging>https://dev.hawksearch.net/</tracking_url_staging>
-        <tracking_url_live>https://manage.hawksearch.com/</tracking_url_live>
-        <search_box_ids>hawksearch</search_box_ids>
-        <hawksearch_include_css>0</hawksearch_include_css>
-      </proxy>
-    </hawksearch_proxy>
-  </default>
+  /**
+   * Copyright (c) 2020 Hawksearch (www.hawksearch.com) - All Rights Reserved
+   *
+   * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+   * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+   * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+   * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+   * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+   * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+   * IN THE SOFTWARE.
+   */
+  -->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <hawksearch_proxy>
+            <general>
+                <enabled>0</enabled>
+                <logging_enabled>0</logging_enabled>
+            </general>
+            <proxy>
+                <manage_categories>0</manage_categories>
+                <manage_all>0</manage_all>
+                <enable_hawk_landing_pages>0</enable_hawk_landing_pages>
+                <manage_search>0</manage_search>
+                <search_box_ids>search</search_box_ids>
+                <autocomplete_query_params><![CDATA[/?fn=ajax&f=GetSuggestions]]></autocomplete_query_params>
+                <hawksearch_include_css>1</hawksearch_include_css>
+                <enable_hawk_landing_pages>1</enable_hawk_landing_pages>
+                <hawk_landing_pages_cache>300</hawk_landing_pages_cache>
+                <result_type>item</result_type>
+                <show_tabs>0</show_tabs>
+                <meta_robots>NOINDEX,FOLLOW</meta_robots>
+                <allow_fulltext>0</allow_fulltext>
+            </proxy>
+            <sync>
+                <cron_string>0 0 * * *</cron_string>
+            </sync>
+        </hawksearch_proxy>
+    </default>
 </config>

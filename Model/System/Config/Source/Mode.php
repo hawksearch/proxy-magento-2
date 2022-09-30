@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2013 Hawksearch (www.hawksearch.com) - All Rights Reserved
+ * Copyright (c) 2020 Hawksearch (www.hawksearch.com) - All Rights Reserved
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -11,7 +11,10 @@
  * IN THE SOFTWARE.
  */
 namespace HawkSearch\Proxy\Model\System\Config\Source;
-class Mode implements \Magento\Framework\Option\ArrayInterface
+
+use Magento\Framework\Option\ArrayInterface;
+
+class Mode implements ArrayInterface
 {
     /**
      * @return array
@@ -19,10 +22,9 @@ class Mode implements \Magento\Framework\Option\ArrayInterface
     public function toOptionArray()
     {
         return [
-            ['value' => '0', 'label' => __('Development')],
-            ['value' => '1', 'label' => __('Production')],           
+            ['value' => 'develop', 'label' => __('Development')],
+            ['value' => 'staging', 'label' => __('Staging')],
+            ['value' => 'production', 'label' => __('Production')],
         ];
     }
 }
- 
-?>

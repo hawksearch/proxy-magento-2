@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2013 Hawksearch (www.hawksearch.com) - All Rights Reserved
+ * Copyright (c) 2020 Hawksearch (www.hawksearch.com) - All Rights Reserved
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -12,35 +12,100 @@
  */
 namespace HawkSearch\Proxy\Controller\Index;
 
-class Index
-    extends \Magento\Framework\App\Action\Action
+use HawkSearch\Proxy\Block\Html;
+use HawkSearch\Proxy\Model\Config\Proxy as ProxyConfigProvider;
+use Magento\Catalog\Model\Session;
+use Magento\Framework\App\Action\Action;
+use Magento\Framework\App\Action\Context;
+use Magento\Framework\App\RequestInterface;
+use Magento\Framework\App\ResponseInterface;
+use Magento\Framework\Controller\Result\Json;
+use Magento\Framework\Controller\Result\JsonFactory;
+use Magento\Framework\Controller\Result\Raw;
+use Magento\Framework\Controller\ResultInterface;
+
+class Index extends Action
 {
 
-    protected $resultPageFactory;
+    /**
+     * @var Raw
+     */
+    protected $result;
+
+    /**
+     * @var Session
+     */
     private $session;
 
+    /**
+     * @var RequestInterface
+     */
+    private $request;
 
-    public function __construct(\Magento\Framework\App\Action\Context $context,
-                                \Magento\Catalog\Model\Session $session,
-                                \Magento\Framework\View\Result\PageFactory $resultPageFactory)
-    {
-        $this->resultPageFactory = $resultPageFactory;
-        $this->session = $session;
+    /**
+     * @var ProxyConfigProvider
+     */
+    private $proxyConfigProvider;
+
+    /**
+     * @var JsonFactory
+     */
+    private $resultJsonFactory;
+
+    /**
+     * Index constructor.
+     * @param Context $context
+     * @param Session $session
+     * @param Raw $result
+     * @param JsonFactory $resultJsonFactory
+     * @param ProxyConfigProvider $proxyConfigProvider
+     */
+    public function __construct(
+        Context $context,
+        Session $session,
+        Raw $result,
+        JsonFactory $resultJsonFactory,
+        ProxyConfigProvider $proxyConfigProvider
+    ) {
         parent::__construct($context);
+        $this->result = $result;
+        $this->session = $session;
+        $this->request = $context->getRequest();
+        $this->resultJsonFactory = $resultJsonFactory;
+        $this->proxyConfigProvider = $proxyConfigProvider;
     }
 
-
+    /**
+     * @return ResponseInterface|Raw|ResultInterface
+     */
     public function execute()
     {
-        $this->_view->loadLayout($this->session->getHawkCurrentUpdateHandle());
-        $html = $this->_view->getLayout()->createBlock('HawkSearch\Proxy\Block\Html')->setTemplate('HawkSearch_Proxy::hawksearch/proxy/html.phtml')->toHtml();
-        $params = $this->getRequest()->getParams();
-        $obj = array('Success' => 'true', 'html' => $html, 'location' => '');
+        $tab = $this->getRequest()->getParam('it');
+        $html = '';
 
-        $result = $this->resultFactory->create(\Magento\Framework\Controller\ResultFactory::TYPE_RAW);
-        $result->setHeader('Content-Type', 'text/html');
-        $result->setContents($params['callback'] . '(' . json_encode($obj) . ')');
+        if (!$this->_view->isLayoutLoaded()) {
+            $this->_view->loadLayout();
+            /** @var Html $block */
+            $block = $this->_view->getLayout()->getBlock('hawksearch_proxy_response');
+            if (!empty($tab)
+                && !empty($this->proxyConfigProvider->getResultType())
+                && $tab !== $this->proxyConfigProvider->getResultType()
+            ) {
+                $block->setTabbedContent(true);
+            }
+            $html = $block->toHtml();
+        }
+        $result = [
+            'success' => 'true',
+            'html' => $html,
+            'multiple_wishlist' => $this->_view->getLayout()->getBlock('wishlist_behaviour')
+                ? $this->_view->getLayout()->getBlock('wishlist_behaviour')->toHtml()
+                : '',
+            'location' => ''
+        ];
 
-        return $result;
+        /** @var Json $resultJson */
+        $resultJson = $this->resultJsonFactory->create();
+        return $resultJson->setData($result);
     }
 }

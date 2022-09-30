@@ -1,28 +1,41 @@
 <?xml version="1.0"?>
 <!--
-/**
- * Copyright (c) 2013 Hawksearch (www.hawksearch.com) - All Rights Reserved
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
- * IN THE SOFTWARE.
- */
--->
+  /**
+   * Copyright (c) 2020 Hawksearch (www.hawksearch.com) - All Rights Reserved
+   *
+   * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+   * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+   * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+   * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+   * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+   * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+   * IN THE SOFTWARE.
+   */
+  -->
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <script src="HawkSearch_Proxy::js/hooks.js"/>
+    </head>
     <body>
         <referenceBlock name="head.additional">
-            <block class="HawkSearch\Proxy\Block\Head\HawksearchJs"
+            <block class="Magento\Framework\View\Element\Template"
                    name="hawksearch.head" as="hawksearch.head"
-                   template="HawkSearch_Proxy::hawksearch/proxy/head/js.phtml"/>
+                   template="HawkSearch_Proxy::hawksearch/proxy/head/js.phtml"
+                   ifconfig="hawksearch_proxy/general/enabled">
+                <arguments>
+                    <argument name="configViewModel" xsi:type="object">HawkSearch\Proxy\ViewModel\Config</argument>
+                </arguments>
+            </block>
         </referenceBlock>
         <referenceContainer name="before.body.end">
-            <block class="HawkSearch\Proxy\Block\Footer" name="hawksearch_proxyfooter"
-                   as="hawksearch_proxyfooter" template="HawkSearch_Proxy::hawksearch/proxy/footer.phtml"/>
+            <block class="Magento\Framework\View\Element\Template" name="hawksearch_proxyfooter"
+                   as="hawksearch_proxyfooter" template="HawkSearch_Proxy::hawksearch/proxy/footer.phtml"
+                   ifconfig="hawksearch_proxy/general/enabled">
+                <arguments>
+                    <argument name="configViewModel" xsi:type="object">HawkSearch\Proxy\ViewModel\Config</argument>
+                </arguments>
+            </block>
         </referenceContainer>
     </body>
 </page>

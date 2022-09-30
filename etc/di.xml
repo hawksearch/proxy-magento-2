@@ -1,19 +1,34 @@
 <?xml version="1.0"?>
+<!--
+  /**
+   * Copyright (c) 2020 Hawksearch (www.hawksearch.com) - All Rights Reserved
+   *
+   * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+   * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+   * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+   * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+   * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+   * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+   * IN THE SOFTWARE.
+   */
+  -->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
-    <!--<type name="Magento\Search\Model\Adminhtml\System\Config\Source\Engine">-->
-        <!--<arguments>-->
-            <!--<argument name="engines" xsi:type="array">-->
-                <!--<item name="hawksearch" xsi:type="string">HawkSearch</item>-->
-            <!--</argument>-->
-        <!--</arguments>-->
-    <!--</type>-->
-    <!--<type name="Magento\Search\Model\AdapterFactory">-->
-        <!--<arguments>-->
-            <!--<argument name="adapters" xsi:type="array">-->
-                <!--<item name="hawksearch" xsi:type="string">HawkSearch\Proxy\SearchAdapter\Adapter</item>-->
-            <!--</argument>-->
-        <!--</arguments>-->
-    <!--</type>-->
+    <preference for="HawkSearch\Proxy\Api\Data\SearchResultDataInterface" type="HawkSearch\Proxy\Model\SearchResultData" />
+    <preference for="HawkSearch\Proxy\Api\Data\SearchResultResponseInterface" type="HawkSearch\Proxy\Model\SearchResultResponse" />
+    <preference for="HawkSearch\Proxy\Api\Data\SearchResultMerchandisingInterface" type="HawkSearch\Proxy\Model\SearchResultMerchandising" />
+    <preference for="HawkSearch\Proxy\Api\Data\SearchResultFeaturedInterface" type="HawkSearch\Proxy\Model\SearchResultFeatured" />
+    <preference for="HawkSearch\Proxy\Api\Data\SearchResultContentInterface" type="HawkSearch\Proxy\Model\SearchResultContent" />
+    <preference for="HawkSearch\Proxy\Api\Data\SearchResultBannerInterface" type="HawkSearch\Proxy\Model\SearchResultBanner" />
+    <preference for="HawkSearch\Proxy\Api\Data\SearchResultContentItemInterface" type="HawkSearch\Proxy\Model\SearchResultContentItem" />
+
+    <type name="Magento\Framework\Console\CommandList">
+        <arguments>
+            <argument name="commands" xsi:type="array">
+                <item name="run_category_sync" xsi:type="object">HawkSearch\Proxy\Console\Command\SyncCategories</item>
+                <item name="schedule_category_sync" xsi:type="object">HawkSearch\Proxy\Console\Command\ScheduleSyncCategories</item>
+            </argument>
+        </arguments>
+    </type>
     <type name="Magento\CatalogSearch\Model\Layer\Category\ItemCollectionProvider">
         <arguments>
             <argument name="collectionFactory"
@@ -26,5 +41,125 @@
         </arguments>
     </virtualType>
 
+    <virtualType name="HawkSearch\Proxy\Logger\Handler\Base" type="Magento\Framework\Logger\Handler\Base">
+        <arguments>
+            <argument name="fileName" xsi:type="string">/var/log/hawksearch_proxy.log</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="HawkSearch\Proxy\Logger\Logger" type="Magento\Framework\Logger\Monolog">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="debug" xsi:type="object">HawkSearch\Proxy\Logger\Handler\Base</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <type name="HawkSearch\Proxy\Logger\LoggerFactory">
+        <arguments>
+            <argument name="instanceName" xsi:type="string">HawkSearch\Proxy\Logger\Logger</argument>
+        </arguments>
+    </type>
 
+    <virtualType name="hawkSearchProxyVirtualContext" type="Magento\Framework\App\Helper\Context">
+        <arguments>
+            <argument name="logger" xsi:type="object">HawkSearch\Proxy\Logger\Logger</argument>
+        </arguments>
+    </virtualType>
+    <type name="HawkSearch\Proxy\Helper\Data">
+        <arguments>
+            <argument name="context" xsi:type="object">hawkSearchProxyVirtualContext</argument>
+        </arguments>
+    </type>
+
+    <!-- Instructions  -->
+    <virtualType name="HawkSearchInstructionsPool" type="HawkSearch\Connector\Gateway\Instruction\InstructionPool">
+        <arguments>
+            <argument name="instructions" xsi:type="array">
+                <item name="searchResults" xsi:type="string">HawkSearchGetResultsInstruction</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <!-- searchResults Instruction  -->
+    <virtualType name="HawkSearchGetResultsInstruction" type="HawkSearch\Connector\Gateway\Instruction\GatewayInstruction">
+        <arguments>
+            <argument name="requestBuilder" xsi:type="object">HawkSearchGetResultsRequestBuilder</argument>
+            <argument name="transferFactory" xsi:type="object">HawkSearchGetResultsTransferFactory</argument>
+            <argument name="client" xsi:type="object">HawkSearch\Connector\Gateway\Http\Client</argument>
+            <argument name="handler" xsi:type="object">HawkSearchGetResultsHandler</argument>
+            <argument name="resultFactory" xsi:type="object">HawkSearchGetResultsResultFactory</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="HawkSearchGetResultsRequestBuilder" type="HawkSearch\Connector\Gateway\Request\BuilderComposite">
+        <arguments>
+            <argument name="builders" xsi:type="array">
+                <item name="searchUriParameters" xsi:type="string">HawkSearch\Proxy\Gateway\Request\SearchParametersBuilder</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="HawkSearchGetResultsTransferFactory" type="HawkSearch\Connector\Gateway\Http\TransferFactory">
+        <arguments>
+            <argument name="headers" xsi:type="object">HawkSearchApiHeaders</argument>
+            <argument name="uriBuilder" xsi:type="object">HawkSearch\Proxy\Gateway\Http\Uri\SearchUriBuilder</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="HawkSearchGetResultsHandler" type="HawkSearch\Connector\Gateway\Response\HandlerChain">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="result_data" xsi:type="string">HawkSearch\Proxy\Gateway\Response\SearchResultHandler</item>
+                <item name="featured_items" xsi:type="string">HawkSearch\Proxy\Gateway\Response\FeaturedItemsHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="HawkSearchGetResultsResultFactory" type="HawkSearch\Connector\Gateway\Instruction\ResultInterfaceFactory">
+        <arguments>
+            <argument xsi:type="string" name="instanceName">HawkSearch\Proxy\Gateway\Instruction\Result\SearchResult</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="HawkSearchGetResultsHeaders" type="HawkSearch\Connector\Gateway\Request\BuilderComposite">
+        <arguments>
+            <argument name="builders" xsi:type="array">
+                <item name="search_results_headers" xsi:type="string">HawkSearch\Proxy\Gateway\Request\SearchResultsHeaders</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <!-- END searchResults Instruction  -->
+
+
+    <!-- END Instructions  -->
+
+
+    <!-- Configs -->
+    <type name="HawkSearch\Proxy\Model\Config\General">
+        <arguments>
+            <argument name="configRootPath" xsi:type="string">hawksearch_proxy</argument>
+        </arguments>
+    </type>
+    <type name="HawkSearch\Proxy\Model\Config\Proxy">
+        <arguments>
+            <argument name="configRootPath" xsi:type="string">hawksearch_proxy</argument>
+            <argument name="configGroup" xsi:type="string">proxy</argument>
+        </arguments>
+    </type>
+    <type name="HawkSearch\Proxy\Model\Config\Sync">
+        <arguments>
+            <argument name="configRootPath" xsi:type="string">hawksearch_proxy</argument>
+            <argument name="configGroup" xsi:type="string">sync</argument>
+        </arguments>
+    </type>
+    <!-- END Configs -->
+
+    <!-- Types -->
+    <type name="HawkSearch\Proxy\Gateway\Request\SearchResultsHeaders">
+        <arguments>
+            <argument name="httpRequest" xsi:type="object">Magento\Framework\App\Request\Http\Proxy</argument>
+        </arguments>
+    </type>
+    <type name="HawkSearch\Proxy\Gateway\Request\SearchParametersBuilder">
+        <arguments>
+            <argument name="httpRequest" xsi:type="object">Magento\Framework\App\Request\Http\Proxy</argument>
+            <argument name="catalogSession" xsi:type="object">Magento\Catalog\Model\Session\Proxy</argument>
+            <argument name="customerSession" xsi:type="object">Magento\Customer\Model\Session\Proxy</argument>
+        </arguments>
+    </type>
+    <!-- End Types -->
 </config>
