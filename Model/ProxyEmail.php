@@ -86,7 +86,7 @@ class ProxyEmail
                         }
                         return trim($a);
                     },
-                    explode(',', $this->scopeConfig->getValue('hawksearch_proxy/sync/email'))
+                    explode(',', (string)$this->scopeConfig->getValue('hawksearch_proxy/sync/email'))
                 )
             )
             ->getTransport();

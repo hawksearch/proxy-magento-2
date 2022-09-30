@@ -115,20 +115,20 @@ class Proxy extends ConfigProvider
 
     /**
      * @param StoreInterface|int|null $store
-     * @return string | null
+     * @return string
      */
-    public function getAutocompleteDivId($store = null): ?string
+    public function getAutocompleteDivId($store = null): string
     {
-        return $this->getConfig(self::CONFIG_AUTOCOMPLETE_DIV_ID, $store);
+        return (string)$this->getConfig(self::CONFIG_AUTOCOMPLETE_DIV_ID, $store);
     }
 
     /**
      * @param StoreInterface|int|null $store
-     * @return string | null
+     * @return string
      */
-    public function getAutocompleteQueryParams($store = null): ?string
+    public function getAutocompleteQueryParams($store = null): string
     {
-        return $this->getConfig(self::CONFIG_AUTOCOMPLETE_QUERY_PARAMS, $store);
+        return (string)$this->getConfig(self::CONFIG_AUTOCOMPLETE_QUERY_PARAMS, $store);
     }
 
     /**
@@ -142,20 +142,20 @@ class Proxy extends ConfigProvider
 
     /**
      * @param StoreInterface|int|null $store
-     * @return string | null
+     * @return string
      */
-    public function getResultType($store = null): ?string
+    public function getResultType($store = null): string
     {
-        return $this->getConfig(self::CONFIG_RESULT_TYPE, $store);
+        return (string)$this->getConfig(self::CONFIG_RESULT_TYPE, $store);
     }
 
     /**
      * @param StoreInterface|int|null $store
-     * @return string | null
+     * @return string
      */
-    public function getMetaRobots($store = null): ?string
+    public function getMetaRobots($store = null): string
     {
-        return $this->getConfig(self::CONFIG_META_ROBOTS, $store);
+        return (string)$this->getConfig(self::CONFIG_META_ROBOTS, $store);
     }
 
     /**
@@ -170,11 +170,11 @@ class Proxy extends ConfigProvider
 
     /**
      * @param StoreInterface|int|null $store
-     * @return string|null
+     * @return string
      */
-    public function getCustomSearchRoute($store = null): ?string
+    public function getCustomSearchRoute($store = null): string
     {
-        return $this->getConfig(self::CONFIG_CUSTOM_SEARCH_ROUTE, $store);
+        return (string)$this->getConfig(self::CONFIG_CUSTOM_SEARCH_ROUTE, $store);
     }
 
     /**
@@ -207,11 +207,11 @@ class Proxy extends ConfigProvider
 
     /**
      * @param StoreInterface|int|null $store
-     * @return string|null
+     * @return string
      */
-    public function getTypeLabel($store = null): ?string
+    public function getTypeLabel($store = null): string
     {
-        return $this->getConfig(self::CONFIG_TYPE_LABEL, $store);
+        return (string)$this->getConfig(self::CONFIG_TYPE_LABEL, $store);
     }
 
     /**
