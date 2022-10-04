@@ -54,14 +54,16 @@ class SearchUriBuilder implements UriBuilderInterface
      */
     public function build(string $url, string $path): string
     {
-        $url = $this->urlUtility->getUriWithPath($url, $path);
+        $uri = $this->urlUtility->getUriWithPath($url, $path);
 
         return $this->urlUtility->addToUriPath(
-            $url,
+            $uri,
             [
                 static::PATH_SITES,
-                $this->apiSettingsProvider->getEngineName()
-            ]
+                $this->apiSettingsProvider->getEngineName(),
+                '/'
+            ],
+            false
         )->__toString();
     }
 }
