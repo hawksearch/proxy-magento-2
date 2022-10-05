@@ -62,8 +62,7 @@ class SearchUriBuilder implements UriBuilderInterface
                 static::PATH_SITES,
                 $this->apiSettingsProvider->getEngineName(),
                 '/'
-            ],
-            false
+            ]
         )->__toString();
     }
 }
