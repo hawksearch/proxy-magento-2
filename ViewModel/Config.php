@@ -13,6 +13,7 @@
 
 namespace HawkSearch\Proxy\ViewModel;
 
+use HawkSearch\Connector\Helper\Url as UrlUtility;
 use HawkSearch\Connector\Model\Config\ApiSettings;
 use HawkSearch\Proxy\Helper\Data as ProxyHelper;
 use HawkSearch\Proxy\Model\Config\Proxy as ProxyConfigProvider;
@@ -50,6 +51,11 @@ class Config implements ArgumentInterface
     private $coreRegistry;
 
     /**
+     * @var UrlUtility
+     */
+    private UrlUtility $urlUtility;
+
+    /**
      * Footer constructor.
      * @param ProxyConfigProvider $proxyConfigProvider
      * @param UrlInterface $urlBuilder
@@ -62,13 +68,15 @@ class Config implements ArgumentInterface
         UrlInterface $urlBuilder,
         ProxyHelper $proxyHelper,
         ApiSettings $apiSettingsConfigProvider,
-        Registry $coreRegistry
+        Registry $coreRegistry,
+        UrlUtility $urlUtility
     ) {
         $this->proxyConfigProvider = $proxyConfigProvider;
         $this->urlBuilder = $urlBuilder;
         $this->proxyHelper = $proxyHelper;
         $this->apiSettingsConfigProvider = $apiSettingsConfigProvider;
         $this->coreRegistry = $coreRegistry;
+        $this->urlUtility = $urlUtility;
     }
 
     /**
@@ -138,11 +146,26 @@ class Config implements ArgumentInterface
     }
 
     /**
-     * @return string|null
+     * Get autosuggestion url query parameters
+     *
+     * @return array
      */
-    public function getAutosuggestionParams()
+    protected function getAutosuggestionParams()
     {
-        return $this->proxyConfigProvider->getAutocompleteQueryParams();
+        return [
+            'fn' => 'ajax',
+            'f' => 'GetSuggestions'
+        ];
+    }
+
+    /**
+     * @return string
+     */
+    public function getAutosuggestionQueryString()
+    {
+        $url = $this->proxyHelper->getSearchUrl('', $this->getAutosuggestionParams());
+        $queryString = $this->urlUtility->getUriInstance($url)->getQuery();
+        return $queryString  ? '?' . $queryString : '';
     }
 
     /**
