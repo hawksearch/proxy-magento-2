@@ -33,7 +33,6 @@ class Proxy extends ConfigProvider
     const CONFIG_HAWKSEARCH_INCLUDE_CSS = 'hawksearch_include_css';
     const CONFIG_SEARCH_BOX_IDS = 'search_box_ids';
     const CONFIG_AUTOCOMPLETE_DIV_ID = 'autocomplete_div_id';
-    const CONFIG_AUTOCOMPLETE_QUERY_PARAMS = 'autocomplete_query_params';
     const CONFIG_SHOW_TABS = 'show_tabs';
     const CONFIG_RESULT_TYPE = 'result_type';
     const CONFIG_META_ROBOTS = 'meta_robots';
@@ -120,15 +119,6 @@ class Proxy extends ConfigProvider
     public function getAutocompleteDivId($store = null): string
     {
         return (string)$this->getConfig(self::CONFIG_AUTOCOMPLETE_DIV_ID, $store);
-    }
-
-    /**
-     * @param StoreInterface|int|null $store
-     * @return string
-     */
-    public function getAutocompleteQueryParams($store = null): string
-    {
-        return (string)$this->getConfig(self::CONFIG_AUTOCOMPLETE_QUERY_PARAMS, $store);
     }
 
     /**

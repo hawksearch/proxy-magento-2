@@ -141,26 +141,17 @@
                     <label>Autocomplete Div ID</label>
                     <comment>The HTML id of the div that will hold autosuggest results</comment>
                 </field>
-                <field id="autocomplete_query_params"
-                       type="text"
-                       showInWebsite="1"
-                       showInDefault="1"
-                       showInStore="1"
-                       sortOrder="100">
-                    <label>Query Params for the autosuggest call to HawkSearch</label>
-                    <comment>Default is: "/?fn=ajax&amp;f=GetSuggestions"</comment>
-                </field>
-                <field id="result_type" type="text" showInStore="1" sortOrder="110">
+                <field id="result_type" type="text" showInStore="1" sortOrder="100">
                     <label>Result Type</label>
                     <comment>Default is 'item'</comment>
                 </field>
                 <field id="show_tabs" type="select" showInDefault="1" showInWebsite="1"
-                       showInStore="1" sortOrder="120">
+                       showInStore="1" sortOrder="110">
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <label>Show Hawk type tabs</label>
                     <comment>Display the HawkSearch type tabs</comment>
                 </field>
-                <field id="show_type_labels" showInStore="1" showInWebsite="1" showInDefault="1" sortOrder="125" type="select">
+                <field id="show_type_labels" showInStore="1" showInWebsite="1" showInDefault="1" sortOrder="120" type="select">
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <backend_model>HawkSearch\Proxy\Model\Config\Backend\ShowTypeLabels</backend_model>
                     <label>Show Hawk type labels</label>

@@ -44,7 +44,7 @@ if (!$configViewModel) {
         <?php foreach ($configViewModel->getSearchBoxes() as $sbid) : ?>
         HawkSearch.SearchBoxes.push('<?= /* @noEscape */ $sbid; ?>');
         <?php endforeach; ?>
-        HawkSearch.AutosuggestionParams = '<?= /* @noEscape */ $configViewModel->getAutosuggestionParams(); ?>';
+        HawkSearch.AutosuggestionParams = '<?= /* @noEscape */ $configViewModel->getAutosuggestionQueryString(); ?>';
         HawkSearch.AutocompleteDiv = '<?= /* @noEscape */ $configViewModel->getHiddenDivName(); ?>';
     }(window.HawkSearch = window.HawkSearch || {}));
 
