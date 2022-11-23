@@ -48,5 +48,5 @@ if (!$configViewModel) {
         HawkSearch.AutocompleteDiv = '<?= /* @noEscape */ $configViewModel->getHiddenDivName(); ?>';
     }(window.HawkSearch = window.HawkSearch || {}));
 
-    require(["jquery", "hawksearchWrapper" ], function ($) {});
+    require(["hawksearch"], function () {});
 </script>
