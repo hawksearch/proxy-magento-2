@@ -27,7 +27,7 @@ if (!$configViewModel) {
         HawkSearch.HawkUrl = '<?= /* @noEscape */ $configViewModel->getHawkUrl(); ?>';
         HawkSearch.TrackingUrl = '<?= /* @noEscape */ $configViewModel->getTrackingUrl(); ?>';
         HawkSearch.RecommenderUrl = '<?= /* @noEscape */ $configViewModel->getRecommendedUrl(); ?>';
-        HawkSearch.ClientGuid = '<?= /* @noEscape */ $configViewModel->getTrackingKey(); ?>';
+        HawkSearch.ClientGuid = '<?= /* @noEscape */ $configViewModel->getClientGuid(); ?>';
         if ('http:' == document.location.protocol) {
             HawkSearch.BaseUrl = HawkSearch.BaseUrl.replace('https://', 'http://');
             HawkSearch.HawkUrl = HawkSearch.HawkUrl.replace('https://', 'http://');

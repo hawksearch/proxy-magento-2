@@ -118,15 +118,23 @@ class Config implements ArgumentInterface
      */
     public function getRecommendedUrl()
     {
-        return $this->apiSettingsConfigProvider->getRecommendationUrl();
+        return $this->apiSettingsConfigProvider->getRecommendationsUrl();
     }
 
     /**
-     * @return string|null
+     * @deplacated 2.5.11
      */
     public function getTrackingKey()
     {
-        return $this->apiSettingsConfigProvider->getOrderTrackingKey();
+        return $this->getClientGuid();
+    }
+
+    /**
+     * @return string
+     */
+    public function getClientGuid()
+    {
+        return $this->apiSettingsConfigProvider->getClientGuid();
     }
 
     /**

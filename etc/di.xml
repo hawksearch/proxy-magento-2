@@ -98,8 +98,8 @@
     </virtualType>
     <virtualType name="HawkSearchGetResultsTransferFactory" type="HawkSearch\Connector\Gateway\Http\TransferFactory">
         <arguments>
-            <argument name="headers" xsi:type="object">HawkSearchApiHeaders</argument>
             <argument name="uriBuilder" xsi:type="object">HawkSearch\Proxy\Gateway\Http\Uri\SearchUriBuilder</argument>
+            <argument name="apiConfig" xsi:type="object">HawkSearch\Proxy\Gateway\Config\LuSearchApiConfig</argument>
         </arguments>
     </virtualType>
     <virtualType name="HawkSearchGetResultsHandler" type="HawkSearch\Connector\Gateway\Response\HandlerChain">

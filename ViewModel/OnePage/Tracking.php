@@ -87,14 +87,14 @@ class Tracking implements ArgumentInterface
         $order = $this->checkoutSession->getLastRealOrder();
 
         $url = $this->urlUtility->getUriWithPath(
-            $this->apiSettingsConfigProvider->getApiUrl(),
+            $this->apiSettingsConfigProvider->getHawkUrl(),
             'sites/_hawk/hawkconversion.aspx'
         )->__toString();
 
         return $this->urlUtility->getUriWithQuery(
             $url,
             [
-                'd' => $this->apiSettingsConfigProvider->getOrderTrackingKey(),
+                'd' => $this->apiSettingsConfigProvider->getClientGuid(),
                 'hawksessionid' => $sid,
                 'orderno' => $order->getIncrementId(),
                 'total' => $order->getGrandTotal()

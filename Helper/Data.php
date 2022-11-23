@@ -344,7 +344,7 @@ class Data extends AbstractHelper
      */
     public function getApiUrl()
     {
-        $apiUrl = rtrim($this->apiSetingsConfigProvider->getApiUrl(), '/');
+        $apiUrl = rtrim($this->apiSetingsConfigProvider->getDashboardApiUrl(), '/');
         return $apiUrl . '/api/v3/';
     }
 
@@ -355,7 +355,7 @@ class Data extends AbstractHelper
      */
     public function getSearchUrl(string $path = '', array $queryParams = [])
     {
-        $url = $this->searchUriBuilder->build($this->apiSetingsConfigProvider->getApiUrl(), $path);
+        $url = $this->searchUriBuilder->build($this->apiSetingsConfigProvider->getHawkUrl(), $path);
 
         if ($queryParams) {
             $url = $this->urlUtility->getUriWithQuery(
