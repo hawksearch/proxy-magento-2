@@ -10,11 +10,9 @@
  * IN THE SOFTWARE.
  */
 define([
-    'hawksearch',
-    'ko',
     'jquery',
     'Magento_Ui/js/lib/view/utils/bindings'
-], function (hawksearch, ko, $) {
+], function ($) {
     'use strict';
 
     HawkSearch.customEvent = function () {
