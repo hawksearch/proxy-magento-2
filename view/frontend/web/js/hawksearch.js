@@ -1916,7 +1916,10 @@ HawkSearch.Context = new HawkSearch.ContextObj();
         // BEGIN Namespaced HawkSearch block.
 
         (function (HawkSearch, $) {
-            HawkSearch.loadingtpl = '<img src="//manage.hawksearch.com/sites/shared/images/global/load.gif" style="margin:0 5px;vertical-align:middle;" />';
+            var uriParser = document.createElement("a");
+            uriParser.href = HawkSearch.getHawkUrl();
+            var loadingImgUrl = uriParser.protocol + "//" + uriParser.hostname + "/sites/shared/images/global/load.gif";
+            HawkSearch.loadingtpl = '<img src="' + loadingImgUrl +'" style="margin:0 5px;vertical-align:middle;" />';
             HawkSearch.loadtimer = null;
             HawkSearch.scroll = false;
             HawkSearch.processing = false;
@@ -3405,7 +3408,10 @@ HawkSearch.Context = new HawkSearch.ContextObj();
                                             // in debug mode log broken image src
                                             log('Image Broken: ' + image.img.src);
                                             // change broken image src with spacer.gif and apply broken image class
-                                            image.img.src = "http://manage.hawksearch.com/sites/shared/images/spacer.gif";
+                                            var uriParser = document.createElement("a");
+                                            uriParser.href = HawkSearch.getHawkUrl();
+                                            //image.img.src = "http://manage.hawksearch.com/sites/shared/images/spacer.gif";
+                                            image.img.src = uriParser.protocol + "//" + uriParser.hostname + "/sites/shared/images/spacer.gif";
                                             image.img.className = "item hawk-brokenSuggestImage"
                                         }
                                     });

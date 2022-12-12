@@ -1,5 +1,6 @@
+<?php
 /**
- * Copyright (c) 2022 Hawksearch (www.hawksearch.com) - All Rights Reserved
+ * Copyright (c) 2021 Hawksearch (www.hawksearch.com) - All Rights Reserved
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -9,13 +10,20 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
-define([
-    'jquery',
-    'Magento_Ui/js/lib/view/utils/bindings'
-], function ($) {
-    'use strict';
 
-    HawkSearch.customEvent = function () {
-        HawkSearch.jQuery.fn.applyBindings = $.fn.applyBindings;
+declare(strict_types=1);
+
+namespace HawkSearch\Proxy\Gateway\Config;
+
+use HawkSearch\Connector\Gateway\Config\SharedApiKeyConfig;
+
+class LuSearchApiConfig extends SharedApiKeyConfig
+{
+    /**
+     * @inheritDoc
+     */
+    public function getApiUrl(): string
+    {
+        return $this->apiSettingsProvider->getHawkUrl();
     }
-});
+}

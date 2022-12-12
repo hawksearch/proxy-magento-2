@@ -10,16 +10,14 @@
  *  IN THE SOFTWARE.
  */
 var config = {
-    "map": {
-        "*": {
-            "quickSearch": "HawkSearch_Proxy/js/autosuggest",
-            "hawksearch": "HawkSearch_Proxy/js/hawksearch",
-            "hawksearchWrapper": "HawkSearch_Proxy/js/wrapper"
-        }
+    paths: {
+        'hawksearch': 'HawkSearch_Proxy/js/hawksearch',
+        'quickSearch': 'HawkSearch_Proxy/js/autosuggest',
+        'hawksearchWrapper': 'HawkSearch_Proxy/js/wrapper'
     },
-    "shim": {
+    shim: {
         "hawksearch": {
-            "deps": ["jquery"]
+            "deps": ["hawksearchWrapper"],
         }
     }
 };
