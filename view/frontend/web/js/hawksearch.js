@@ -1916,7 +1916,10 @@ HawkSearch.Context = new HawkSearch.ContextObj();
         // BEGIN Namespaced HawkSearch block.
 
         (function (HawkSearch, $) {
-            HawkSearch.loadingtpl = '<img src="//manage.hawksearch.com/sites/shared/images/global/load.gif" style="margin:0 5px;vertical-align:middle;" />';
+            var uriParser = document.createElement("a");
+            uriParser.href = HawkSearch.getHawkUrl();
+            var loadingImgUrl = uriParser.protocol + "//" + uriParser.hostname + "/sites/shared/images/global/load.gif";
+            HawkSearch.loadingtpl = '<img src="' + loadingImgUrl +'" style="margin:0 5px;vertical-align:middle;" />';
             HawkSearch.loadtimer = null;
             HawkSearch.scroll = false;
             HawkSearch.processing = false;
@@ -2785,9 +2788,6 @@ HawkSearch.Context = new HawkSearch.ContextObj();
                 HawkSearch.copyValue(objs, '#hawkaid');
                 HawkSearch.copyValue(objs, '#hawkp');
 
-                HawkSearch.triggerUpdateMultipleWishlist(json.multiple_wishlist)
-                HawkSearch.triggerUpdateRequisitionList()
-
                 HawkSearch.copyCustomBanners(objs);
 
                 if (queryGuid !== undefined) {
@@ -2801,6 +2801,8 @@ HawkSearch.Context = new HawkSearch.ContextObj();
 
                 obj = objs.find("#errormsg");
                 if (obj != null && obj.length > 0) alert(obj.html());
+
+                HawkSearch.triggerHook('processFacetsCopyValue', json);
 
                 // register trackingre
                 HawkSearch.regTracking();
@@ -2829,51 +2831,6 @@ HawkSearch.Context = new HawkSearch.ContextObj();
                 }
 
             };
-
-            /**
-             * Update Multiple wishlist widget on PLP after ajax content reloading
-             */
-            HawkSearch.triggerUpdateMultipleWishlist = function(widgetData) {
-                $('.popup-tmpl').remove();
-                $('.split-btn-tmpl').remove();
-                $('#form-tmpl-multiple').replaceWith(widgetData);
-
-                var wishlistWidget;
-                wishlistWidget = $('body').data('mageMultipleWishlist');
-
-                if (wishlistWidget !== undefined) {
-                    wishlistWidget.destroy();
-                }
-                var uiRegistry = require('uiRegistry');
-                if (uiRegistry !== undefined) {
-                    uiRegistry.remove('multipleWishlist');
-                }
-
-                $('.page-wrapper').trigger('contentUpdated');
-            }
-
-            /**
-             * Update Requisition list widget on PLP after ajax content reloading
-             */
-            HawkSearch.triggerUpdateRequisitionList = function() {
-                var uiRegistry = require('uiRegistry');
-                if (uiRegistry !== undefined) {
-                    $(uiRegistry.filter({
-                        "component": "Magento_RequisitionList/js/requisition/action/product/add"
-                    })).each(function () {
-                        uiRegistry.remove(this.index);
-                    });
-
-                    $(uiRegistry.filter({
-                        "component": "Magento_RequisitionList/js/requisition/list/edit"
-                    })).each(function () {
-                        uiRegistry.remove(this.index);
-                    });
-                }
-
-                $('.page-wrapper').trigger('contentUpdated');
-                $('.block-requisition-list.social-button').applyBindings();
-            }
 
             HawkSearch.clearAllFacets = function () {
                 var keyword = $("#hdnhawkkeyword").val();
@@ -3405,7 +3362,10 @@ HawkSearch.Context = new HawkSearch.ContextObj();
                                             // in debug mode log broken image src
                                             log('Image Broken: ' + image.img.src);
                                             // change broken image src with spacer.gif and apply broken image class
-                                            image.img.src = "http://manage.hawksearch.com/sites/shared/images/spacer.gif";
+                                            var uriParser = document.createElement("a");
+                                            uriParser.href = HawkSearch.getHawkUrl();
+                                            //image.img.src = "http://manage.hawksearch.com/sites/shared/images/spacer.gif";
+                                            image.img.src = uriParser.protocol + "//" + uriParser.hostname + "/sites/shared/images/spacer.gif";
                                             image.img.className = "item hawk-brokenSuggestImage"
                                         }
                                     });
