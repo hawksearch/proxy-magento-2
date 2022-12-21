@@ -2788,9 +2788,6 @@ HawkSearch.Context = new HawkSearch.ContextObj();
                 HawkSearch.copyValue(objs, '#hawkaid');
                 HawkSearch.copyValue(objs, '#hawkp');
 
-                HawkSearch.triggerUpdateMultipleWishlist(json.multiple_wishlist)
-                HawkSearch.triggerUpdateRequisitionList()
-
                 HawkSearch.copyCustomBanners(objs);
 
                 if (queryGuid !== undefined) {
@@ -2804,6 +2801,8 @@ HawkSearch.Context = new HawkSearch.ContextObj();
 
                 obj = objs.find("#errormsg");
                 if (obj != null && obj.length > 0) alert(obj.html());
+
+                HawkSearch.triggerHook('processFacetsCopyValue', json);
 
                 // register trackingre
                 HawkSearch.regTracking();
@@ -2832,51 +2831,6 @@ HawkSearch.Context = new HawkSearch.ContextObj();
                 }
 
             };
-
-            /**
-             * Update Multiple wishlist widget on PLP after ajax content reloading
-             */
-            HawkSearch.triggerUpdateMultipleWishlist = function(widgetData) {
-                $('.popup-tmpl').remove();
-                $('.split-btn-tmpl').remove();
-                $('#form-tmpl-multiple').replaceWith(widgetData);
-
-                var wishlistWidget;
-                wishlistWidget = $('body').data('mageMultipleWishlist');
-
-                if (wishlistWidget !== undefined) {
-                    wishlistWidget.destroy();
-                }
-                var uiRegistry = require('uiRegistry');
-                if (uiRegistry !== undefined) {
-                    uiRegistry.remove('multipleWishlist');
-                }
-
-                $('.page-wrapper').trigger('contentUpdated');
-            }
-
-            /**
-             * Update Requisition list widget on PLP after ajax content reloading
-             */
-            HawkSearch.triggerUpdateRequisitionList = function() {
-                var uiRegistry = require('uiRegistry');
-                if (uiRegistry !== undefined) {
-                    $(uiRegistry.filter({
-                        "component": "Magento_RequisitionList/js/requisition/action/product/add"
-                    })).each(function () {
-                        uiRegistry.remove(this.index);
-                    });
-
-                    $(uiRegistry.filter({
-                        "component": "Magento_RequisitionList/js/requisition/list/edit"
-                    })).each(function () {
-                        uiRegistry.remove(this.index);
-                    });
-                }
-
-                $('.page-wrapper').trigger('contentUpdated');
-                $('.block-requisition-list.social-button').applyBindings();
-            }
 
             HawkSearch.clearAllFacets = function () {
                 var keyword = $("#hdnhawkkeyword").val();
