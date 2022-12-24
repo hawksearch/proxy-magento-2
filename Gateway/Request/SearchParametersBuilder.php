@@ -97,8 +97,7 @@ class SearchParametersBuilder implements BuilderInterface
         $params = [
             'output' => 'custom',
             'hawkitemlist' => 'json',
-            'hawkfeatured' => 'json',
-            'lpurl' => '', //TODO
+            'hawkfeatured' => 'json'
         ];
 
         $params = array_merge($params, $buildSubject);
@@ -141,6 +140,8 @@ class SearchParametersBuilder implements BuilderInterface
     private function manageLandingPageParam(&$params, $buildSubject)
     {
         $controller = implode('_', [$this->httpRequest->getModuleName(), $this->httpRequest->getControllerName()]);
+        unset($params['lpurl']);
+
         if (isset($buildSubject['lpurl'])) {
             $buildSubject['lpurl'] = rtrim($buildSubject['lpurl'], "/");
             $buildSubject['lpurl'] = '/' . ltrim($buildSubject['lpurl'], "/");
@@ -173,9 +174,15 @@ class SearchParametersBuilder implements BuilderInterface
                 //do nothing
         }
 
-        if (isset($params['lpurl']) && (!$this->helper->getIsHawkManaged($params['lpurl'])
-                || $params['lpurl'] == '/catalogsearch/result/')
-        ) {
+        if (!isset($params['lpurl'])) {
+            return $this;
+        }
+
+        if (!$this->helper->getIsHawkManaged($params['lpurl']) || substr(
+                $params['lpurl'],
+                0,
+                strlen('/catalogsearch/result')
+            ) === '/catalogsearch/result') {
             unset($params['lpurl']);
         }
 

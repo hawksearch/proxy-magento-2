@@ -16,6 +16,70 @@ define([
     'use strict';
 
     HawkSearch.customEvent = function () {
-        HawkSearch.jQuery.fn.applyBindings = $.fn.applyBindings;
+        //HawkSearch.jQuery.fn.applyBindings = $.fn.applyBindings;
     }
+
+    /**
+     * Update Multiple wishlist widget on PLP after ajax content reloading
+     */
+    function triggerUpdateMultipleWishlist (widgetData) {
+        $('.popup-tmpl').remove();
+        $('.split-btn-tmpl').remove();
+        $('#form-tmpl-multiple').replaceWith(widgetData);
+
+        var wishlistWidget;
+        wishlistWidget = $('body').data('mageMultipleWishlist');
+
+        if (wishlistWidget !== undefined) {
+            wishlistWidget.destroy();
+        }
+        var uiRegistry = require('uiRegistry');
+        if (uiRegistry !== undefined) {
+            uiRegistry.remove('multipleWishlist');
+        }
+
+        $('.page-wrapper').trigger('contentUpdated');
+        $('#form-tmpl-multiple').trigger('contentUpdated');
+    }
+
+    /**
+     * Update Requisition list widget on PLP after ajax content reloading
+     */
+    function triggerUpdateRequisitionList()  {
+        var uiRegistry = require('uiRegistry');
+        if (uiRegistry !== undefined) {
+            $(uiRegistry.filter({
+                "component": "Magento_RequisitionList/js/requisition/action/product/add"
+            })).each(function () {
+                uiRegistry.remove(this.index);
+            });
+
+            $(uiRegistry.filter({
+                "component": "Magento_RequisitionList/js/requisition/list/edit"
+            })).each(function () {
+                uiRegistry.remove(this.index);
+            });
+        }
+
+        $('.page-wrapper').trigger('contentUpdated');
+        $('.block-requisition-list.social-button').applyBindings();
+    }
+
+    /**
+     * Register processFacetsCopyValue hook
+     */
+    HawkSearchHooks.register('processFacetsCopyValue', function(json){
+        triggerUpdateMultipleWishlist(json.multiple_wishlist);
+        triggerUpdateRequisitionList();
+        return json;
+    });
+
+    /**
+     * Register processFacetsAfter hook
+     */
+    HawkSearchHooks.register('processFacetsAfter', function(json){
+        $('#hawkitemlist').trigger('contentUpdated');
+        return json;
+    });
+
 });
