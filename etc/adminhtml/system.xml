@@ -22,6 +22,7 @@
             <group id="api_settings">
                 <group id="indexing_api_url" showInDefault="0" showInWebsite="0" showInStore="0"  />
                 <group id="search_api_url" showInDefault="0" showInWebsite="0" showInStore="0"  />
+                <group id="hawksearch_workbench_url" showInDefault="0" showInWebsite="0" showInStore="0"  />
             </group>
         </section>
         <section id="hawksearch_proxy" translate="label" type="text" sortOrder="300" showInDefault="1" showInWebsite="1"
