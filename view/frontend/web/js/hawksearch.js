@@ -147,21 +147,27 @@ HawkSearch.Context = new HawkSearch.ContextObj();
     })(window.location.search.substr(1).split('&'));
 
     HawkSearch.getTrackingUrl = function () {
-        if (HawkSearch.TrackingUrl === undefined || HawkSearch.TrackingUrl === "") {
-            return HawkSearch.BaseUrl;
+        var resultUrl = HawkSearch.TrackingUrl;
+        if (resultUrl === undefined || resultUrl === "") {
+            resultUrl = HawkSearch.BaseUrl;
         } else if (HawkSearch.Tracking.Version.none === HawkSearch.Tracking.CurrentVersion()) {
-            return HawkSearch.HawkUrl;
-        } else {
-            return HawkSearch.TrackingUrl;
+            resultUrl = HawkSearch.HawkUrl;
         }
+
+        return resultUrl.replace(/\/+$/g,'') + '/';
+    };
+
+    HawkSearch.getBaseUrl = function () {
+        return HawkSearch.BaseUrl.replace(/\/+$/g,'') + '/';
     };
 
     HawkSearch.getHawkUrl = function () {
+        var resultUrl = HawkSearch.HawkUrl;
         if (HawkSearch.HawkUrl === undefined || HawkSearch.HawkUrl === "") {
-            return HawkSearch.getTrackingUrl();
-        } else {
-            return HawkSearch.HawkUrl;
+            resultUrl = HawkSearch.getTrackingUrl();
         }
+
+        return resultUrl.replace(/\/+$/g,'') + '/';
     };
 
     HawkSearch.triggerHook = function (hookName, inputData, ...params) {
@@ -530,13 +536,13 @@ HawkSearch.Context = new HawkSearch.ContextObj();
     HawkSearch.Tracking.V1 = {};
 
     HawkSearch.Tracking.V1.bannerLink = function (el, id) {
-        el.href = HawkSearch.getTrackingUrl() + '/banners.aspx?BannerId=' + id; el.mousedown = '';
+        el.href = HawkSearch.getTrackingUrl() + 'banners.aspx?BannerId=' + id; el.mousedown = '';
         return true;
     };
 
     HawkSearch.Tracking.V1.autosuggestClick = function (keyword, name, url, type) {
         var args = '&keyword=' + encodeURIComponent(keyword) + '&name=' + encodeURIComponent(name) + '&type=' + type + '&url=' + encodeURIComponent(url);
-        var getUrl = HawkSearch.BaseUrl + "?fn=ajax&f=GetAutoCompleteClick" + args;
+        var getUrl = HawkSearch.getBaseUrl() + "?fn=ajax&f=GetAutoCompleteClick" + args;
         var $ = $ || jQuery;
 
         $.ajax({
@@ -562,7 +568,7 @@ HawkSearch.Context = new HawkSearch.ContextObj();
     };
 
     HawkSearch.Tracking.V1.link = function (el, id, i, pk, mlt) {
-        var full = HawkSearch.getTrackingUrl() + "/link.aspx?id=" + escape(id) + "&q=" + escape(el.currentTarget.href).replace(/\+/g, "%2B") + "&i=" + i + "&pk=" + pk + "&mlt=" + mlt;
+        var full = HawkSearch.getTrackingUrl() + "link.aspx?id=" + escape(id) + "&q=" + escape(el.currentTarget.href).replace(/\+/g, "%2B") + "&i=" + i + "&pk=" + pk + "&mlt=" + mlt;
         el.currentTarget.href = full;
         return true;
     };
@@ -1106,7 +1112,7 @@ HawkSearch.Context = new HawkSearch.ContextObj();
             } else {
                 clientIdentifyToken = '&bu=' + HawkSearch.getHawkUrl();
             }
-                var src = HawkSearch.getTrackingUrl() + '/hawk.png?t=' + encodeURIComponent(btoa(event.join('\x01'))) + '&et=' + et + clientIdentifyToken + '&cd=' + encodeURIComponent(customDictionaryString) + '&' + this.randomHexBlocks(1);
+                var src = HawkSearch.getTrackingUrl() + 'hawk.png?t=' + encodeURIComponent(btoa(event.join('\x01'))) + '&et=' + et + clientIdentifyToken + '&cd=' + encodeURIComponent(customDictionaryString) + '&' + this.randomHexBlocks(1);
 
                 log(src);
                 try {
@@ -1746,7 +1752,7 @@ HawkSearch.Context = new HawkSearch.ContextObj();
 
                             });
                             var uriParser = document.createElement("a");
-                            var url = uriParser.href = HawkSearch.HawkUrl || HawkSearch.BaseUrl;
+                            var url = uriParser.href = HawkSearch.getHawkUrl() || HawkSearch.getBaseUrl();
                             var apiUrl = uriParser.protocol + "//" + uriParser.hostname + "/api/v3/RecommendationModel/getruleexplain?widgetGuid=" + item.widgetGuid + "&bu=" + encodeURIComponent(HawkSearch.getHawkUrl()) + "&cg=" + HawkSearch.getClientGuid();
                             $.ajax({
                                 url: apiUrl,
@@ -2481,7 +2487,7 @@ HawkSearch.Context = new HawkSearch.ContextObj();
                 var lpId = $("#hdnhawklp").val();
                 var ssfid = $("#hdnhawkssfid").val();
                 var previewDate = typeof smartbugDatetimepicker != 'undefined' ? smartbugDatetimepicker.hawkDate : '';
-                return HawkSearch.BaseUrl + "/?fn=ajax&f=" + f + "&itemId=" + encodeURIComponent(itemId) + "&" + keywordField + "=" + keyword + "&lp=" + encodeURIComponent(lpId) + "&lpurl=" + encodeURIComponent(lpurl) + "&hawkb=" + HawkSearch.getHashOrQueryVariable("hawkb") + "&hawkaid=" + HawkSearch.getHashOrQueryVariable("hawkaid") + "&hawkp=" + HawkSearch.getHashOrQueryVariable("hawkp") + "&HawkDate=" + previewDate + "&ssfid=" + encodeURIComponent(ssfid);
+                return HawkSearch.getBaseUrl() + "?fn=ajax&f=" + f + "&itemId=" + encodeURIComponent(itemId) + "&" + keywordField + "=" + keyword + "&lp=" + encodeURIComponent(lpId) + "&lpurl=" + encodeURIComponent(lpurl) + "&hawkb=" + HawkSearch.getHashOrQueryVariable("hawkb") + "&hawkaid=" + HawkSearch.getHashOrQueryVariable("hawkaid") + "&hawkp=" + HawkSearch.getHashOrQueryVariable("hawkp") + "&HawkDate=" + previewDate + "&ssfid=" + encodeURIComponent(ssfid);
             }
 
             HawkSearch.addToTop = function (el, itemId) {
@@ -2573,7 +2579,7 @@ HawkSearch.Context = new HawkSearch.ContextObj();
 
                 var lpurl = HawkSearch.getCustomUrl();
                 var hawkcustom = $("#hdnhawkcustom").val();
-                var full = HawkSearch.BaseUrl + "/?" + hash + "&ajax=1&json=1&docid=" + encodeURIComponent(docid) + (lpurl != '' ? "&lpurl=" + encodeURIComponent(lpurl) : "") + (hawkcustom != '' ? "&hawkcustom=" + encodeURIComponent(hawkcustom) : "");
+                var full = HawkSearch.getBaseUrl() + "?" + hash + "&ajax=1&json=1&docid=" + encodeURIComponent(docid) + (lpurl != '' ? "&lpurl=" + encodeURIComponent(lpurl) : "") + (hawkcustom != '' ? "&hawkcustom=" + encodeURIComponent(hawkcustom) : "");
                 full += "&hawkvisitorid=" + HawkSearch.lilBro.event.getVisitorId()
 
                 $.ajax({ "type": "GET", "data": "", "async": "false", "contentType": "application/json; charset=utf-8", "url": full, "dataType": "jsonp", "success": HawkSearch.showAjaxPopup });
@@ -2588,7 +2594,7 @@ HawkSearch.Context = new HawkSearch.ContextObj();
                 }
                 HawkSearch.Tracking.writeClick(event, 0, true, pk, trackingId);
 
-                var url = HawkSearch.BaseUrl + "/default.aspx?fn=ajax&f=MoreLikeThis&args=" + arg;
+                var url = HawkSearch.getBaseUrl() + "default.aspx?fn=ajax&f=MoreLikeThis&args=" + arg;
 
                 $.ajax({
                     "type": "GET",
@@ -2698,7 +2704,7 @@ HawkSearch.Context = new HawkSearch.ContextObj();
                     var hash = HawkSearch.getHash();
                     var hawkcustom = $("#hdnhawkcustom").val();
                     var queryGuid = $("#hdnhawkquery").val();
-                    var full = HawkSearch.BaseUrl + "/?" + (hash != '' ? hash + '&' : '') + "ajax=1&json=1" + (lpurl != '' ? "&lpurl=" + encodeURIComponent(lpurl) : "") + (hawkcustom != '' ? "&hawkcustom=" + encodeURIComponent(hawkcustom) : "");
+                    var full = HawkSearch.getBaseUrl() + "?" + (hash != '' ? hash + '&' : '') + "ajax=1&json=1" + (lpurl != '' ? "&lpurl=" + encodeURIComponent(lpurl) : "") + (hawkcustom != '' ? "&hawkcustom=" + encodeURIComponent(hawkcustom) : "");
                     full += '&hawkvisitorid=' + HawkSearch.lilBro.event.getVisitorId();
 
 
@@ -3364,8 +3370,8 @@ HawkSearch.Context = new HawkSearch.ContextObj();
                                             // change broken image src with spacer.gif and apply broken image class
                                             var uriParser = document.createElement("a");
                                             uriParser.href = HawkSearch.getHawkUrl();
-                                            //image.img.src = "http://manage.hawksearch.com/sites/shared/images/spacer.gif";
                                             image.img.src = uriParser.protocol + "//" + uriParser.hostname + "/sites/shared/images/spacer.gif";
+                                            //image.img.src = "http://manage.hawksearch.com/sites/shared/images/spacer.gif";
                                             image.img.className = "item hawk-brokenSuggestImage"
                                         }
                                     });
@@ -3990,7 +3996,7 @@ HawkSearch.Context = new HawkSearch.ContextObj();
 
             HawkCompare.getImage = function (itemVal) {
                 // sets up query and cache
-                var compareQuery = HawkSearch.getHawkUrl() + "/default.aspx?fn=ajax&F=GetItemImageToCompare&ItemId=" + itemVal;
+                var compareQuery = HawkSearch.getHawkUrl() + "default.aspx?fn=ajax&F=GetItemImageToCompare&ItemId=" + itemVal;
                 var cacheResp = window[compareQuery];
                 // check for cache; process and output ajax query
                 if (cacheResp) {
@@ -4087,7 +4093,7 @@ HawkSearch.Context = new HawkSearch.ContextObj();
             } else if (HawkSearch.SearchBoxes !== undefined) {
                 for (i = 0; i < HawkSearch.SearchBoxes.length; i++) {
                     HawkSearch.suggestInit('#' + HawkSearch.SearchBoxes[i], {
-                        lookupUrlPrefix: HawkSearch.HawkUrl + HawkSearch.AutosuggestionParams,
+                        lookupUrlPrefix: HawkSearch.getHawkUrl() + HawkSearch.AutosuggestionParams,
                         hiddenDivName: HawkSearch.AutocompleteDiv,
                         isAutoWidth: true
                     });
