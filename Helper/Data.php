@@ -856,7 +856,7 @@ RuleType="Group" Operator="All" />'
         $hawkList = $this->getHawkLandingPages();
         $existingCustom = $this->createExistingCustomFieldMap($hawkList);
         $this->log(sprintf('got %d hawk managed landing pages', count($hawkList)));
-
+        
         $mageList = $this->getMagentoLandingPages();
         $this->log(sprintf('got %d magento categories', count($mageList)));
 
@@ -1019,14 +1019,14 @@ RuleType="Group" Operator="All" />'
         $hawkPages = [];
         $pages = $this->getHawkResponse(Zend_Http_Client::GET, 'LandingPage');
         foreach ($pages as $page) {
-            if (empty($page->Custom)) {
+            if (empty($page['Custom'])) {
                 continue;
             }
             $hawkPages[] = [
-                'pageid' => $page->PageId,
-                'hawkurl' => $page->CustomUrl,
-                'name' => $page->Name,
-                'custom' => $page->Custom
+                'pageid' => $page['PageId'] ?? '',
+                'hawkurl' => $page['CustomUrl'] ?? '',
+                'name' => $page['Name'] ?? '',
+                'custom' => $page['Custom'] ?? ''
             ];
         }
 
