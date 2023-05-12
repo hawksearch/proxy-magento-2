@@ -204,7 +204,7 @@ class Html extends Template
         $layout = $this->getLayout();
         $lpurl = $this->_request->getParam('lpurl');
         if ($this->getTabbedContent() && in_array(
-                rtrim($lpurl, '/'),
+                rtrim((string) $lpurl, '/'),
                 [
                     '/catalogsearch/result',
                     '/catalogsearch/result/index',

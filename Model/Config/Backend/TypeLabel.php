@@ -88,9 +88,9 @@ class TypeLabel extends ArraySerialized
             if ($response->getStatus() != 200) {
                 return;
             }
-            $result = json_decode($response->getBody());
+            $result = json_decode((string) $response->getBody());
             if (isset($result->Data) && isset($result->Data->Tabs)) {
-                $tabs = json_decode($result->Data->Tabs);
+                $tabs = json_decode((string) $result->Data->Tabs);
                 $value = [];
                 foreach ($tabs->Tabs as $tab) {
                     if ($tab->Value == 'all') {

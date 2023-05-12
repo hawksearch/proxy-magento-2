@@ -143,7 +143,7 @@ class SearchParametersBuilder implements BuilderInterface
         unset($params['lpurl']);
 
         if (isset($buildSubject['lpurl'])) {
-            $buildSubject['lpurl'] = rtrim($buildSubject['lpurl'], "/");
+            $buildSubject['lpurl'] = rtrim((string) $buildSubject['lpurl'], "/");
             $buildSubject['lpurl'] = '/' . ltrim($buildSubject['lpurl'], "/");
         }
         switch ($controller) {
@@ -162,7 +162,7 @@ class SearchParametersBuilder implements BuilderInterface
             case 'hawkproxy_index':
                 if (isset($buildSubject['lpurl'])
                     && substr(
-                        $buildSubject['lpurl'],
+                        (string) $buildSubject['lpurl'],
                         0,
                         strlen('/catalogsearch/result')
                     ) !== '/catalogsearch/result'
@@ -179,7 +179,7 @@ class SearchParametersBuilder implements BuilderInterface
         }
 
         if (!$this->helper->getIsHawkManaged($params['lpurl']) || substr(
-                $params['lpurl'],
+                (string) $params['lpurl'],
                 0,
                 strlen('/catalogsearch/result')
             ) === '/catalogsearch/result') {

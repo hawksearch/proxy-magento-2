@@ -27,7 +27,7 @@ class StoreRedirect extends ResponseRedirect
     public function afterGetRefererUrl($subject, $result)
     {
         $baseurl = $this->_storeManager->getStore()->getBaseUrl();
-        if (substr($result, strlen($baseurl), 9) == 'hawkproxy') {
+        if (substr((string) $result, strlen((string) $baseurl), 9) == 'hawkproxy') {
             return $this->_request->getServer('HTTP_REFERER');
         }
         return $result;

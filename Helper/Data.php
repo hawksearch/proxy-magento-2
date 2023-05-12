@@ -473,7 +473,7 @@ class Data extends AbstractHelper
             $it = $collection->getIterator();
             while ($it->valid()) {
                 $prod = $it->current();
-                $sorted[$map[trim($prod->getSku())]] = $prod;
+                $sorted[$map[trim((string) $prod->getSku())]] = $prod;
                 $it->next();
             }
             ksort($sorted);
@@ -535,7 +535,7 @@ class Data extends AbstractHelper
             $it = $collection->getIterator();
             while ($it->valid()) {
                 $prod = $it->current();
-                $sorted[$map[trim($prod->getSku())]] = $prod;
+                $sorted[$map[trim((string) $prod->getSku())]] = $prod;
                 $it->next();
             }
             ksort($sorted);
@@ -618,7 +618,7 @@ class Data extends AbstractHelper
             $path = $this->_getRequest()->getOriginalPathInfo();
         }
 
-        $path = '/' . rtrim(ltrim($path, '/'), '/');
+        $path = '/' . rtrim(ltrim((string) $path, '/'), '/');
 
         //switch ($path) {
         switch ($this->_getRequest()->getFullActionName()) {
@@ -718,7 +718,7 @@ class Data extends AbstractHelper
          */
         while ($lowIndex <= $highIndex) {
             $floorAverage = (int)floor(($highIndex + $lowIndex) / 2);
-            $comparisonResult = strcmp($landingPages[$floorAverage], $pageUrl);
+            $comparisonResult = strcmp((string) $landingPages[$floorAverage], $pageUrl);
             if ($comparisonResult == 0) {
                 $isManaged = true;
                 break;
@@ -807,7 +807,7 @@ RuleType="Group" Operator="All" />'
         if (isset($existingCustom[$lpObject['Custom']])
             && $existingCustom[$lpObject['Custom']]['hawkurl'] != $lpObject['CustomUrl']
         ) {
-            preg_match('/__mage_catid_(\d+)__/', $existingCustom[$lpObject['Custom']]['custom'], $matches);
+            preg_match('/__mage_catid_(\d+)__/', (string) $existingCustom[$lpObject['Custom']]['custom'], $matches);
             if ($matches[1]) {
                 $otherObject = $this->getLandingPageObject(
                     $existingCustom[$lpObject['Custom']]['name'],
@@ -865,13 +865,13 @@ RuleType="Group" Operator="All" />'
         usort(
             $hawkList,
             function ($a, $b) {
-                return strcmp($a['hawkurl'], $b['hawkurl']);
+                return strcmp((string) $a['hawkurl'], (string) $b['hawkurl']);
             }
         );
         usort(
             $mageList,
             function ($a, $b) {
-                return strcmp($a['hawkurl'], $b['hawkurl']);
+                return strcmp((string) $a['hawkurl'], (string) $b['hawkurl']);
             }
         );
 
@@ -885,12 +885,12 @@ RuleType="Group" Operator="All" />'
                 // only left left to process
                 $sc = -1;
             } else {
-                $sc = strcmp($hawkList[$left]['hawkurl'], $mageList[$right]['hawkurl']);
+                $sc = strcmp((string) $hawkList[$left]['hawkurl'], (string) $mageList[$right]['hawkurl']);
             }
             $customVal = null;
             if ($sc < 0) {
                 //Hawk has page Magento doesn't want managed, delete, increment left
-                if (substr($hawkList[$left]['custom'], 0, strlen('__mage_catid_')) == '__mage_catid_') {
+                if (substr((string) $hawkList[$left]['custom'], 0, strlen('__mage_catid_')) == '__mage_catid_') {
                     $resp = $this->getHawkResponse(
                         Zend_Http_Client::DELETE,
                         self::HAWK_LANDING_PAGE_URL . $hawkList[$left]['pageid']
