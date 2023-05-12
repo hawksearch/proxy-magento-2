@@ -191,7 +191,7 @@ class ShowTypeLabels extends Value
         $client->setHeaders('Accept', 'application/json');
 
         $response = $client->request();
-        return ['code' => $response->getStatus(), 'object' => json_decode($response->getBody(), true)];
+        return ['code' => $response->getStatus(), 'object' => json_decode((string) $response->getBody(), true)];
     }
 
     /**
@@ -212,6 +212,6 @@ class ShowTypeLabels extends Value
         $client->setRawData($body);
 
         $response = $client->request();
-        return ['code' => $response->getStatus(), 'object' => json_decode($response->getBody())];
+        return ['code' => $response->getStatus(), 'object' => json_decode((string) $response->getBody())];
     }
 }

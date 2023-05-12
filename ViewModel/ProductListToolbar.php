@@ -77,7 +77,7 @@ class ProductListToolbar implements ArgumentInterface
         return str_replace(
             $baseUrl . '/',
             $baseUrl,
-            $html
+            (string) $html
         );
     }
 }

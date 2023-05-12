@@ -60,7 +60,7 @@ class Redirect extends ControllerRedirect
     public function afterSetRefererOrBaseUrl(ControllerRedirect $subject, ControllerRedirect $result)
     {
         $baseurl = $this->storeManager->getStore()->getBaseUrl();
-        if (substr((string)$result->url, strlen($baseurl), 9) == 'hawkproxy') {
+        if (substr((string)$result->url, strlen((string) $baseurl), 9) == 'hawkproxy') {
             $result->setUrl($this->request->getServer('HTTP_REFERER'));
         }
         return $result;

@@ -108,7 +108,7 @@ class Proxy extends ConfigProvider
      */
     public function getSearchBoxIds($store = null): array
     {
-        $ids = explode(',', $this->getConfig(self::CONFIG_SEARCH_BOX_IDS, $store) ?: '');
+        $ids = explode(',', (string) ($this->getConfig(self::CONFIG_SEARCH_BOX_IDS, $store) ?: ''));
         return array_filter(array_map('trim', $ids));
     }
 
