@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2021 Hawksearch (www.hawksearch.com) - All Rights Reserved
+ * Copyright (c) 2023 Hawksearch (www.hawksearch.com) - All Rights Reserved
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -15,6 +15,10 @@ namespace HawkSearch\Proxy\Model\Config\Backend;
 
 use HawkSearch\Connector\Model\Config\ApiSettings as ApiSettingsProvider;
 use HawkSearch\Proxy\Helper\Data;
+use Laminas\Http\Client;
+use Laminas\Http\Exception\RuntimeException;
+use Laminas\Http\Headers;
+use Laminas\Http\Request as HttpRequest;
 use Magento\Framework\App\Cache\TypeListInterface;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\Config\Value;
@@ -24,8 +28,6 @@ use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Model\Context;
 use Magento\Framework\Model\ResourceModel\AbstractResource;
 use Magento\Framework\Registry;
-use Zend_Http_Client;
-use Zend_Http_Client_Exception;
 
 class ShowTypeLabels extends Value
 {
@@ -70,7 +72,7 @@ class ShowTypeLabels extends Value
     /**
      * @return ShowTypeLabels
      * @throws NoSuchEntityException
-     * @throws Zend_Http_Client_Exception
+     * @throws RuntimeException
      */
     public function afterLoad()
     {
@@ -90,7 +92,7 @@ class ShowTypeLabels extends Value
     /**
      * @return ShowTypeLabels
      * @throws NoSuchEntityException
-     * @throws Zend_Http_Client_Exception
+     * @throws RuntimeException
      */
     public function beforeSave()
     {
@@ -111,7 +113,7 @@ class ShowTypeLabels extends Value
     /**
      * @return string
      * @throws NoSuchEntityException
-     * @throws Zend_Http_Client_Exception
+     * @throws RuntimeException
      */
     private function activateTypeInResult()
     {
@@ -127,7 +129,7 @@ class ShowTypeLabels extends Value
     /**
      * @return string
      * @throws NoSuchEntityException
-     * @throws Zend_Http_Client_Exception
+     * @throws RuntimeException
      */
     private function deactivateTypeInResult()
     {
@@ -143,7 +145,7 @@ class ShowTypeLabels extends Value
     /**
      * @param string $field
      * @return DataObject
-     * @throws Zend_Http_Client_Exception
+     * @throws RuntimeException
      */
     private function getFieldByName($field)
     {
@@ -162,7 +164,7 @@ class ShowTypeLabels extends Value
      * @param DataObject $field
      * @return bool
      * @throws NoSuchEntityException
-     * @throws Zend_Http_Client_Exception
+     * @throws RuntimeException
      */
     private function updateField(DataObject $field)
     {
@@ -180,38 +182,48 @@ class ShowTypeLabels extends Value
      * @param $path
      * @param $args
      * @return array
-     * @throws Zend_Http_Client_Exception
+     * @throws RuntimeException
      */
     private function apiGetCall($path, $args)
     {
-        $client = new Zend_Http_Client();
+        $client = new Client();
         $client->setUri($this->helper->getApiUrl() . $path . '?' . http_build_query($args));
-        $client->setMethod(Zend_Http_Client::GET);
-        $client->setHeaders('X-HawkSearch-ApiKey', $this->apiSettingsProvider->getApiKey());
-        $client->setHeaders('Accept', 'application/json');
+        $client->setMethod(HttpRequest::METHOD_GET);
+        $headers = new Headers();
+        $headers->addHeaderLine('X-HawkSearch-ApiKey', $this->apiSettingsProvider->getApiKey());
+        $headers->addHeaderLine('Accept', 'application/json');
+        $client->setHeaders($headers);
 
-        $response = $client->request();
-        return ['code' => $response->getStatus(), 'object' => json_decode((string) $response->getBody(), true)];
+        $response = $client->send();
+        return [
+            'code' => $response->getStatusCode(),
+            'object' => json_decode((string) $response->getBody(), true)
+        ];
     }
 
     /**
      * @param $path
      * @param $body
      * @return array
-     * @throws NoSuchEntityException
-     * @throws Zend_Http_Client_Exception
+     * @throws RuntimeException
      */
     private function apiPutCall($path, $body)
     {
-        $client = new Zend_Http_Client();
+        $client = new Client();
         $client->setUri($this->helper->getApiUrl() . $path . '?');
-        $client->setMethod(Zend_Http_Client::PUT);
-        $client->setHeaders('X-HawkSearch-ApiKey', $this->apiSettingsProvider->getApiKey());
-        $client->setHeaders('Accept', 'application/json');
-        $client->setHeaders('Content-Type', 'application/json');
-        $client->setRawData($body);
+        $client->setMethod(HttpRequest::METHOD_PUT);
+        $headers = new Headers();
+        $headers->addHeaderLine('X-HawkSearch-ApiKey', $this->apiSettingsProvider->getApiKey());
+        $headers->addHeaderLine('X-HawkSearch-ApiKey', $this->apiSettingsProvider->getApiKey());
+        $headers->addHeaderLine('Accept', 'application/json');
+        $client->setHeaders($headers);
+        $client->setEncType('application/json');
+        $client->setRawBody($body);
 
-        $response = $client->request();
-        return ['code' => $response->getStatus(), 'object' => json_decode((string) $response->getBody())];
+        $response = $client->send();
+        return [
+            'code' => $response->getStatusCode(),
+            'object' => json_decode((string) $response->getBody())
+        ];
     }
 }
