@@ -22,6 +22,7 @@ use HawkSearch\Proxy\Model\Task\SyncCategories\TaskOptionsFactory;
 use HawkSearch\Proxy\Model\Task\SyncCategories\TaskResults;
 use Magento\Framework\App\Area;
 use Magento\Framework\App\State;
+use Magento\Framework\Console\Cli;
 use Magento\Framework\Exception\LocalizedException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -74,20 +75,19 @@ class SyncCategories extends Command
     }
 
     /**
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     * @return void
-     * @throws LocalizedException
+     * @inheritDoc
      */
-    protected function execute(InputInterface $input, OutputInterface $output) : void
+    protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->state->setAreaCode(Area::AREA_CRONTAB);
 
+        /** @var TaskOptions $options */
         $options = $this->taskOptionsFactory->create();
 
         try {
             $results = $this->task->execute($options);
             $this->reportSuccess($results, $output);
+            return Cli::RETURN_SUCCESS;
         } catch (TaskLockException $exception) {
             $output->writeln('Failed to lock, please check the status of the database lock');
         } catch (TaskUnlockException $exception) {
@@ -95,6 +95,8 @@ class SyncCategories extends Command
         } catch (TaskException $exception) {
             $output->writeln('An error occurred: ' . $exception->getMessage());
         }
+
+        return Cli::RETURN_FAILURE;
     }
 
     /**
