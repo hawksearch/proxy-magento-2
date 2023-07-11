@@ -135,7 +135,7 @@ class Tabbed extends Html
                         continue;
                     }
                     $obj = new \stdClass();
-                    $obj->title = ucfirst($foundType);
+                    $obj->title = ucfirst((string) $foundType);
                     $obj->code = $foundType;
                     $obj->color = $this->helper->generateColor($foundType);
                     $obj->textColor = $this->helper->generateTextColor($obj->color);
