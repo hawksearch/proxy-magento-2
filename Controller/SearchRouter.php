@@ -53,8 +53,8 @@ class SearchRouter implements RouterInterface
         if (!$this->proxyConfigProvider->isCustomSearchRouteEnabled()) {
             return false;
         }
-        $stem = (string)$this->proxyConfigProvider->getCustomSearchRoute();
-        $parts = explode('/', trim($request->getPathInfo(), '/'));
+        $stem = $this->proxyConfigProvider->getCustomSearchRoute();
+        $parts = explode('/', trim((string) $request->getPathInfo(), '/'));
         $identifier = (string)array_shift($parts);
 
         if (strpos($identifier, $stem) !== false) {
