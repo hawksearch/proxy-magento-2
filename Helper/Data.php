@@ -27,6 +27,7 @@ use HawkSearch\Proxy\Model\Config\General as GeneralConfigProvider;
 use HawkSearch\Proxy\Model\Config\Proxy as ProxyConfigProvider;
 use HawkSearch\Proxy\Model\ProxyEmailFactory;
 use HawkSearch\Proxy\Model\SearchResultBanner;
+use Laminas\Http\Headers;
 use Laminas\Http\Request as HttpRequest;
 use Magento\Catalog\Api\CategoryRepositoryInterface;
 use Magento\Catalog\Api\Data\CategoryInterface;
@@ -566,12 +567,10 @@ class Data extends AbstractHelper
                 $client->setRawBody($data);
                 $client->setEncType('application/json');
             }
-            $client->setHeaders(
-                [
-                    'X-HawkSearch-ApiKey' => $this->apiSetingsConfigProvider->getApiKey(),
-                    'Accept', 'application/json'
-                ]
-            );
+            $headers = new Headers();
+            $headers->addHeaderLine('X-HawkSearch-ApiKey', $this->apiSetingsConfigProvider->getApiKey());
+            $headers->addHeaderLine('Accept', 'application/json');
+            $client->setHeaders($headers);
             $this->log(sprintf('fetching request. URL: %s, Method: %s', $client->getUri(), $method));
             $response = $client->send();
             $responseBody = $response->getBody();
