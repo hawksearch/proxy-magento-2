@@ -214,7 +214,6 @@ class ShowTypeLabels extends Value
         $client->setMethod(HttpRequest::METHOD_PUT);
         $headers = new Headers();
         $headers->addHeaderLine('X-HawkSearch-ApiKey', $this->apiSettingsProvider->getApiKey());
-        $headers->addHeaderLine('X-HawkSearch-ApiKey', $this->apiSettingsProvider->getApiKey());
         $headers->addHeaderLine('Accept', 'application/json');
         $client->setHeaders($headers);
         $client->setEncType('application/json');
