@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2020 Hawksearch (www.hawksearch.com) - All Rights Reserved
+ * Copyright (c) 2023 Hawksearch (www.hawksearch.com) - All Rights Reserved
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -27,6 +27,8 @@ use HawkSearch\Proxy\Model\Config\General as GeneralConfigProvider;
 use HawkSearch\Proxy\Model\Config\Proxy as ProxyConfigProvider;
 use HawkSearch\Proxy\Model\ProxyEmailFactory;
 use HawkSearch\Proxy\Model\SearchResultBanner;
+use Laminas\Http\Headers;
+use Laminas\Http\Request as HttpRequest;
 use Magento\Catalog\Api\CategoryRepositoryInterface;
 use Magento\Catalog\Api\Data\CategoryInterface;
 use Magento\Catalog\Model\Attribute\Config as AttributeConfig;
@@ -55,7 +57,7 @@ use Magento\Store\Model\Store;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\UrlRewrite\Model\UrlFinderInterface;
 use Magento\UrlRewrite\Service\V1\Data\UrlRewrite;
-use Zend_Http_Client;
+use Laminas\Http\Client;
 
 class Data extends AbstractHelper
 {
@@ -473,7 +475,7 @@ class Data extends AbstractHelper
             $it = $collection->getIterator();
             while ($it->valid()) {
                 $prod = $it->current();
-                $sorted[$map[trim($prod->getSku())]] = $prod;
+                $sorted[$map[trim((string) $prod->getSku())]] = $prod;
                 $it->next();
             }
             ksort($sorted);
@@ -535,7 +537,7 @@ class Data extends AbstractHelper
             $it = $collection->getIterator();
             while ($it->valid()) {
                 $prod = $it->current();
-                $sorted[$map[trim($prod->getSku())]] = $prod;
+                $sorted[$map[trim((string) $prod->getSku())]] = $prod;
                 $it->next();
             }
             ksort($sorted);
@@ -557,17 +559,20 @@ class Data extends AbstractHelper
     public function getHawkResponse($method, $url, $data = null)
     {
         try {
-            $client = new Zend_Http_Client();
-            $client->setConfig(['timeout' => 60]);
+            $client = new Client();
+            $client->setOptions(['timeout' => 60]);
             $client->setUri($this->getApiUrl() . $url);
             $client->setMethod($method);
             if (isset($data)) {
-                $client->setRawData($data, 'application/json');
+                $client->setRawBody($data);
+                $client->setEncType('application/json');
             }
-            $client->setHeaders('X-HawkSearch-ApiKey', $this->apiSetingsConfigProvider->getApiKey());
-            $client->setHeaders('Accept', 'application/json');
+            $headers = new Headers();
+            $headers->addHeaderLine('X-HawkSearch-ApiKey', $this->apiSetingsConfigProvider->getApiKey());
+            $headers->addHeaderLine('Accept', 'application/json');
+            $client->setHeaders($headers);
             $this->log(sprintf('fetching request. URL: %s, Method: %s', $client->getUri(), $method));
-            $response = $client->request();
+            $response = $client->send();
             $responseBody = $response->getBody();
             return $this->converter->convert($responseBody);
         } catch (Exception $e) {
@@ -595,7 +600,7 @@ class Data extends AbstractHelper
         if (($serialized = $this->cache->load($this->getLPCacheKey()))) {
             $landingPages = $this->serializer->unserialize($serialized);
         } else {
-            $landingPages = $this->getHawkResponse(Zend_Http_Client::GET, 'LandingPage/Urls') ?: [];
+            $landingPages = $this->getHawkResponse(HttpRequest::METHOD_GET, 'LandingPage/Urls') ?: [];
             sort($landingPages, SORT_STRING);
             $this->cache->save(
                 $this->serializer->serialize($landingPages),
@@ -618,7 +623,7 @@ class Data extends AbstractHelper
             $path = $this->_getRequest()->getOriginalPathInfo();
         }
 
-        $path = '/' . rtrim(ltrim($path, '/'), '/');
+        $path = '/' . rtrim(ltrim((string) $path, '/'), '/');
 
         //switch ($path) {
         switch ($this->_getRequest()->getFullActionName()) {
@@ -718,7 +723,7 @@ class Data extends AbstractHelper
          */
         while ($lowIndex <= $highIndex) {
             $floorAverage = (int)floor(($highIndex + $lowIndex) / 2);
-            $comparisonResult = strcmp($landingPages[$floorAverage], $pageUrl);
+            $comparisonResult = strcmp((string) $landingPages[$floorAverage], $pageUrl);
             if ($comparisonResult == 0) {
                 $isManaged = true;
                 break;
@@ -807,7 +812,7 @@ RuleType="Group" Operator="All" />'
         if (isset($existingCustom[$lpObject['Custom']])
             && $existingCustom[$lpObject['Custom']]['hawkurl'] != $lpObject['CustomUrl']
         ) {
-            preg_match('/__mage_catid_(\d+)__/', $existingCustom[$lpObject['Custom']]['custom'], $matches);
+            preg_match('/__mage_catid_(\d+)__/', (string) $existingCustom[$lpObject['Custom']]['custom'], $matches);
             if ($matches[1]) {
                 $otherObject = $this->getLandingPageObject(
                     $existingCustom[$lpObject['Custom']]['name'],
@@ -818,14 +823,14 @@ RuleType="Group" Operator="All" />'
                 );
                 $otherObject['PageId'] = $existingCustom[$lpObject['Custom']]['pageid'];
                 $resp = $this->getHawkResponse(
-                    Zend_Http_Client::PUT,
+                    HttpRequest::METHOD_PUT,
                     self::HAWK_LANDING_PAGE_URL . $otherObject['PageId'],
                     $this->serializer->serialize($otherObject)
 
                 );
                 $this->validateHawkLandingPageResponse(
                     $resp,
-                    Zend_Http_Client::PUT,
+                    HttpRequest::METHOD_PUT,
                     $lpObject['CustomUrl'],
                     $this->serializer->serialize($lpObject)
                 );
@@ -856,7 +861,7 @@ RuleType="Group" Operator="All" />'
         $hawkList = $this->getHawkLandingPages();
         $existingCustom = $this->createExistingCustomFieldMap($hawkList);
         $this->log(sprintf('got %d hawk managed landing pages', count($hawkList)));
-        
+
         $mageList = $this->getMagentoLandingPages();
         $this->log(sprintf('got %d magento categories', count($mageList)));
 
@@ -865,13 +870,13 @@ RuleType="Group" Operator="All" />'
         usort(
             $hawkList,
             function ($a, $b) {
-                return strcmp($a['hawkurl'], $b['hawkurl']);
+                return strcmp((string) $a['hawkurl'], (string) $b['hawkurl']);
             }
         );
         usort(
             $mageList,
             function ($a, $b) {
-                return strcmp($a['hawkurl'], $b['hawkurl']);
+                return strcmp((string) $a['hawkurl'], (string) $b['hawkurl']);
             }
         );
 
@@ -885,19 +890,19 @@ RuleType="Group" Operator="All" />'
                 // only left left to process
                 $sc = -1;
             } else {
-                $sc = strcmp($hawkList[$left]['hawkurl'], $mageList[$right]['hawkurl']);
+                $sc = strcmp((string) $hawkList[$left]['hawkurl'], (string) $mageList[$right]['hawkurl']);
             }
             $customVal = null;
             if ($sc < 0) {
                 //Hawk has page Magento doesn't want managed, delete, increment left
-                if (substr($hawkList[$left]['custom'], 0, strlen('__mage_catid_')) == '__mage_catid_') {
+                if (substr((string) $hawkList[$left]['custom'], 0, strlen('__mage_catid_')) == '__mage_catid_') {
                     $resp = $this->getHawkResponse(
-                        Zend_Http_Client::DELETE,
+                        HttpRequest::METHOD_DELETE,
                         self::HAWK_LANDING_PAGE_URL . $hawkList[$left]['pageid']
                     );
                     $this->validateHawkLandingPageResponse(
                         $resp,
-                        Zend_Http_Client::DELETE,
+                        HttpRequest::METHOD_DELETE,
                         $hawkList[$left]['hawkurl']
                     );
                     $this->log(
@@ -927,13 +932,13 @@ RuleType="Group" Operator="All" />'
                 );
                 $customVal = $this->clearExistingCustomField($lpObject, $existingCustom);
                 $resp = $this->getHawkResponse(
-                    Zend_Http_Client::POST,
+                    HttpRequest::METHOD_POST,
                     self::HAWK_LANDING_PAGE_URL,
                     $this->serializer->serialize($lpObject)
                 );
                 $this->validateHawkLandingPageResponse(
                     $resp,
-                    Zend_Http_Client::POST,
+                    HttpRequest::METHOD_POST,
                     $mageList[$right]['hawkurl'],
                     $this->serializer->serialize($lpObject)
                 );
@@ -958,13 +963,13 @@ RuleType="Group" Operator="All" />'
                 $customVal = $this->clearExistingCustomField($lpObject, $existingCustom);
 
                 $resp = $this->getHawkResponse(
-                    Zend_Http_Client::PUT,
+                    HttpRequest::METHOD_PUT,
                     self::HAWK_LANDING_PAGE_URL . $hawkList[$left]['pageid'],
                     $this->serializer->serialize($lpObject)
                 );
                 $this->validateHawkLandingPageResponse(
                     $resp,
-                    Zend_Http_Client::PUT,
+                    HttpRequest::METHOD_PUT,
                     $hawkList[$left]['hawkurl'],
                     $this->serializer->serialize($lpObject)
                 );
@@ -1017,7 +1022,7 @@ RuleType="Group" Operator="All" />'
     public function getHawkLandingPages()
     {
         $hawkPages = [];
-        $pages = $this->getHawkResponse(Zend_Http_Client::GET, 'LandingPage');
+        $pages = $this->getHawkResponse(HttpRequest::METHOD_GET, 'LandingPage');
         foreach ($pages as $page) {
             if (empty($page['Custom'])) {
                 continue;
@@ -1131,13 +1136,13 @@ RuleType="Group" Operator="All" />'
         if (isset($response['Message'])) {
             // valid action
             switch ($action) {
-                case Zend_Http_Client::PUT:
+                case HttpRequest::METHOD_PUT:
                     $act = 'Landing page: Update';
                     break;
-                case Zend_Http_Client::POST:
+                case HttpRequest::METHOD_POST:
                     $act = 'Landing page: Create New';
                     break;
-                case Zend_Http_Client::DELETE:
+                case HttpRequest::METHOD_DELETE:
                     $act = 'Landing page: Delete';
                     break;
                 default:

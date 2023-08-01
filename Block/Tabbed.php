@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2020 Hawksearch (www.hawksearch.com) - All Rights Reserved
+ * Copyright (c) 2023 Hawksearch (www.hawksearch.com) - All Rights Reserved
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -135,7 +135,7 @@ class Tabbed extends Html
                         continue;
                     }
                     $obj = new \stdClass();
-                    $obj->title = ucfirst($foundType);
+                    $obj->title = ucfirst((string) $foundType);
                     $obj->code = $foundType;
                     $obj->color = $this->helper->generateColor($foundType);
                     $obj->textColor = $this->helper->generateTextColor($obj->color);

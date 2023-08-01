@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2020 Hawksearch (www.hawksearch.com) - All Rights Reserved
+ * Copyright (c) 2023 Hawksearch (www.hawksearch.com) - All Rights Reserved
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -17,6 +17,7 @@ use HawkSearch\Proxy\Model\Task\Exception\AlreadyScheduledException;
 use HawkSearch\Proxy\Model\Task\Exception\SchedulerException;
 use HawkSearch\Proxy\Model\Task\SyncCategories\TaskScheduler;
 use Magento\Cron\Model\Schedule;
+use Magento\Framework\Console\Cli;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -52,20 +53,20 @@ class ScheduleSyncCategories extends Command
     }
 
     /**
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     * @return void
+     * @inheritDoc
      */
-    protected function execute(InputInterface $input, OutputInterface $output) : void
+    protected function execute(InputInterface $input, OutputInterface $output)
     {
         try {
             $schedule = $this->taskScheduler->schedule();
             $this->reportSuccess($schedule, $output);
+            return Cli::RETURN_SUCCESS;
         } catch (AlreadyScheduledException $exception) {
             $output->writeln('Failed to schedule datafeed generation: a pending job already exists');
         } catch (SchedulerException $exception) {
             $output->writeln('An error occurred: ' . $exception->getMessage());
         }
+        return Cli::RETURN_FAILURE;
     }
 
     /**

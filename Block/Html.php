@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2020 Hawksearch (www.hawksearch.com) - All Rights Reserved
+ * Copyright (c) 2023 Hawksearch (www.hawksearch.com) - All Rights Reserved
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -204,7 +204,7 @@ class Html extends Template
         $layout = $this->getLayout();
         $lpurl = $this->_request->getParam('lpurl');
         if ($this->getTabbedContent() && in_array(
-                rtrim($lpurl, '/'),
+                rtrim((string) $lpurl, '/'),
                 [
                     '/catalogsearch/result',
                     '/catalogsearch/result/index',

@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2020 Hawksearch (www.hawksearch.com) - All Rights Reserved
+ * Copyright (c) 2023 Hawksearch (www.hawksearch.com) - All Rights Reserved
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -13,7 +13,6 @@
 
 namespace HawkSearch\Proxy\Cron;
 
-use HawkSearch\Proxy\Helper\Data;
 use HawkSearch\Proxy\Model\Config\Sync as SyncConfigProvider;
 use HawkSearch\Proxy\Model\ProxyEmail;
 use HawkSearch\Proxy\Model\Task\Exception\TaskException;
@@ -24,9 +23,6 @@ use HawkSearch\Proxy\Model\Task\SyncCategories\TaskOptionsFactory;
 
 class SyncCategories
 {
-    /** @var Data */
-    private $helper;
-
     /** @var ProxyEmail $email */
     private $email;
 
@@ -37,24 +33,25 @@ class SyncCategories
     private $taskOptionsFactory;
 
     /**
-     * @param Data $helper
+     * @var SyncConfigProvider
+     */
+    private $syncConfigProvider;
+
+    /**
      * @param ProxyEmail $email
      * @param Task $task
      * @param TaskOptionsFactory $taskOptionsFactory
      * @param SyncConfigProvider $syncConfigProvider
      */
     public function __construct(
-        Data $helper,
         ProxyEmail $email,
         Task $task,
         TaskOptionsFactory $taskOptionsFactory,
         SyncConfigProvider $syncConfigProvider
     )
     {
-        $this->helper = $helper;
         $this->email = $email;
         $this->task = $task;
-        $this->taskOptionsFactory = $taskOptionsFactory;
         $this->taskOptionsFactory = $taskOptionsFactory;
         $this->syncConfigProvider = $syncConfigProvider;
     }

@@ -1,8 +1,11 @@
-# HawkSearch 
-## Proxy module for Magento 2
+# HawkSearch Proxy module for Adobe Commerce and Magento Open Source
 
-### Installation Instructions
-#### Steps to install via composer:
+## Platform Version Support
+Magento Open Source: 2.3.5 - 2.4.6 
+Adobe Commerce: 2.3.5 - 2.4.6
+
+## Installation Instructions
+### Steps to install via composer:
 1. Update the “repositories” section of your sites “composer.json” file to include the repositories for the hawksearch modules:
 ```javascript
     "repositories": {
@@ -34,7 +37,7 @@ composer update
 4. Login to your Magento Dashboard and configure the modules with instructions provided by your Hawksearch account manager.
 
 
-#### Steps to install the HawkSearch modules via zip file:
+### Steps to install the HawkSearch modules via zip file:
 1. Open https://github.com/hawksearch/connector-magento-2 and https://github.com/hawksearch/proxy-magento-2 in a browser.
 2. On each page, click the “Download zip” button to download the zip files.
 3. Create a directory named “HawkSearch” in the Magento “app/code” directory and unzip the downloaded files in that directory.

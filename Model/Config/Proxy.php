@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2020 Hawksearch (www.hawksearch.com) - All Rights Reserved
+ * Copyright (c) 2023 Hawksearch (www.hawksearch.com) - All Rights Reserved
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -108,7 +108,7 @@ class Proxy extends ConfigProvider
      */
     public function getSearchBoxIds($store = null): array
     {
-        $ids = explode(',', $this->getConfig(self::CONFIG_SEARCH_BOX_IDS, $store) ?: '');
+        $ids = explode(',', (string) ($this->getConfig(self::CONFIG_SEARCH_BOX_IDS, $store) ?: ''));
         return array_filter(array_map('trim', $ids));
     }
 

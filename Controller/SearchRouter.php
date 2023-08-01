@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2020 Hawksearch (www.hawksearch.com) - All Rights Reserved
+ * Copyright (c) 2023 Hawksearch (www.hawksearch.com) - All Rights Reserved
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -53,8 +53,8 @@ class SearchRouter implements RouterInterface
         if (!$this->proxyConfigProvider->isCustomSearchRouteEnabled()) {
             return false;
         }
-        $stem = (string)$this->proxyConfigProvider->getCustomSearchRoute();
-        $parts = explode('/', trim($request->getPathInfo(), '/'));
+        $stem = $this->proxyConfigProvider->getCustomSearchRoute();
+        $parts = explode('/', trim((string) $request->getPathInfo(), '/'));
         $identifier = (string)array_shift($parts);
 
         if (strpos($identifier, $stem) !== false) {

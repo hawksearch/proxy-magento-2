@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2020 Hawksearch (www.hawksearch.com) - All Rights Reserved
+ * Copyright (c) 2023 Hawksearch (www.hawksearch.com) - All Rights Reserved
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -14,6 +14,8 @@
 namespace HawkSearch\Proxy\Model\Config\Backend;
 
 use HawkSearch\Proxy\Helper\Data as ProxyHelper;
+use Laminas\Http\Client;
+use Laminas\Http\Exception\RuntimeException;
 use Magento\Config\Model\Config\Backend\Serialized\ArraySerialized;
 use Magento\Framework\App\Cache\TypeListInterface;
 use Magento\Framework\App\Config\ScopeConfigInterface;
@@ -22,8 +24,6 @@ use Magento\Framework\Model\Context;
 use Magento\Framework\Model\ResourceModel\AbstractResource;
 use Magento\Framework\Registry;
 use Magento\Framework\Serialize\Serializer\Json;
-use Zend_Http_Client;
-use Zend_Http_Client_Exception;
 
 class TypeLabel extends ArraySerialized
 {
@@ -70,27 +70,27 @@ class TypeLabel extends ArraySerialized
 
     /**
      * @inheritDoc
-     * @throws Zend_Http_Client_Exception
+     * @throws RuntimeException
      */
     protected function _afterLoad()
     {
         parent::_afterLoad();
         if (!$this->getValue() || count($this->getValue()) == 0) {
 
-            $client = new Zend_Http_Client();
+            $client = new Client();
             $client->setUri(
                 $this->proxyHelper->getSearchUrl(
                     '',
                     ['q' => '', 'hawktabs' => 'json', 'it' => 'all', 'output' => 'custom']
                 )
             );
-            $response = $client->request();
-            if ($response->getStatus() != 200) {
+            $response = $client->send();
+            if ($response->getStatusCode() != 200) {
                 return;
             }
-            $result = json_decode($response->getBody());
+            $result = json_decode((string) $response->getBody());
             if (isset($result->Data) && isset($result->Data->Tabs)) {
-                $tabs = json_decode($result->Data->Tabs);
+                $tabs = json_decode((string) $result->Data->Tabs);
                 $value = [];
                 foreach ($tabs->Tabs as $tab) {
                     if ($tab->Value == 'all') {
