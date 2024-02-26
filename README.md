@@ -1,27 +1,29 @@
 # HawkSearch Proxy module for Adobe Commerce and Magento Open Source
 
 ## Platform Version Support
-Magento Open Source: 2.3.5 - 2.4.6 
+Magento Open Source: 2.3.5 - 2.4.6  
 Adobe Commerce: 2.3.5 - 2.4.6
 
 ## Installation Instructions
 ### Steps to install via composer:
 1. Update the “repositories” section of your sites “composer.json” file to include the repositories for the hawksearch modules:
-```javascript
-    "repositories": {
-        "0": {
-            "type": "composer",
-            "url": "https://repo.magento.com/"
-        },
-        "hawksearch.connector": {
-            "type": "git",
-             "url": "git@github.com:hawksearch/connector-magento-2.git"
-        },
-        "hawksearch.proxy": {
-            "type": "git",
-            "url": "git@github.com:hawksearch/proxy-magento-2.git"
-        }
+```json
+{
+  "repositories": {
+    "0": {
+      "type": "composer",
+      "url": "https://repo.magento.com/"
+    },
+    "hawksearch.connector": {
+      "type": "git",
+      "url": "git@github.com:hawksearch/connector-magento-2.git"
+    },
+    "hawksearch.proxy": {
+      "type": "git",
+      "url": "git@github.com:hawksearch/proxy-magento-2.git"
     }
+  }
+}
 ```
 OR by using composer commands directly:
 ```bash
