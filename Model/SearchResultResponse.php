@@ -28,11 +28,13 @@ class SearchResultResponse extends AbstractSimpleObject implements SearchResultR
 
     /**
      * SearchResultResponse constructor.
+     *
      * @param SearchResultDataInterfaceFactory $searchResultDataInterfaceFactory
      */
     public function __construct(
         SearchResultDataInterfaceFactory $searchResultDataInterfaceFactory
-    ) {
+    )
+    {
         $this->searchResultDataInterfaceFactory = $searchResultDataInterfaceFactory;
     }
 
@@ -57,17 +59,13 @@ class SearchResultResponse extends AbstractSimpleObject implements SearchResultR
      */
     public function getResponseData(): SearchResultDataInterface
     {
-        $result = $this->_get(self::RESPONSE_DATA);
-        if ($result === null) {
-            $result = $this->searchResultDataInterfaceFactory->create();
-        }
-        return $result;
+        return $this->_get(self::RESPONSE_DATA) ?? $this->searchResultDataInterfaceFactory->create();
     }
 
     /**
      * @inheritDoc
      */
-    public function setResponseData(SearchResultDataInterface $value)
+    public function setResponseData(?SearchResultDataInterface $value)
     {
         return $this->setData(self::RESPONSE_DATA, $value);
     }
@@ -75,15 +73,15 @@ class SearchResultResponse extends AbstractSimpleObject implements SearchResultR
     /**
      * @inheritDoc
      */
-    public function getLocation(): ?string
+    public function getLocation(): string
     {
-        return $this->_get(self::LOCATION);
+        return (string)$this->_get(self::LOCATION);
     }
 
     /**
      * @inheritDoc
      */
-    public function setLocation(string $value)
+    public function setLocation(?string $value)
     {
         return $this->setData(self::LOCATION, $value);
     }
@@ -91,15 +89,15 @@ class SearchResultResponse extends AbstractSimpleObject implements SearchResultR
     /**
      * @inheritDoc
      */
-    public function getDidYouMean(): ?string
+    public function getDidYouMean(): string
     {
-        return $this->_get(self::DID_YOU_MEAN);
+        return (string)$this->_get(self::DID_YOU_MEAN);
     }
 
     /**
      * @inheritDoc
      */
-    public function setDidYouMean(string $value)
+    public function setDidYouMean(?string $value)
     {
         return $this->setData(self::DID_YOU_MEAN, $value);
     }
@@ -107,15 +105,15 @@ class SearchResultResponse extends AbstractSimpleObject implements SearchResultR
     /**
      * @inheritDoc
      */
-    public function getTrackingId(): ?string
+    public function getTrackingId(): string
     {
-        return $this->_get(self::TRACKING_ID);
+        return (string)$this->_get(self::TRACKING_ID);
     }
 
     /**
      * @inheritDoc
      */
-    public function setTrackingId(string $value)
+    public function setTrackingId(?string $value)
     {
         return $this->setData(self::TRACKING_ID, $value);
     }
@@ -123,15 +121,15 @@ class SearchResultResponse extends AbstractSimpleObject implements SearchResultR
     /**
      * @inheritDoc
      */
-    public function getMetaRobots(): ?string
+    public function getMetaRobots(): string
     {
-        return $this->_get(self::META_ROBOTS);
+        return (string)$this->_get(self::META_ROBOTS);
     }
 
     /**
      * @inheritDoc
      */
-    public function setMetaRobots(string $value)
+    public function setMetaRobots(?string $value)
     {
         return $this->setData(self::META_ROBOTS, $value);
     }
@@ -139,15 +137,15 @@ class SearchResultResponse extends AbstractSimpleObject implements SearchResultR
     /**
      * @inheritDoc
      */
-    public function getHeaderTitle(): ?string
+    public function getHeaderTitle(): string
     {
-        return $this->_get(self::HEADER_TITLE);
+        return (string)$this->_get(self::HEADER_TITLE);
     }
 
     /**
      * @inheritDoc
      */
-    public function setHeaderTitle(string $value)
+    public function setHeaderTitle(?string $value)
     {
         return $this->setData(self::HEADER_TITLE, $value);
     }
@@ -155,15 +153,15 @@ class SearchResultResponse extends AbstractSimpleObject implements SearchResultR
     /**
      * @inheritDoc
      */
-    public function getMetaDescription(): ?string
+    public function getMetaDescription(): string
     {
-        return $this->_get(self::META_DESCRIPTION);
+        return (string)$this->_get(self::META_DESCRIPTION);
     }
 
     /**
      * @inheritDoc
      */
-    public function setMetaDescription(string $value)
+    public function setMetaDescription(?string $value)
     {
         return $this->setData(self::META_DESCRIPTION, $value);
     }
@@ -171,15 +169,15 @@ class SearchResultResponse extends AbstractSimpleObject implements SearchResultR
     /**
      * @inheritDoc
      */
-    public function getMetaKeywords(): ?string
+    public function getMetaKeywords(): string
     {
-        return $this->_get(self::META_KEYWORDS);
+        return (string)$this->_get(self::META_KEYWORDS);
     }
 
     /**
      * @inheritDoc
      */
-    public function setMetaKeywords(string $value)
+    public function setMetaKeywords(?string $value)
     {
         return $this->setData(self::META_KEYWORDS, $value);
     }
@@ -187,15 +185,15 @@ class SearchResultResponse extends AbstractSimpleObject implements SearchResultR
     /**
      * @inheritDoc
      */
-    public function getRelCanonical(): ?string
+    public function getRelCanonical(): string
     {
-        return $this->_get(self::REL_CANONICAL);
+        return (string)$this->_get(self::REL_CANONICAL);
     }
 
     /**
      * @inheritDoc
      */
-    public function setRelCanonical(string $value)
+    public function setRelCanonical(?string $value)
     {
         return $this->setData(self::REL_CANONICAL, $value);
     }
@@ -203,15 +201,15 @@ class SearchResultResponse extends AbstractSimpleObject implements SearchResultR
     /**
      * @inheritDoc
      */
-    public function getOriginal(): ?string
+    public function getOriginal(): string
     {
-        return $this->_get(self::ORIGINAL);
+        return (string)$this->_get(self::ORIGINAL);
     }
 
     /**
      * @inheritDoc
      */
-    public function setOriginal(string $value)
+    public function setOriginal(?string $value)
     {
         return $this->setData(self::ORIGINAL, $value);
     }
@@ -219,15 +217,15 @@ class SearchResultResponse extends AbstractSimpleObject implements SearchResultR
     /**
      * @inheritDoc
      */
-    public function getKeyword(): ?string
+    public function getKeyword(): string
     {
-        return $this->_get(self::KEYWORD);
+        return (string)$this->_get(self::KEYWORD);
     }
 
     /**
      * @inheritDoc
      */
-    public function setKeyword(string $value)
+    public function setKeyword(?string $value)
     {
         return $this->setData(self::KEYWORD, $value);
     }

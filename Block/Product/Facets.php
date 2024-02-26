@@ -50,7 +50,7 @@ class Facets extends Template
     }
 
     /**
-     * @return string|null
+     * @return string
      * @throws InstructionException
      * @throws NotFoundException
      */

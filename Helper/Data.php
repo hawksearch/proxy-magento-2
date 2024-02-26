@@ -397,7 +397,7 @@ class Data extends AbstractHelper
     }
 
     /**
-     * @return string|null
+     * @return string
      * @throws InstructionException
      * @throws NotFoundException
      */

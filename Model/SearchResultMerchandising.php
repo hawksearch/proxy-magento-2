@@ -30,7 +30,7 @@ class SearchResultMerchandising extends AbstractSimpleObject implements SearchRe
     /**
      * @inheritDoc
      */
-    public function setItems(array $value)
+    public function setItems(?array $value)
     {
         return $this->setData(self::ITEMS, $value);
     }
