@@ -41,7 +41,7 @@ interface SearchResultResponseInterface extends ExtensibleDataInterface
     /**
      * @return bool
      */
-    public function getSuccess() : bool;
+    public function getSuccess(): bool;
 
     /**
      * @param bool $value
@@ -52,128 +52,128 @@ interface SearchResultResponseInterface extends ExtensibleDataInterface
     /**
      * @return \HawkSearch\Proxy\Api\Data\SearchResultDataInterface
      */
-    public function getResponseData() : \HawkSearch\Proxy\Api\Data\SearchResultDataInterface;
+    public function getResponseData(): \HawkSearch\Proxy\Api\Data\SearchResultDataInterface;
 
     /**
-     * @param \HawkSearch\Proxy\Api\Data\SearchResultDataInterface $value
+     * @param \HawkSearch\Proxy\Api\Data\SearchResultDataInterface|null $value
      * @return $this
      */
-    public function setResponseData(\HawkSearch\Proxy\Api\Data\SearchResultDataInterface $value);
+    public function setResponseData(?\HawkSearch\Proxy\Api\Data\SearchResultDataInterface $value);
 
     /**
-     * @return string|null
+     * @return string
      */
-    public function getLocation() : ?string;
+    public function getLocation(): string;
 
     /**
-     * @param string $value
+     * @param string|null $value
      * @return $this
      */
-    public function setLocation(string $value);
+    public function setLocation(?string $value);
 
     /**
-     * @return string|null
+     * @return string
      */
-    public function getDidYouMean() : ?string;
+    public function getDidYouMean(): string;
 
     /**
-     * @param string $value
+     * @param string|null $value
      * @return $this
      */
-    public function setDidYouMean(string $value);
+    public function setDidYouMean(?string $value);
 
     /**
-     * @return string|null
+     * @return string
      */
-    public function getTrackingId() : ?string;
+    public function getTrackingId(): string;
 
     /**
-     * @param string $value
+     * @param string|null $value
      * @return $this
      */
-    public function setTrackingId(string $value);
+    public function setTrackingId(?string $value);
 
     /**
-     * @return string|null
+     * @return string
      */
-    public function getMetaRobots() : ?string;
+    public function getMetaRobots(): string;
 
     /**
-     * @param string $value
+     * @param string|null $value
      * @return $this
      */
-    public function setMetaRobots(string $value);
+    public function setMetaRobots(?string $value);
 
     /**
-     * @return string|null
+     * @return string
      */
-    public function getHeaderTitle() : ?string;
+    public function getHeaderTitle(): string;
 
     /**
-     * @param string $value
+     * @param string|null $value
      * @return $this
      */
-    public function setHeaderTitle(string $value);
+    public function setHeaderTitle(?string $value);
 
     /**
-     * @return string|null
+     * @return string
      */
-    public function getMetaDescription() : ?string;
+    public function getMetaDescription(): string;
 
     /**
-     * @param string $value
+     * @param string|null $value
      * @return $this
      */
-    public function setMetaDescription(string $value);
+    public function setMetaDescription(?string $value);
 
     /**
-     * @return string|null
+     * @return string
      */
-    public function getMetaKeywords() : ?string;
+    public function getMetaKeywords(): string;
 
     /**
-     * @param string $value
+     * @param string|null $value
      * @return $this
      */
-    public function setMetaKeywords(string $value);
+    public function setMetaKeywords(?string $value);
 
     /**
-     * @return string|null
+     * @return string
      */
-    public function getRelCanonical() : ?string;
+    public function getRelCanonical(): string;
 
     /**
-     * @param string $value
+     * @param string|null $value
      * @return $this
      */
-    public function setRelCanonical(string $value);
+    public function setRelCanonical(?string $value);
 
     /**
-     * @return string|null
+     * @return string
      */
-    public function getOriginal() : ?string;
+    public function getOriginal(): string;
 
     /**
-     * @param string $value
+     * @param string|null $value
      * @return $this
      */
-    public function setOriginal(string $value);
+    public function setOriginal(?string $value);
 
     /**
-     * @return string|null
+     * @return string
      */
-    public function getKeyword() : ?string;
+    public function getKeyword(): string;
 
     /**
-     * @param string $value
+     * @param string|null $value
      * @return $this
      */
-    public function setKeyword(string $value);
+    public function setKeyword(?string $value);
 
     /**
      * @return int
      */
-    public function getPageLayoutId() : int;
+    public function getPageLayoutId(): int;
 
     /**
      * @param int $value
@@ -184,7 +184,7 @@ interface SearchResultResponseInterface extends ExtensibleDataInterface
     /**
      * @return int
      */
-    public function getSearchDuration() : int;
+    public function getSearchDuration(): int;
 
     /**
      * @param int $value
@@ -195,7 +195,7 @@ interface SearchResultResponseInterface extends ExtensibleDataInterface
     /**
      * @return bool
      */
-    public function getQueryUsedAllKeywords() : bool;
+    public function getQueryUsedAllKeywords(): bool;
 
     /**
      * @param bool $value

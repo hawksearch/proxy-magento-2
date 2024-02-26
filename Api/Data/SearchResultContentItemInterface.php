@@ -38,7 +38,7 @@ interface SearchResultContentItemInterface extends ExtensibleDataInterface
     /**
      * @return float
      */
-    public function getScore() : float;
+    public function getScore(): float;
 
     /**
      * @param float $value
@@ -47,53 +47,53 @@ interface SearchResultContentItemInterface extends ExtensibleDataInterface
     public function setScore(float $value);
 
     /**
-     * @return string|null
+     * @return string
      */
-    public function getItemName() : ?string;
+    public function getItemName(): string;
 
     /**
-     * @param string $value
+     * @param string|null $value
      * @return $this
      */
-    public function setItemName(string $value);
+    public function setItemName(?string $value);
 
     /**
-     * @return string|null
+     * @return string
      */
-    public function getImageUrl() : ?string;
+    public function getImageUrl(): string;
 
     /**
-     * @param string $value
+     * @param string|null $value
      * @return $this
      */
-    public function setImageUrl(string $value);
+    public function setImageUrl(?string $value);
 
     /**
-     * @return string|null
+     * @return string
      */
-    public function getId() : ?string;
+    public function getId(): string;
 
     /**
-     * @param string $value
+     * @param string|null $value
      * @return $this
      */
-    public function setId(string $value);
+    public function setId(?string $value);
 
     /**
-     * @return string|null
+     * @return string
      */
-    public function getCustomUrl() : ?string;
+    public function getCustomUrl(): string;
 
     /**
-     * @param string $value
+     * @param string|null $value
      * @return $this
      */
-    public function setCustomUrl(string $value);
+    public function setCustomUrl(?string $value);
 
     /**
      * @return float
      */
-    public function getSalePrice() : float;
+    public function getSalePrice(): float;
 
     /**
      * @param float $value
@@ -104,7 +104,7 @@ interface SearchResultContentItemInterface extends ExtensibleDataInterface
     /**
      * @return bool
      */
-    public function getIsOnSale() : bool;
+    public function getIsOnSale(): bool;
 
     /**
      * @param bool $value
@@ -113,42 +113,42 @@ interface SearchResultContentItemInterface extends ExtensibleDataInterface
     public function setIsOnSale(bool $value);
 
     /**
-     * @return string|null
+     * @return string
      */
-    public function getBestFragment() : ?string;
+    public function getBestFragment(): string;
 
     /**
-     * @param string $value
+     * @param string|null $value
      * @return $this
      */
-    public function setBestFragment(string $value);
+    public function setBestFragment(?string $value);
 
     /**
-     * @return string|null
+     * @return string
      */
-    public function getSku() : ?string;
+    public function getSku(): string;
 
     /**
-     * @param string $value
+     * @param string|null $value
      * @return $this
      */
-    public function setSku(string $value);
+    public function setSku(?string $value);
 
     /**
      * @return string[]
      */
-    public function getCustom() : ?array;
+    public function getCustom(): array;
 
     /**
-     * @param string[] $value
+     * @param string[]|null $value
      * @return $this
      */
-    public function setCustom(array $value);
+    public function setCustom(?array $value);
 
     /**
      * @return bool
      */
-    public function getIsPinned() : bool;
+    public function getIsPinned(): bool;
 
     /**
      * @param bool $value
@@ -159,7 +159,7 @@ interface SearchResultContentItemInterface extends ExtensibleDataInterface
     /**
      * @return float
      */
-    public function getHawkBoost() : float;
+    public function getHawkBoost(): float;
 
     /**
      * @param float $value

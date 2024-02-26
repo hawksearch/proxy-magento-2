@@ -27,11 +27,11 @@ interface SearchResultMerchandisingInterface extends ExtensibleDataInterface
     /**
      * @return \HawkSearch\Proxy\Api\Data\SearchResultBannerInterface[]
      */
-    public function getItems() : array;
+    public function getItems(): array;
 
     /**
-     * @param \HawkSearch\Proxy\Api\Data\SearchResultBannerInterface[] $value
+     * @param \HawkSearch\Proxy\Api\Data\SearchResultBannerInterface[]|null $value
      * @return $this
      */
-    public function setItems(array $value);
+    public function setItems(?array $value);
 }
