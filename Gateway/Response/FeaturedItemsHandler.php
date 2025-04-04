@@ -48,7 +48,7 @@ class FeaturedItemsHandler implements HandlerInterface
      * @param array $response
      * @return array
      */
-    public function handle(array $handlingSubject, array $response)
+    public function handle(array $handlingSubject, array $response): array
     {
         $featuredItems = null;
         $responseData = $this->httpResponseReader->readResponseData($response);

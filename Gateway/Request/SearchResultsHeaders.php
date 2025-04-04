@@ -38,7 +38,7 @@ class SearchResultsHeaders implements BuilderInterface
     /**
      * @inheritDoc
      */
-    public function build(array $buildSubject)
+    public function build(array $buildSubject): array
     {
         return [
             'HTTP-TRUE-CLIENT-IP' => $this->httpRequest->getClientIp(),

@@ -91,7 +91,7 @@ class SearchParametersBuilder implements BuilderInterface
     /**
      * @inheritDoc
      */
-    public function build(array $buildSubject)
+    public function build(array $buildSubject): array
     {
         // define default params' values
         $params = [

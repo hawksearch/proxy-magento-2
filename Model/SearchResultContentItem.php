@@ -168,7 +168,7 @@ class SearchResultContentItem extends AbstractSimpleObject implements SearchResu
      */
     public function getCustom(): array
     {
-        return $this->_get(self::CUSTOM) ?? [];
+        return (array)($this->_get(self::CUSTOM) ?? []);
     }
 
     /**

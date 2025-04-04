@@ -24,7 +24,7 @@ class SearchResultMerchandising extends AbstractSimpleObject implements SearchRe
      */
     public function getItems(): array
     {
-        return $this->_get(self::ITEMS) ?? [];
+        return (array)($this->_get(self::ITEMS) ?? []);
     }
 
     /**
