@@ -1,8 +1,8 @@
 # HawkSearch Proxy module for Adobe Commerce and Magento Open Source
 
 ## Platform Version Support
-Magento Open Source: 2.3.5 - 2.4.6  
-Adobe Commerce: 2.3.5 - 2.4.6
+Magento Open Source: 2.4.0 - 2.4.7  
+Adobe Commerce: 2.4.0 - 2.4.7
 
 ## Installation Instructions
 ### Steps to install via composer:
