@@ -2384,6 +2384,8 @@ HawkSearch.Context = new HawkSearch.ContextObj();
                 var hawkp = $("#hdnhawkp").val();
                 var hdnhawcustomergroupid = $("#hdnhawcustomergroupid").val();
                 var hdnhawcustomergroupidname = $("#hdnhawcustomergroupidname").val();
+                var hdnhawapprovedcompanyid = $("#hdnhawapprovedcompanyid").val();
+                var hdnhawapprovedcompanyidreqname = $("#hdnhawapprovedcompanyidreqname").val();
                 var product_list_mode = $("#hdnproductlistmode").val();
 
                 if (keyword && keyword !== "") qs += (qs === "" ? "" : "&") + keywordfield + "=" + encodeURIComponent(keyword);
