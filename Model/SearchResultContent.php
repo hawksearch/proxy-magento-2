@@ -24,7 +24,7 @@ class SearchResultContent extends AbstractSimpleObject implements SearchResultCo
      */
     public function getItems(): array
     {
-        return $this->_get(self::ITEMS) ?? [];
+        return (array)($this->_get(self::ITEMS) ?? []);
     }
 
     /**
