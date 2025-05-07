@@ -24,13 +24,13 @@ class SearchResultContent extends AbstractSimpleObject implements SearchResultCo
      */
     public function getItems(): array
     {
-        return $this->_get(self::ITEMS) ?? [];
+        return (array)($this->_get(self::ITEMS) ?? []);
     }
 
     /**
      * @inheritDoc
      */
-    public function setItems(array $value)
+    public function setItems(?array $value)
     {
         return $this->setData(self::ITEMS, $value);
     }

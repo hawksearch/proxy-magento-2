@@ -187,7 +187,7 @@ class Data extends AbstractHelper
     /**
      * @var ApiSettings
      */
-    private $apiSetingsConfigProvider;
+    private $apiSettingsConfigProvider;
 
     /**
      * @var SearchUriBuilder
@@ -300,7 +300,7 @@ class Data extends AbstractHelper
         $this->utilFileSystem = $utilFileSystem;
         $this->instructionManagerPool = $instructionManagerPool;
         $this->proxyConfigProvider = $proxyConfigProvider;
-        $this->apiSetingsConfigProvider = $apiSettingsConfigProvider;
+        $this->apiSettingsConfigProvider = $apiSettingsConfigProvider;
         $this->generalConfigProvider = $generalConfigProvider;
         $this->attributeConfig = $attributeConfig;
         $this->searchUriBuilder = $searchUriBuilder;
@@ -346,7 +346,7 @@ class Data extends AbstractHelper
      */
     public function getApiUrl()
     {
-        $apiUrl = rtrim($this->apiSetingsConfigProvider->getDashboardApiUrl(), '/');
+        $apiUrl = rtrim($this->apiSettingsConfigProvider->getDashboardApiUrl(), '/');
         return $apiUrl . '/api/v3/';
     }
 
@@ -357,7 +357,7 @@ class Data extends AbstractHelper
      */
     public function getSearchUrl(string $path = '', array $queryParams = [])
     {
-        $url = $this->searchUriBuilder->build($this->apiSetingsConfigProvider->getHawkUrl(), $path);
+        $url = $this->searchUriBuilder->build($this->apiSettingsConfigProvider->getHawkUrl(), $path);
 
         if ($queryParams) {
             $url = $this->urlUtility->getUriWithQuery(
@@ -397,7 +397,7 @@ class Data extends AbstractHelper
     }
 
     /**
-     * @return string|null
+     * @return string
      * @throws InstructionException
      * @throws NotFoundException
      */
@@ -568,7 +568,7 @@ class Data extends AbstractHelper
                 $client->setEncType('application/json');
             }
             $headers = new Headers();
-            $headers->addHeaderLine('X-HawkSearch-ApiKey', $this->apiSetingsConfigProvider->getApiKey());
+            $headers->addHeaderLine('X-HawkSearch-ApiKey', $this->apiSettingsConfigProvider->getApiKey());
             $headers->addHeaderLine('Accept', 'application/json');
             $client->setHeaders($headers);
             $this->log(sprintf('fetching request. URL: %s, Method: %s', $client->getUri(), $method));

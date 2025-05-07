@@ -42,6 +42,7 @@ class SearchResultData extends AbstractSimpleObject implements SearchResultDataI
 
     /**
      * SearchResultData constructor.
+     *
      * @param SearchResultContentInterfaceFactory $searchResultContentInterfaceFactory
      * @param SearchResultMerchandisingInterfaceFactory $searchResultMerchandisingInterfaceFactory
      * @param SearchResultFeaturedInterfaceFactory $searchResultFeaturedInterfaceFactory
@@ -50,7 +51,8 @@ class SearchResultData extends AbstractSimpleObject implements SearchResultDataI
         SearchResultContentInterfaceFactory $searchResultContentInterfaceFactory,
         SearchResultMerchandisingInterfaceFactory $searchResultMerchandisingInterfaceFactory,
         SearchResultFeaturedInterfaceFactory $searchResultFeaturedInterfaceFactory
-    ) {
+    )
+    {
         $this->searchResultContentInterfaceFactory = $searchResultContentInterfaceFactory;
         $this->searchResultMerchandisingInterfaceFactory = $searchResultMerchandisingInterfaceFactory;
         $this->searchResultFeaturedInterfaceFactory = $searchResultFeaturedInterfaceFactory;
@@ -59,15 +61,15 @@ class SearchResultData extends AbstractSimpleObject implements SearchResultDataI
     /**
      * @inheritDoc
      */
-    public function getTitle(): ?string
+    public function getTitle(): string
     {
-        return $this->_get(self::TITLE);
+        return (string)$this->_get(self::TITLE);
     }
 
     /**
      * @inheritDoc
      */
-    public function setTitle(string $value)
+    public function setTitle(?string $value)
     {
         return $this->setData(self::TITLE, $value);
     }
@@ -75,15 +77,15 @@ class SearchResultData extends AbstractSimpleObject implements SearchResultDataI
     /**
      * @inheritDoc
      */
-    public function getTopText(): ?string
+    public function getTopText(): string
     {
-        return $this->_get(self::TOP_TEXT);
+        return (string)$this->_get(self::TOP_TEXT);
     }
 
     /**
      * @inheritDoc
      */
-    public function setTopText(string $value)
+    public function setTopText(?string $value)
     {
         return $this->setData(self::TOP_TEXT, $value);
     }
@@ -91,15 +93,15 @@ class SearchResultData extends AbstractSimpleObject implements SearchResultDataI
     /**
      * @inheritDoc
      */
-    public function getBreadCrumb(): ?string
+    public function getBreadCrumb(): string
     {
-        return $this->_get(self::BREADCRUMB);
+        return (string)$this->_get(self::BREADCRUMB);
     }
 
     /**
      * @inheritDoc
      */
-    public function setBreadCrumb(string $value)
+    public function setBreadCrumb(?string $value)
     {
         return $this->setData(self::BREADCRUMB, $value);
     }
@@ -107,15 +109,15 @@ class SearchResultData extends AbstractSimpleObject implements SearchResultDataI
     /**
      * @inheritDoc
      */
-    public function getTopPager(): ?string
+    public function getTopPager(): string
     {
-        return $this->_get(self::TOP_PAGER);
+        return (string)$this->_get(self::TOP_PAGER);
     }
 
     /**
      * @inheritDoc
      */
-    public function setTopPager(string $value)
+    public function setTopPager(?string $value)
     {
         return $this->setData(self::TOP_PAGER, $value);
     }
@@ -123,15 +125,15 @@ class SearchResultData extends AbstractSimpleObject implements SearchResultDataI
     /**
      * @inheritDoc
      */
-    public function getBottomPager(): ?string
+    public function getBottomPager(): string
     {
-        return $this->_get(self::BOTTOM_PAGER);
+        return (string)$this->_get(self::BOTTOM_PAGER);
     }
 
     /**
      * @inheritDoc
      */
-    public function setBottomPager(string $value)
+    public function setBottomPager(?string $value)
     {
         return $this->setData(self::BOTTOM_PAGER, $value);
     }
@@ -141,17 +143,13 @@ class SearchResultData extends AbstractSimpleObject implements SearchResultDataI
      */
     public function getResults(): SearchResultContentInterface
     {
-        $result = $this->_get(self::RESULTS);
-        if ($result === null) {
-            $result = $this->searchResultContentInterfaceFactory->create();
-        }
-        return $result;
+        return $this->_get(self::RESULTS) ?? $this->searchResultContentInterfaceFactory->create();
     }
 
     /**
      * @inheritDoc
      */
-    public function setResults(SearchResultContentInterface $value)
+    public function setResults(?SearchResultContentInterface $value)
     {
         return $this->setData(self::RESULTS, $value);
     }
@@ -161,17 +159,13 @@ class SearchResultData extends AbstractSimpleObject implements SearchResultDataI
      */
     public function getMerchandising(): SearchResultMerchandisingInterface
     {
-        $result = $this->_get(self::MERCHANDISING);
-        if ($result === null) {
-            $result = $this->searchResultMerchandisingInterfaceFactory->create();
-        }
-        return $result;
+        return $this->_get(self::MERCHANDISING) ?? $this->searchResultMerchandisingInterfaceFactory->create();
     }
 
     /**
      * @inheritDoc
      */
-    public function setMerchandising(SearchResultMerchandisingInterface $value)
+    public function setMerchandising(?SearchResultMerchandisingInterface $value)
     {
         return $this->setData(self::MERCHANDISING, $value);
     }
@@ -179,15 +173,15 @@ class SearchResultData extends AbstractSimpleObject implements SearchResultDataI
     /**
      * @inheritDoc
      */
-    public function getSelections(): ?string
+    public function getSelections(): string
     {
-        return $this->_get(self::SELECTIONS);
+        return (string)$this->_get(self::SELECTIONS);
     }
 
     /**
      * @inheritDoc
      */
-    public function setSelections(string $value)
+    public function setSelections(?string $value)
     {
         return $this->setData(self::SELECTIONS, $value);
     }
@@ -195,15 +189,15 @@ class SearchResultData extends AbstractSimpleObject implements SearchResultDataI
     /**
      * @inheritDoc
      */
-    public function getFacets(): ?string
+    public function getFacets(): string
     {
-        return $this->_get(self::FACETS);
+        return (string)$this->_get(self::FACETS);
     }
 
     /**
      * @inheritDoc
      */
-    public function setFacets(string $value)
+    public function setFacets(?string $value)
     {
         return $this->setData(self::FACETS, $value);
     }
@@ -211,15 +205,15 @@ class SearchResultData extends AbstractSimpleObject implements SearchResultDataI
     /**
      * @inheritDoc
      */
-    public function getRelated(): ?string
+    public function getRelated(): string
     {
-        return $this->_get(self::RELATED);
+        return (string)$this->_get(self::RELATED);
     }
 
     /**
      * @inheritDoc
      */
-    public function setRelated(string $value)
+    public function setRelated(?string $value)
     {
         return $this->setData(self::RELATED, $value);
     }
@@ -229,17 +223,13 @@ class SearchResultData extends AbstractSimpleObject implements SearchResultDataI
      */
     public function getFeaturedItems(): SearchResultFeaturedInterface
     {
-        $result = $this->_get(self::FEATURED_ITEMS);
-        if ($result === null) {
-            $result = $this->searchResultFeaturedInterfaceFactory->create();
-        }
-        return $result;
+        return $this->_get(self::FEATURED_ITEMS) ?? $this->searchResultFeaturedInterfaceFactory->create();
     }
 
     /**
      * @inheritDoc
      */
-    public function setFeaturedItems(SearchResultFeaturedInterface $value)
+    public function setFeaturedItems(?SearchResultFeaturedInterface $value)
     {
         return $this->setData(self::FEATURED_ITEMS, $value);
     }
@@ -247,15 +237,15 @@ class SearchResultData extends AbstractSimpleObject implements SearchResultDataI
     /**
      * @inheritDoc
      */
-    public function getTabs(): ?string
+    public function getTabs(): string
     {
-        return $this->_get(self::TABS);
+        return (string)$this->_get(self::TABS);
     }
 
     /**
      * @inheritDoc
      */
-    public function setTabs(string $value)
+    public function setTabs(?string $value)
     {
         return $this->setData(self::TABS, $value);
     }

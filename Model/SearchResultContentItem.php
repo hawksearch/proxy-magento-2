@@ -38,15 +38,15 @@ class SearchResultContentItem extends AbstractSimpleObject implements SearchResu
     /**
      * @inheritDoc
      */
-    public function getItemName(): ?string
+    public function getItemName(): string
     {
-        return $this->_get(self::ITEM_NAME);
+        return (string)$this->_get(self::ITEM_NAME);
     }
 
     /**
      * @inheritDoc
      */
-    public function setItemName(string $value)
+    public function setItemName(?string $value)
     {
         return $this->setData(self::ITEM_NAME, $value);
     }
@@ -54,15 +54,15 @@ class SearchResultContentItem extends AbstractSimpleObject implements SearchResu
     /**
      * @inheritDoc
      */
-    public function getImageUrl(): ?string
+    public function getImageUrl(): string
     {
-        return $this->_get(self::IMAGE_URL);
+        return (string)$this->_get(self::IMAGE_URL);
     }
 
     /**
      * @inheritDoc
      */
-    public function setImageUrl(string $value)
+    public function setImageUrl(?string $value)
     {
         return $this->setData(self::IMAGE_URL, $value);
     }
@@ -70,15 +70,15 @@ class SearchResultContentItem extends AbstractSimpleObject implements SearchResu
     /**
      * @inheritDoc
      */
-    public function getId(): ?string
+    public function getId(): string
     {
-        return $this->_get(self::ITEM_ID);
+        return (string)$this->_get(self::ITEM_ID);
     }
 
     /**
      * @inheritDoc
      */
-    public function setId(string $value)
+    public function setId(?string $value)
     {
         return $this->setData(self::ITEM_ID, $value);
     }
@@ -86,15 +86,15 @@ class SearchResultContentItem extends AbstractSimpleObject implements SearchResu
     /**
      * @inheritDoc
      */
-    public function getCustomUrl(): ?string
+    public function getCustomUrl(): string
     {
-        return $this->_get(self::CUSTOM_URL);
+        return (string)$this->_get(self::CUSTOM_URL);
     }
 
     /**
      * @inheritDoc
      */
-    public function setCustomUrl(string $value)
+    public function setCustomUrl(?string $value)
     {
         return $this->setData(self::CUSTOM_URL, $value);
     }
@@ -134,15 +134,15 @@ class SearchResultContentItem extends AbstractSimpleObject implements SearchResu
     /**
      * @inheritDoc
      */
-    public function getBestFragment(): ?string
+    public function getBestFragment(): string
     {
-        return $this->_get(self::BEST_FRAGMENT);
+        return (string)$this->_get(self::BEST_FRAGMENT);
     }
 
     /**
      * @inheritDoc
      */
-    public function setBestFragment(string $value)
+    public function setBestFragment(?string $value)
     {
         return $this->setData(self::BEST_FRAGMENT, $value);
     }
@@ -150,15 +150,15 @@ class SearchResultContentItem extends AbstractSimpleObject implements SearchResu
     /**
      * @inheritDoc
      */
-    public function getSku(): ?string
+    public function getSku(): string
     {
-        return $this->_get(self::SKU);
+        return (string)$this->_get(self::SKU);
     }
 
     /**
      * @inheritDoc
      */
-    public function setSku(string $value)
+    public function setSku(?string $value)
     {
         return $this->setData(self::SKU, $value);
     }
@@ -168,13 +168,13 @@ class SearchResultContentItem extends AbstractSimpleObject implements SearchResu
      */
     public function getCustom(): array
     {
-        return $this->_get(self::CUSTOM) ? (array)$this->_get(self::CUSTOM) : [];
+        return (array)($this->_get(self::CUSTOM) ?? []);
     }
 
     /**
      * @inheritDoc
      */
-    public function setCustom(array $value)
+    public function setCustom(?array $value)
     {
         return $this->setData(self::CUSTOM, $value);
     }

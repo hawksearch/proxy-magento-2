@@ -28,46 +28,46 @@ interface SearchResultBannerInterface extends ExtensibleDataInterface
     /**#@-*/
 
     /**
-     * @return string|null
+     * @return string
      */
-    public function getZone() : ?string;
+    public function getZone(): string;
 
     /**
-     * @param string $value
+     * @param string|null $value
      * @return $this
      */
-    public function setZone(string $value);
+    public function setZone(?string $value);
 
     /**
-     * @return string|null
+     * @return string
      */
-    public function getHtml() : ?string;
+    public function getHtml(): string;
 
     /**
-     * @param string $value
+     * @param string|null $value
      * @return $this
      */
-    public function setHtml(string $value);
+    public function setHtml(?string $value);
 
     /**
-     * @return string|null
+     * @return string
      */
-    public function getTitle() : ?string;
+    public function getTitle(): string;
 
     /**
-     * @param string $value
+     * @param string|null $value
      * @return $this
      */
-    public function setTitle(string $value);
+    public function setTitle(?string $value);
 
     /**
      * @return \HawkSearch\Proxy\Api\Data\SearchResultContentItemInterface[]
      */
-    public function getItems() : array;
+    public function getItems(): array;
 
     /**
-     * @param \HawkSearch\Proxy\Api\Data\SearchResultContentItemInterface[] $value
+     * @param \HawkSearch\Proxy\Api\Data\SearchResultContentItemInterface[]|null $value
      * @return $this
      */
-    public function setItems(array $value);
+    public function setItems(?array $value);
 }

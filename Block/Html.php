@@ -56,7 +56,7 @@ class Html extends Template
     }
 
     /**
-     * @return string|null
+     * @return string
      * @throws InstructionException
      * @throws NotFoundException
      */
@@ -74,7 +74,7 @@ class Html extends Template
     }
 
     /**
-     * @return string|null
+     * @return string
      * @throws InstructionException
      * @throws NotFoundException
      */
@@ -84,7 +84,7 @@ class Html extends Template
     }
 
     /**
-     * @return string|null
+     * @return string
      * @throws InstructionException
      * @throws NotFoundException
      */
@@ -144,7 +144,7 @@ class Html extends Template
     }
 
     /**
-     * @return string|null
+     * @return string
      * @throws InstructionException
      * @throws NotFoundException
      */
@@ -154,7 +154,7 @@ class Html extends Template
     }
 
     /**
-     * @return string|null
+     * @return string
      * @throws InstructionException
      * @throws NotFoundException
      */
@@ -164,7 +164,7 @@ class Html extends Template
     }
 
     /**
-     * @return string|null
+     * @return string
      * @throws InstructionException
      * @throws NotFoundException
      */
@@ -174,7 +174,7 @@ class Html extends Template
     }
 
     /**
-     * @return string|null
+     * @return string
      * @throws InstructionException
      * @throws NotFoundException
      */
@@ -234,6 +234,6 @@ class Html extends Template
      */
     public function getTabs()
     {
-        return $this->helper->getResultData()->getResponseData()->getTabs() ?? '';
+        return $this->helper->getResultData()->getResponseData()->getTabs();
     }
 }

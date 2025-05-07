@@ -70,7 +70,7 @@ class Tabbed extends Html
      */
     public function getTabs()
     {
-        return $this->helper->getResultData()->getResponseData()->getTabs() ?? null;
+        return $this->helper->getResultData()->getResponseData()->getTabs();
     }
 
     /**

@@ -1112,7 +1112,7 @@ HawkSearch.Context = new HawkSearch.ContextObj();
             } else {
                 clientIdentifyToken = '&bu=' + HawkSearch.getHawkUrl();
             }
-                var src = HawkSearch.getTrackingUrl() + 'hawk.png?t=' + encodeURIComponent(btoa(event.join('\x01'))) + '&et=' + et + clientIdentifyToken + '&cd=' + encodeURIComponent(customDictionaryString) + '&' + this.randomHexBlocks(1);
+            var src = HawkSearch.getTrackingUrl() + 'hawk.png?t=' + btoa(unescape(encodeURIComponent(event.join('\x01')))) + '&et=' + et + clientIdentifyToken + '&cd=' + encodeURIComponent(customDictionaryString) + '&' + this.randomHexBlocks(1);
 
                 log(src);
                 try {
@@ -2382,6 +2382,10 @@ HawkSearch.Context = new HawkSearch.ContextObj();
                 var hawkflags = $('#hdnhawkflags').val();
                 var aid = $("#hdnhawkaid").val();
                 var hawkp = $("#hdnhawkp").val();
+                var hdnhawcustomergroupid = $("#hdnhawcustomergroupid").val();
+                var hdnhawcustomergroupidname = $("#hdnhawcustomergroupidname").val();
+                var hdnhawapprovedcompanyid = $("#hdnhawapprovedcompanyid").val();
+                var hdnhawapprovedcompanyidreqname = $("#hdnhawapprovedcompanyidreqname").val();
                 var product_list_mode = $("#hdnproductlistmode").val();
 
                 if (keyword && keyword !== "") qs += (qs === "" ? "" : "&") + keywordfield + "=" + encodeURIComponent(keyword);
@@ -2399,6 +2403,8 @@ HawkSearch.Context = new HawkSearch.ContextObj();
                 if (hawkflags && hawkflags !== "") qs += (qs === "" ? "" : "&") + "hawkflags=" + encodeURIComponent(hawkflags);
                 if (aid && aid !== "") qs += (qs === "" ? "" : "&") + "hawkaid=" + encodeURIComponent(aid);
                 if (hawkp && hawkp !== "") qs += (qs === "" ? "" : "&") + "hawkp=" + encodeURIComponent(hawkp);
+                if (hdnhawcustomergroupid && hdnhawcustomergroupid !== "") qs += (qs === "" ? "" : "&") + hdnhawcustomergroupidname + "=" + encodeURIComponent(hdnhawcustomergroupid);
+                if (hdnhawapprovedcompanyid && hdnhawapprovedcompanyid !== "") qs += (qs === "" ? "" : "&") + hdnhawapprovedcompanyidreqname + "=" + encodeURIComponent(hdnhawapprovedcompanyid);
                 if (product_list_mode && product_list_mode !== "") qs += (qs === "" ? "" : "&") + "product_list_mode=" + encodeURIComponent(product_list_mode);
 
                 $(".hawk-facetFilters li.hawkFacet-active > a").each(function () {
@@ -3388,16 +3394,8 @@ HawkSearch.Context = new HawkSearch.ContextObj();
                             var footerLink = document.createElement("a");
                             footerLink.href = "javascript:void(0);";
                             footerLink.setAttribute("onclick", "window.location='" + url + "?" + keywordfield + "=" + encodeURIComponent($(queryField).val()) + HawkSearch.preserveUrlParams() + "'");
-                            footerLink.innerHTML = "View All Matches";
-
-                            if (count > 0) {
-                                //creating the footer count
-                                var footerCount = document.createElement("div");
-                                footerCount.style.marginTop = "3px";
-                                footerCount.style.fontSize = ".85em";
-                                footerCount.innerHTML = count + " product(s)";
-                                footerContainer.appendChild(footerCount);
-                            }
+                            var footerHtml = (count > 0 ? ("Show All " + count + " Results →") : "Show All Results");
+                            footerLink.innerHTML = footerHtml;
 
                             //appending link and count to container
                             footerContainer.appendChild(footerLink);
@@ -3592,12 +3590,14 @@ HawkSearch.Context = new HawkSearch.ContextObj();
 
 
             HawkSearch.preserveUrlParams = function () {
+                var companyid = HawkSearch.GetQueryStringValue["companyid"] + '';
                 var prv = HawkSearch.GetQueryStringValue["prv"] + '';
                 var adv = HawkSearch.GetQueryStringValue["adv"] + '';
                 var hawkflags = HawkSearch.GetQueryStringValue["hawkflags"] + '';
                 var aid = HawkSearch.GetQueryStringValue["hawkaid"] + '';
                 var ret = '';
 
+                if (companyid != "undefined" && companyid != '') ret += '&companyid=' + escape(companyid);
                 if (prv != "undefined" && prv != '') ret += '&prv=' + escape(prv);
                 if (adv != "undefined" && adv != '') ret += '&adv=' + escape(adv);
                 if (hawkflags != "undefined" && hawkflags != '') ret += '&hawkflags=' + escape(hawkflags);

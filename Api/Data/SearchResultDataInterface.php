@@ -36,134 +36,134 @@ interface SearchResultDataInterface extends ExtensibleDataInterface
     /**#@-*/
 
     /**
-     * @return string|null
+     * @return string
      */
-    public function getTitle() : ?string;
+    public function getTitle(): string;
 
     /**
-     * @param string $value
+     * @param string|null $value
      * @return $this
      */
-    public function setTitle(string $value);
+    public function setTitle(?string $value);
 
     /**
-     * @return string|null
+     * @return string
      */
-    public function getTopText() : ?string;
+    public function getTopText(): string;
 
     /**
-     * @param string $value
+     * @param string|null $value
      * @return $this
      */
-    public function setTopText(string $value);
+    public function setTopText(?string $value);
 
     /**
-     * @return string|null
+     * @return string
      */
-    public function getBreadCrumb() : ?string;
+    public function getBreadCrumb(): string;
 
     /**
-     * @param string $value
+     * @param string|null $value
      * @return $this
      */
-    public function setBreadCrumb(string $value);
+    public function setBreadCrumb(?string $value);
 
     /**
-     * @return string|null
+     * @return string
      */
-    public function getTopPager() : ?string;
+    public function getTopPager(): string;
 
     /**
-     * @param string $value
+     * @param string|null $value
      * @return $this
      */
-    public function setTopPager(string $value);
+    public function setTopPager(?string $value);
 
     /**
-     * @return string|null
+     * @return string
      */
-    public function getBottomPager() : ?string;
+    public function getBottomPager(): string;
 
     /**
-     * @param string $value
+     * @param string|null $value
      * @return $this
      */
-    public function setBottomPager(string $value);
+    public function setBottomPager(?string $value);
 
     /**
      * @return \HawkSearch\Proxy\Api\Data\SearchResultContentInterface
      */
-    public function getResults() : \HawkSearch\Proxy\Api\Data\SearchResultContentInterface;
+    public function getResults(): \HawkSearch\Proxy\Api\Data\SearchResultContentInterface;
 
     /**
-     * @param \HawkSearch\Proxy\Api\Data\SearchResultContentInterface $value
+     * @param \HawkSearch\Proxy\Api\Data\SearchResultContentInterface|null $value
      * @return $this
      */
-    public function setResults(\HawkSearch\Proxy\Api\Data\SearchResultContentInterface $value);
+    public function setResults(?\HawkSearch\Proxy\Api\Data\SearchResultContentInterface $value);
 
     /**
      * @return \HawkSearch\Proxy\Api\Data\SearchResultMerchandisingInterface
      */
-    public function getMerchandising() : \HawkSearch\Proxy\Api\Data\SearchResultMerchandisingInterface;
+    public function getMerchandising(): \HawkSearch\Proxy\Api\Data\SearchResultMerchandisingInterface;
 
     /**
-     * @param \HawkSearch\Proxy\Api\Data\SearchResultMerchandisingInterface $value
+     * @param \HawkSearch\Proxy\Api\Data\SearchResultMerchandisingInterface|null $value
      * @return $this
      */
-    public function setMerchandising(\HawkSearch\Proxy\Api\Data\SearchResultMerchandisingInterface $value);
+    public function setMerchandising(?\HawkSearch\Proxy\Api\Data\SearchResultMerchandisingInterface $value);
 
     /**
-     * @return string|null
+     * @return string
      */
-    public function getSelections() : ?string;
+    public function getSelections(): string;
 
     /**
-     * @param string $value
+     * @param string|null $value
      * @return $this
      */
-    public function setSelections(string $value);
+    public function setSelections(?string $value);
 
     /**
-     * @return string|null
+     * @return string
      */
-    public function getFacets() : ?string;
+    public function getFacets(): string;
 
     /**
-     * @param string $value
+     * @param string|null $value
      * @return $this
      */
-    public function setFacets(string $value);
+    public function setFacets(?string $value);
 
     /**
-     * @return string|null
+     * @return string
      */
-    public function getRelated() : ?string;
+    public function getRelated(): string;
 
     /**
-     * @param string $value
+     * @param string|null $value
      * @return $this
      */
-    public function setRelated(string $value);
+    public function setRelated(?string $value);
 
     /**
      * @return \HawkSearch\Proxy\Api\Data\SearchResultFeaturedInterface
      */
-    public function getFeaturedItems() : \HawkSearch\Proxy\Api\Data\SearchResultFeaturedInterface;
+    public function getFeaturedItems(): \HawkSearch\Proxy\Api\Data\SearchResultFeaturedInterface;
 
     /**
-     * @param \HawkSearch\Proxy\Api\Data\SearchResultFeaturedInterface $value
+     * @param \HawkSearch\Proxy\Api\Data\SearchResultFeaturedInterface|null $value
      * @return $this
      */
-    public function setFeaturedItems(\HawkSearch\Proxy\Api\Data\SearchResultFeaturedInterface $value);
+    public function setFeaturedItems(?\HawkSearch\Proxy\Api\Data\SearchResultFeaturedInterface $value);
 
     /**
-     * @return string|null
+     * @return string
      */
-    public function getTabs() : ?string;
+    public function getTabs(): string;
 
     /**
-     * @param string $value
+     * @param string|null $value
      * @return $this
      */
-    public function setTabs(string $value);
+    public function setTabs(?string $value);
 }

@@ -27,11 +27,11 @@ interface SearchResultContentInterface extends ExtensibleDataInterface
     /**
      * @return \HawkSearch\Proxy\Api\Data\SearchResultContentItemInterface[]
      */
-    public function getItems() : array;
+    public function getItems(): array;
 
     /**
-     * @param \HawkSearch\Proxy\Api\Data\SearchResultContentItemInterface[] $value
+     * @param \HawkSearch\Proxy\Api\Data\SearchResultContentItemInterface[]|null $value
      * @return $this
      */
-    public function setItems(array $value);
+    public function setItems(?array $value);
 }

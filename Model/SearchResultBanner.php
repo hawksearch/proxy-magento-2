@@ -22,15 +22,15 @@ class SearchResultBanner extends AbstractSimpleObject implements SearchResultBan
     /**
      * @inheritDoc
      */
-    public function getZone(): ?string
+    public function getZone(): string
     {
-        return $this->_get(self::ZONE);
+        return (string)$this->_get(self::ZONE);
     }
 
     /**
      * @inheritDoc
      */
-    public function setZone(string $value)
+    public function setZone(?string $value)
     {
         return $this->setData(self::ZONE, $value);
     }
@@ -38,15 +38,15 @@ class SearchResultBanner extends AbstractSimpleObject implements SearchResultBan
     /**
      * @inheritDoc
      */
-    public function getHtml(): ?string
+    public function getHtml(): string
     {
-        return $this->_get(self::HTML);
+        return (string)$this->_get(self::HTML);
     }
 
     /**
      * @inheritDoc
      */
-    public function setHtml(string $value)
+    public function setHtml(?string $value)
     {
         return $this->setData(self::HTML, $value);
     }
@@ -54,15 +54,15 @@ class SearchResultBanner extends AbstractSimpleObject implements SearchResultBan
     /**
      * @inheritDoc
      */
-    public function getTitle(): ?string
+    public function getTitle(): string
     {
-        return $this->_get(self::TITLE);
+        return (string)$this->_get(self::TITLE);
     }
 
     /**
      * @inheritDoc
      */
-    public function setTitle(string $value)
+    public function setTitle(?string $value)
     {
         return $this->setData(self::TITLE, $value);
     }
@@ -72,13 +72,13 @@ class SearchResultBanner extends AbstractSimpleObject implements SearchResultBan
      */
     public function getItems(): array
     {
-        return $this->_get(self::ITEMS) ?? [];
+        return (array)($this->_get(self::ITEMS) ?? []);
     }
 
     /**
      * @inheritDoc
      */
-    public function setItems(array $value)
+    public function setItems(?array $value)
     {
         return $this->setData(self::ITEMS, $value);
     }
