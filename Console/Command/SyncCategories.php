@@ -55,7 +55,7 @@ class SyncCategories extends Command
         State $state,
         Task $task,
         TaskOptionsFactory $taskOptionsFactory,
-        string $name = null
+        ?string $name = null
     ) {
         parent::__construct($name);
 

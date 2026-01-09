@@ -21,5 +21,5 @@ interface ResponseProviderInterface
      * @param ResponseInterface|null $response
      * @return void
      */
-    public function execute(ResponseInterface $response = null);
+    public function execute(?ResponseInterface $response = null);
 }
