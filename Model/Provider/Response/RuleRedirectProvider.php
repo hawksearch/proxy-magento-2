@@ -62,7 +62,7 @@ class RuleRedirectProvider implements ResponseProviderInterface
      * Use this redirect provider before action pre-dispatch
      * @inheritdoc
      */
-    public function execute(ResponseInterface $response = null)
+    public function execute(?ResponseInterface $response = null)
     {
         if ($url = $this->getUrl()) {
             $this->actionFlag->set('', Action::FLAG_NO_DISPATCH, true);

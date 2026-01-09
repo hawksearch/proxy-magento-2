@@ -48,8 +48,8 @@ class Cron extends Value
         ScopeConfigInterface $config,
         TypeListInterface $cacheTypeList,
         Config $resourceConfig,
-        AbstractResource $resource = null,
-        AbstractDb $resourceCollection = null,
+        ?AbstractResource $resource = null,
+        ?AbstractDb $resourceCollection = null,
         array $data = []
     ) {
         $this->resourceConfig = $resourceConfig;
