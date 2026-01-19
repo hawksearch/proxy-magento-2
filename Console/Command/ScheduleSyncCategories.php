@@ -35,7 +35,7 @@ class ScheduleSyncCategories extends Command
      */
     public function __construct(
         TaskScheduler $taskScheduler,
-        string $name = null
+        ?string $name = null
     ) {
         parent::__construct($name);
         $this->taskScheduler = $taskScheduler;
