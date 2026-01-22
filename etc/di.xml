@@ -98,10 +98,16 @@
     </virtualType>
     <virtualType name="HawkSearchGetResultsTransferFactory" type="HawkSearch\Connector\Gateway\Http\TransferFactory">
         <arguments>
-            <argument name="uriBuilder" xsi:type="object">HawkSearch\Proxy\Gateway\Http\Uri\SearchUriBuilder</argument>
+            <argument name="uriBuilderFactory" xsi:type="object">uriBuilderFactoryVirtual</argument>
             <argument name="apiConfig" xsi:type="object">HawkSearch\Proxy\Gateway\Config\LuSearchApiConfig</argument>
         </arguments>
     </virtualType>
+    <virtualType name="uriBuilderFactoryVirtual" type="HawkSearch\Connector\Gateway\Http\Uri\UriBuilderFactory">
+        <arguments>
+            <argument name="instanceName" xsi:type="string">HawkSearch\Proxy\Gateway\Http\Uri\SearchUriBuilder</argument>
+        </arguments>
+    </virtualType>
+
     <virtualType name="HawkSearchGetResultsHandler" type="HawkSearch\Connector\Gateway\Response\HandlerChain">
         <arguments>
             <argument name="handlers" xsi:type="array">

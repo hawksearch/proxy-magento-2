@@ -15,11 +15,11 @@ declare(strict_types=1);
 
 namespace HawkSearch\Proxy\Gateway\Http\Uri;
 
-use HawkSearch\Connector\Gateway\Http\Uri\UriBuilderInterface;
+use HawkSearch\Connector\Gateway\Http\Uri\UriBuilder;
 use HawkSearch\Connector\Helper\Url as UrlUtility;
 use HawkSearch\Connector\Model\Config\ApiSettings as ApiSettingsProvider;
 
-class SearchUriBuilder implements UriBuilderInterface
+class SearchUriBuilder extends UriBuilder
 {
     /**
      * Engine part identification in URI
@@ -42,11 +42,12 @@ class SearchUriBuilder implements UriBuilderInterface
      * @param UrlUtility $urlUtility
      */
     public function __construct(
-        ApiSettingsProvider $apiSettingsProvider,
-        UrlUtility $urlUtility
+        UrlUtility $urlUtility,
+        ApiSettingsProvider $apiSettingsProvider
     ) {
-        $this->apiSettingsProvider = $apiSettingsProvider;
         $this->urlUtility = $urlUtility;
+        $this->apiSettingsProvider = $apiSettingsProvider;
+        parent::__construct($urlUtility);
     }
 
     /**
