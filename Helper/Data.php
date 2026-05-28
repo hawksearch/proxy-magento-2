@@ -737,28 +737,26 @@ class Data extends AbstractHelper
     }
 
     /**
-     * @param string $name
-     * @param string $url
-     * @param string $xml
-     * @param string $cid
+     * @param array{name: string, hawkurl:string, catid: string} $landingPageData
      * @param bool $clear
      * @return array
      */
-    private function getLandingPageObject($name, $url, $xml, $cid, $clear = false)
+    private function getLandingPageObject(array $landingPageData, bool $clear = false)
     {
         $custom = '';
         if (!$clear) {
-            $custom = "__mage_catid_{$cid}__";
+            $custom = "__mage_catid_{$landingPageData['catid']}__";
         }
+
         return [
             'PageId' => 0,
-            'Name' => $name,
-            'CustomUrl' => $url,
-            'IsFacetOverride' => false,
+            'Name' => $landingPageData['name'],
+            'CustomUrl' => $landingPageData['hawkurl'],
+            'IsFacetOverride' => $landingPageData['is_facet_override'] ?? false,
             'SortFieldId' => 0,
             'SortDirection' => 'Asc',
             'SelectedFacets' => [],
-            'NarrowXml' => $xml,
+            'NarrowXml' => $this->getHawkNarrowXml($landingPageData['catid']),
             'Custom' => $custom
         ];
     }
@@ -814,13 +812,9 @@ RuleType="Group" Operator="All" />'
         ) {
             preg_match('/__mage_catid_(\d+)__/', (string) $existingCustom[$lpObject['Custom']]['custom'], $matches);
             if ($matches[1]) {
-                $otherObject = $this->getLandingPageObject(
-                    $existingCustom[$lpObject['Custom']]['name'],
-                    $existingCustom[$lpObject['Custom']]['hawkurl'],
-                    $this->getHawkNarrowXml($matches[1]),
-                    $matches[1],
-                    true
-                );
+                $lpData = $existingCustom[$lpObject['Custom']];
+                $lpData['catid'] = $matches[1];
+                $otherObject = $this->getLandingPageObject($lpData, true);
                 $otherObject['PageId'] = $existingCustom[$lpObject['Custom']]['pageid'];
                 $resp = $this->getHawkResponse(
                     HttpRequest::METHOD_PUT,
@@ -924,12 +918,7 @@ RuleType="Group" Operator="All" />'
                 $left++;
             } elseif ($sc > 0) {
                 //Mage wants it managed, but hawk doesn't know, POST and increment right
-                $lpObject = $this->getLandingPageObject(
-                    $mageList[$right]['name'],
-                    $mageList[$right]['hawkurl'],
-                    $this->getHawkNarrowXml($mageList[$right]['catid']),
-                    $mageList[$right]['catid']
-                );
+                $lpObject = $this->getLandingPageObject($mageList[$right]);
                 $customVal = $this->clearExistingCustomField($lpObject, $existingCustom);
                 $resp = $this->getHawkResponse(
                     HttpRequest::METHOD_POST,
@@ -953,18 +942,14 @@ RuleType="Group" Operator="All" />'
                 $right++;
             } else {
                 //they are the same, PUT value to cover name changes, etc. increment both sides
-                $lpObject = $this->getLandingPageObject(
-                    $mageList[$right]['name'],
-                    $mageList[$right]['hawkurl'],
-                    $this->getHawkNarrowXml($mageList[$right]['catid']),
-                    $mageList[$right]['catid']
-                );
+                $lpObject = $this->getLandingPageObject($mageList[$right]);
                 $lpObject['PageId'] = $hawkList[$left]['pageid'];
+                $lpObject['IsFacetOverride'] = $hawkList[$left]['is_facet_override'];
                 $customVal = $this->clearExistingCustomField($lpObject, $existingCustom);
 
                 $resp = $this->getHawkResponse(
                     HttpRequest::METHOD_PUT,
-                    self::HAWK_LANDING_PAGE_URL . $hawkList[$left]['pageid'],
+                    self::HAWK_LANDING_PAGE_URL . $lpObject['PageId'],
                     $this->serializer->serialize($lpObject)
                 );
                 $this->validateHawkLandingPageResponse(
@@ -1031,7 +1016,8 @@ RuleType="Group" Operator="All" />'
                 'pageid' => $page['PageId'] ?? '',
                 'hawkurl' => $page['CustomUrl'] ?? '',
                 'name' => $page['Name'] ?? '',
-                'custom' => $page['Custom'] ?? ''
+                'custom' => $page['Custom'] ?? '',
+                'is_facet_override' => $page['IsFacetOverride'] ?? false
             ];
         }
 
