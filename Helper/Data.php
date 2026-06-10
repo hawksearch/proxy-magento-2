@@ -42,6 +42,7 @@ use Magento\CatalogUrlRewrite\Model\CategoryUrlRewriteGenerator;
 use Magento\Framework\App\CacheInterface as Cache;
 use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\App\Helper\Context;
+use Magento\Framework\App\ObjectManager;
 use Magento\Framework\Escaper;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
@@ -58,6 +59,9 @@ use Magento\Store\Model\StoreManagerInterface;
 use Magento\UrlRewrite\Model\UrlFinderInterface;
 use Magento\UrlRewrite\Service\V1\Data\UrlRewrite;
 use Laminas\Http\Client;
+use HawkSearch\Connector\Gateway\Request\BuilderInterface;
+use HawkSearch\Connector\Gateway\Request\BuilderInterfaceFactory;
+use HawkSearch\Connector\Gateway\Request\BuilderCompositeFactory;
 
 class Data extends AbstractHelper
 {
@@ -218,6 +222,7 @@ class Data extends AbstractHelper
      * @var JsonToArray
      */
     private $converter;
+    private BuilderInterface $headersBuilder;
 
     /**
      * Data constructor.
@@ -250,6 +255,7 @@ class Data extends AbstractHelper
      * @param Registry $coreRegistry
      * @param CategoryRepositoryInterface $categoryRepository
      * @param JsonToArray $converter
+     * @param BuilderInterfaceFactory|null $headersBuilderInterfaceFactory
      */
     public function __construct(
         Context $context,
@@ -279,7 +285,8 @@ class Data extends AbstractHelper
         SearchResultResponseInterfaceFactory $resultResponseFactory,
         Registry $coreRegistry,
         CategoryRepositoryInterface $categoryRepository,
-        JsonToArray $converter
+        JsonToArray $converter,
+        ?BuilderInterfaceFactory $headersBuilderInterfaceFactory = null,
     ) {
         parent::__construct($context);
         $this->storeManager = $storeManager;
@@ -309,6 +316,8 @@ class Data extends AbstractHelper
         $this->coreRegistry = $coreRegistry;
         $this->categoryRepository = $categoryRepository;
         $this->converter = $converter;
+        $headersBuilderFactory = $headersBuilderInterfaceFactory ?? ObjectManager::getInstance()->get(BuilderCompositeFactory::class);
+        $this->headersBuilder = $headersBuilderFactory->create();
     }
 
     /**
@@ -568,9 +577,10 @@ class Data extends AbstractHelper
                 $client->setEncType('application/json');
             }
             $headers = new Headers();
-            $headers->addHeaderLine('X-HawkSearch-ApiKey', $this->apiSettingsConfigProvider->getApiKey());
+            $headers->addHeaders($this->headersBuilder->build([]));
             $headers->addHeaderLine('Accept', 'application/json');
             $client->setHeaders($headers);
+
             $this->log(sprintf('fetching request. URL: %s, Method: %s', $client->getUri(), $method));
             $response = $client->send();
             $responseBody = $response->getBody();

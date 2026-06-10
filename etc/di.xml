@@ -67,6 +67,12 @@
     <type name="HawkSearch\Proxy\Helper\Data">
         <arguments>
             <argument name="context" xsi:type="object">hawkSearchProxyVirtualContext</argument>
+            <argument name="headersBuilderInterfaceFactory" xsi:type="object">headersBuilderFactoryVirtual</argument>
+        </arguments>
+    </type>
+    <type name="HawkSearch\Proxy\Model\Config\Backend\ShowTypeLabels">
+        <arguments>
+            <argument name="headersBuilderInterfaceFactory" xsi:type="object">headersBuilderFactoryVirtual</argument>
         </arguments>
     </type>
 
