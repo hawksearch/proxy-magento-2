@@ -22,12 +22,16 @@ use Laminas\Http\Request as HttpRequest;
 use Magento\Framework\App\Cache\TypeListInterface;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\Config\Value;
+use Magento\Framework\App\ObjectManager;
 use Magento\Framework\Data\Collection\AbstractDb;
 use Magento\Framework\DataObject;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Model\Context;
 use Magento\Framework\Model\ResourceModel\AbstractResource;
 use Magento\Framework\Registry;
+use HawkSearch\Connector\Gateway\Request\BuilderInterface;
+use HawkSearch\Connector\Gateway\Request\BuilderInterfaceFactory;
+use HawkSearch\Connector\Gateway\Request\BuilderCompositeFactory;
 
 class ShowTypeLabels extends Value
 {
@@ -40,6 +44,7 @@ class ShowTypeLabels extends Value
      * @var ApiSettingsProvider
      */
     private $apiSettingsProvider;
+    private BuilderInterface $headersBuilder;
 
     /**
      * ShowTypeLabels constructor.
@@ -62,11 +67,14 @@ class ShowTypeLabels extends Value
         ApiSettingsProvider $apiSettingsProvider,
         ?AbstractResource $resource = null,
         ?AbstractDb $resourceCollection = null,
-        array $data = []
+        array $data = [],
+        ?BuilderInterfaceFactory $headersBuilderInterfaceFactory = null,
     ) {
         parent::__construct($context, $registry, $config, $cacheTypeList, $resource, $resourceCollection, $data);
         $this->helper = $helper;
         $this->apiSettingsProvider = $apiSettingsProvider;
+        $headersBuilderFactory = $headersBuilderInterfaceFactory ?? ObjectManager::getInstance()->get(BuilderCompositeFactory::class);
+        $this->headersBuilder = $headersBuilderFactory->create();
     }
 
     /**
@@ -190,7 +198,7 @@ class ShowTypeLabels extends Value
         $client->setUri($this->helper->getApiUrl() . $path . '?' . http_build_query($args));
         $client->setMethod(HttpRequest::METHOD_GET);
         $headers = new Headers();
-        $headers->addHeaderLine('X-HawkSearch-ApiKey', $this->apiSettingsProvider->getApiKey());
+        $headers->addHeaders($this->headersBuilder->build([]));
         $headers->addHeaderLine('Accept', 'application/json');
         $client->setHeaders($headers);
 
@@ -213,7 +221,7 @@ class ShowTypeLabels extends Value
         $client->setUri($this->helper->getApiUrl() . $path . '?');
         $client->setMethod(HttpRequest::METHOD_PUT);
         $headers = new Headers();
-        $headers->addHeaderLine('X-HawkSearch-ApiKey', $this->apiSettingsProvider->getApiKey());
+        $headers->addHeaders($this->headersBuilder->build([]));
         $headers->addHeaderLine('Accept', 'application/json');
         $client->setHeaders($headers);
         $client->setEncType('application/json');
